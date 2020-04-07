@@ -1,5 +1,7 @@
 package Model;
 
+import Model.Guest.Guest;
+
 import java.util.Date;
 
 public class RoomService {

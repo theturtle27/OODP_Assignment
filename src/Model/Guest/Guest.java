@@ -1,9 +1,9 @@
-package Model;
+package Model.Guest;
 
 public class Guest {
     String guestID;
     String creditNo;
-    int CVV;
+    short CVV;
     String address;
     String country;
     char gender;
@@ -33,7 +33,7 @@ public class Guest {
         return CVV;
     }
 
-    public void setCVV(int CVV) {
+    public void setCVV(short CVV) {
         this.CVV = CVV;
     }
 
@@ -101,7 +101,7 @@ public class Guest {
         this.email = email;
     }
 
-    public Guest(String guestID, String creditNo, int CVV, String address, String country, char gender, String identityNo, String identityType, String nationality, String contact, String email) {
+    public Guest(String guestID, String creditNo, short CVV, String address, String country, char gender, String identityNo, String identityType, String nationality, String contact, String email) {
         this.guestID = guestID;
         this.creditNo = creditNo;
         this.CVV = CVV;

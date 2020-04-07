@@ -1,4 +1,4 @@
-package Model;
+package Model.Room;
 
 public class Room {
     int roonID;

@@ -1,5 +1,8 @@
 package Model;
 
+import Model.Guest.Guest;
+import Model.Room.Room;
+
 import java.util.Date;
 
 public class Reservation {
