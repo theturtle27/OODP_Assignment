@@ -1,10 +1,9 @@
 package Model.reservation;
 
 import Model.Room.Room;
-import Model.service.fnb.OrderStatus;
-import Model.service.fnb.ServiceOrder;
+import Model.RoomServiceOrder.RoomServiceOrder;
+import Model.RoomServiceOrder.RoomServiceOrderStatus;
 import Persistence.Entity;
-import Persistence.PersistAnnotation;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -69,10 +68,10 @@ public class Payment extends Entity {
 			long numOfDays = (reservation.getEndDate().getTime() - reservation.getStartDate().getTime()) / TimeUnit.DAYS.toMillis(1);
 			totalSum += reservation.getAssignedRoom().getType().getPrice() * numOfDays;
 			
-			for(ServiceOrder order: reservation.getOrderList()) {
+			for(RoomServiceOrder order: reservation.getOrderList()) {
 				// Loop through all the service orders and add up all the service orders.
-				if(order.getStatus() == OrderStatus.Delivered)
-					totalSum += order.getItem().getPrice();
+				if(order.getStatus() == RoomServiceOrderStatus.Delivered)
+					totalSum += order.getTotalPrice();
 			}
 		}
 		
@@ -107,12 +106,12 @@ public class Payment extends Entity {
 			
 			int count = 0;
 			builder.append("--- Service Orders ---\n");
-			for(ServiceOrder order: reservation.getOrderList()) {
+			for(RoomServiceOrder order: reservation.getOrderList()) {
 				// Loop through all the service orders and count the number of delivered service order.
-				if(order.getStatus() == OrderStatus.Delivered) {
+				if(order.getStatus() == RoomServiceOrderStatus.Delivered) {
 					count++;
-					builder.append("Service Order " + count + ": " + order.getItem().getName() + "($" + order.getItem().getPrice() + ")\n");
-					roomSubTotal += order.getItem().getPrice();
+					builder.append(order);
+					roomSubTotal += order.getTotalPrice();
 				}
 			}
 			builder.append("Total number of room service orders placed: " + count + "\n");

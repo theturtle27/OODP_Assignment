@@ -5,6 +5,7 @@ import Model.Guest.Guest;
 import Model.Room.Room;
 import Model.Room.RoomDescription;
 import Model.Room.RoomStatus;
+import Model.RoomServiceOrder.RoomServiceOrder;
 import Model.StatusEntity;
 //import Persistence.CascadeType;
 //import Persistence.PersistAnnotation;
@@ -22,7 +23,7 @@ public class Reservation extends StatusEntity<ReservationStatus> {
 	private final Guest guest;
 	private final RoomDescription criteria;
 	private final BillingInformation billingInformation;
-	private final List<ServiceOrder> orders;
+	private final List<RoomServiceOrder> orders;
 	private int numOfChildren;
 	private int numOfAdult;
 	private Date startDate;
@@ -48,7 +49,7 @@ public class Reservation extends StatusEntity<ReservationStatus> {
 		this.guest = guest;
 		this.criteria = new RoomDescription();
 		this.billingInformation = new BillingInformation();
-		this.orders = new ArrayList<ServiceOrder>();
+		this.orders = new ArrayList<RoomServiceOrder>();
 		this.setStatus(ReservationStatus.Waitlist);
 	}
 	
@@ -80,7 +81,7 @@ public class Reservation extends StatusEntity<ReservationStatus> {
 	 * Gets the service orders that have been made using this reservation.
 	 * @return orders
 	 */
-	public List<ServiceOrder> getOrderList() {
+	public List<RoomServiceOrder> getOrderList() {
 		return orders;
 	}
 	

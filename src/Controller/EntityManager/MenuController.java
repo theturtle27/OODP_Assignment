@@ -1,9 +1,9 @@
 package Controller.EntityManager;
 
 import Controller.EntityController;
-import Model.Guest.Guest;
 import Model.Menu.MenuItem;
 import Persistence.Persistence;
+import Persistence.Entity;
 import View.View;
 
 import java.util.*;
@@ -14,10 +14,17 @@ public class MenuController extends EntityController<MenuItem> {
     public final static String KEY_NAME = "menu item name";
     public final static String KEY_DESCRIPTION = "description";
     public final static String KEY_PRICE = "price";
+    public final static String KEY_SEARCH = "name of the menuitem to search for";
     public final static String KEY_ID = "ID of guest or 'Search' to search for guest ID by name";
 
     public MenuController(Persistence persistence) {
         super(persistence);
+    }
+
+
+    @Override
+    protected String getEntityName() {
+        return "MenuItem Controller";
     }
 
     @Override
@@ -88,6 +95,29 @@ public class MenuController extends EntityController<MenuItem> {
     }
 
     @Override
+    protected boolean retrieve(View view) throws Exception {
+        Map<String, String> inputMap = new LinkedHashMap<String, String>();
+        inputMap.put(KEY_SEARCH, null);
+
+        view.input(inputMap);
+
+        Persistence persistence = this.getPersistenceImpl();
+
+        List entityList = new ArrayList();
+        // Provide a predicate to search for matching items
+        Iterable<MenuItem> menuItems = persistence.search(MenuItem.class);
+
+        // Loop through results and add it into the list
+        for(Entity entity: menuItems)
+            entityList.add(entity);
+
+        // Display guests
+        view.display(entityList);
+
+        return entityList.size() > 0;
+    }
+
+    @Override
     protected void update(View view) throws Exception {
 
         MenuItem menuItem = select(view);
@@ -95,10 +125,7 @@ public class MenuController extends EntityController<MenuItem> {
         if(menuItem != null) {
             Persistence persistence = this.getPersistenceImpl();
             Map<String, String> inputMap = new LinkedHashMap<String, String>();
-            inputMap.put(KEY_NAME, null);
-            inputMap.put(KEY_GENDER, null);
-            inputMap.put(KEY_CONTACT_NUMBER, null);
-            inputMap.put(KEY_EMAIL_ADDRESS, null);
+            inputMap.put(KEY_PRICE, null);
 
             boolean valid = false;
             do {
@@ -106,53 +133,39 @@ public class MenuController extends EntityController<MenuItem> {
                 view.input(inputMap);
 
                 try {
-                    guest.setName(inputMap.get(KEY_NAME));
-                    guest.setGender(Character.toUpperCase(inputMap.get(KEY_GENDER).charAt(0)));
-                    guest.setContactNo(inputMap.get(KEY_CONTACT_NUMBER));
-                    guest.setEmailAddress(inputMap.get(KEY_EMAIL_ADDRESS));
+                    menuItem.setPrice(Double.parseDouble(inputMap.get(KEY_PRICE)));
 
                     // Validate all fields
                     List<String> invalids = new ArrayList<String>();
-                    if(guest.getName().length() == 0)
-                        invalids.add(KEY_NAME);
-                    if(guest.getGender() != 'M' && guest.getGender() != 'F')
-                        invalids.add(KEY_GENDER);
-                    if(!Pattern.matches("\\+?(\\d|-|\\s|\\(|\\))+", guest.getContactNo()))
-                        invalids.add(KEY_CONTACT_NUMBER);
-                    if(!Pattern.matches("^.+@.+\\..+$", guest.getEmailAddress()))
-                        invalids.add(KEY_EMAIL_ADDRESS);
+                    if(menuItem.getPrice() <= 0)
+                        invalids.add(KEY_PRICE);
 
                     // Attempts to update entity
-                    if(invalids.size() == 0 && persistence.update(guest, Guest.class)) {
+                    if(invalids.size() == 0 && persistence.update(menuItem, MenuItem.class)) {
                         valid = true;
-                        view.message("Guest profile successfully updated!");
+                        view.message("MenuItem successfully updated!");
                     }
                     else {
                         view.error(invalids);
                     }
                 } catch(IndexOutOfBoundsException e) {
-                    view.error(Arrays.asList(KEY_GENDER));
                 }
             } while(!valid && !view.bailout());
         }
     }
 
-    private void removeMenuItem(MenuView menuView)
+    @Override
+    protected void delete(View view) throws Exception
     {
-        menuView.printMenu(menu);
-        int menuItemIndex = menuView.getInputInteger("Enter the number of the menu item: ");
-        menu.removeMenuItem(menuItemIndex-1);
-        menuView.displayText("\nThe menu item has been removed from the menu.\n");
-        menuView.printMenu(menu);
-        menuView.displayText("\n\n\n\n");
+
+        MenuItem menuItem = select(view);
+
+        Persistence persistence = this.getPersistenceImpl();
+        if(menuItem != null && persistence.delete(menuItem, MenuItem.class))
+            view.message("MenuItem deleted successfully!");
+
     }
 
-    private void exitMenuEditor(MenuView menuView)
-    {
-        menuView.displayText("\nThe menu has been changed successfully.\n");
-        menuView.printMenu(menu);
-        menuView.displayText("\n\n\n\n");
-    }
 
     @Override
     public MenuItem select(View view) throws Exception {
