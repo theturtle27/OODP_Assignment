@@ -1,10 +1,12 @@
 package Controller;
 
+import View.View;
+
 import java.util.List;
 
 public interface Controller {
 
-    List<String> getOptions();
+    public List<String> getOptions();
 
-    void onSelected();
+    public void onOptionSelected(View view, int option);
 }
