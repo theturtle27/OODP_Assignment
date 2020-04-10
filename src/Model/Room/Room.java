@@ -1,87 +1,153 @@
 package Model.Room;
+\
+import Model.StatusEntity;
+import Model.reservation.Reservation;
 
-public class Room {
-    int roonID;
-    String type;
-    Double rate;
-    String bedType;
-    boolean wifiEnabled;
-    String facing;
-    boolean smoking;
-    String status;
+import java.util.ArrayList;
+import java.util.List;
 
-    public Room(int roonID, String type, Double rate, String bedType, boolean wifiEnabled, String facing, boolean smoking, String status) {
-        this.roonID = roonID;
-        this.type = type;
-        this.rate = rate;
-        this.bedType = bedType;
-        this.wifiEnabled = wifiEnabled;
-        this.facing = facing;
-        this.smoking = smoking;
-        this.status = status;
-    }
+/**
+ * Room is a {@link StatusEntity} class that encapsulates information about a Room.
+ * @author Yijie
+ */
+public class Room extends StatusEntity<RoomStatus> {
+	private final String number;
+	private final List<Reservation> reservations;
+	private final RoomDescription description;
+	
+	/**
+	 * Room Constructor. For Persistence API Usage
+	 */
+	protected Room() {
+		this.number = null;
+		this.reservations = null;
+		this.description = null;
+	}
+	
+	/**
+	 * Room Constructor
+	 * @param number - The room number.
+	 */
+	public Room(String number) {
+		this.number = number;
+		this.reservations = new ArrayList<Reservation>();
+		this.description = new RoomDescription();
+		this.setStatus(RoomStatus.Vacant);
+	}
 
-    public int getRoonID() {
-        return roonID;
-    }
+	/**
+	 * Gets Room Number.
+	 * @return number
+	 */
+	public String getNumber() {
+		return number;
+	}
+	
+	/**
+	 * Gets a list of {@link Reservation} associated with this Room instance.
+	 * @return reservations
+	 */
+	public List<Reservation> getReservationList() {
+		return reservations;
+	}
 
-    public void setRoonID(int roonID) {
-        this.roonID = roonID;
-    }
+	/**
+	 * Gets Room View.
+	 * @return view
+	 */
+	public String getView() {
+		return description.getView();
+	}
+	
+	/**
+	 * Sets Room View.
+	 * @param view
+	 */
+	public void setView(String view) {
+		this.description.setView(view);
+	}
 
-    public String getType() {
-        return type;
-    }
+	/**
+	 * Gets is Wifi-Enabled.
+	 * @return wifi
+	 */
+	public boolean isWifi() {
+		return description.isWifi();
+	}
 
-    public void setType(String type) {
-        this.type = type;
-    }
+	/**
+	 * Sets Wifi-Enabled.
+	 * @param wifi
+	 */
+	public void setWifi(boolean wifi) {
+		this.description.setIsWifi(wifi);
+	}
 
-    public Double getRate() {
-        return rate;
-    }
+	/**
+	 * Gets is Smoking-Room.
+	 * @return
+	 */
+	public boolean isSmoking() {
+		return description.isSmoking();
+	}
 
-    public void setRate(Double rate) {
-        this.rate = rate;
-    }
+	/**
+	 * Sets is Smoking-Room.
+	 * @param smoking
+	 */
+	public void setSmoking(boolean smoking) {
+		this.description.setIsSmoking(smoking);
+	}
 
-    public String getBedType() {
-        return bedType;
-    }
+	/**
+	 * Gets Room Type.
+	 * @return type
+	 */
+	public RoomType getType() {
+		return description.getRoomType();
+	}
 
-    public void setBedType(String bedType) {
-        this.bedType = bedType;
-    }
+	/**
+	 * Sets Room Type.
+	 * @param type
+	 */
+	public void setType(RoomType type) {
+		this.description.setRoomType(type);
+	}
+	
+	/**
+	 * Gets Bed Type.
+	 * @return
+	 */
+	public BedType getBedType() {
+		return description.getBedType();
+	}
 
-    public boolean isWifiEnabled() {
-        return wifiEnabled;
-    }
-
-    public void setWifiEnabled(boolean wifiEnabled) {
-        this.wifiEnabled = wifiEnabled;
-    }
-
-    public String getFacing() {
-        return facing;
-    }
-
-    public void setFacing(String facing) {
-        this.facing = facing;
-    }
-
-    public boolean isSmoking() {
-        return smoking;
-    }
-
-    public void setSmoking(boolean smoking) {
-        this.smoking = smoking;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
+	/**
+	 * Sets Bed Type.
+	 * @param bedType
+	 */
+	public void setBedType(BedType bedType) {
+		this.description.setBedType(bedType);
+	}
+	
+	/**
+	 * Gets the {@link RoomDescription} of this Room instance.
+	 * @return description
+	 */
+	public RoomDescription getDescription() {
+		return description;
+	}
+	
+	@Override
+	public String toString() {
+		return super.toString() +
+				"Room Number: " + this.getNumber() + "\n" +
+				"Room View: " + this.getView() + "\n" +
+				"Room Type: " + this.getType().getName() + "\n" +
+				"Room Status: " + this.getStatus() +"\n" +
+				"Bed Type: " + this.getBedType() + "\n" +
+				"Wifi-Enabled: " + this.isWifi() + "\n" +
+				"Smoking-Room: " + this.isSmoking() + "\n";
+	}
 }

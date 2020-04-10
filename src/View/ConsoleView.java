@@ -24,7 +24,36 @@ public class ConsoleView extends View {
     @Override
     public void show(){
         System.out.println("==============" + this.getTitle() + "===================");
+        List<String> options = controller.getOptions();
 
+        int option;
+        do {
+            System.out.println("==========" + title + "==========");
+
+            // Loop through and display the list of options
+            for(int i = 0; i < options.size(); i++)
+                System.out.println((i + 1) + ") " + options.get(i));
+
+            System.out.println((options.size() + 1) + ") Exit from " + title);
+            System.out.println();
+
+            do {
+                System.out.print("Please select an option: ");
+                try {
+                    option = Integer.parseInt(scanner.nextLine());
+                } catch(NumberFormatException e) {
+                    option = -1;
+                }
+
+                System.out.println();
+
+                if(option < 1 || option > options.size() + 1)
+                    System.out.println("Invalid selection, please enter a valid value");
+                else if(option <= options.size())
+                    controller.onOptionSelected(this, option - 1);
+            } while(option < 1 || option > options.size() + 1);
+
+        } while(option != options.size() + 1);
 
     }
 

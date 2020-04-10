@@ -22,7 +22,7 @@ public abstract class EntityController<T> extends PersistenceController {
     }
 
     @Override
-    public void onOptionSelected(View view, int option) throws Exception{
+    protected void safeOnOptionSelected(View view, int option) throws Exception{
         switch(option) {
             case 0:
                 create(view);
@@ -39,55 +39,22 @@ public abstract class EntityController<T> extends PersistenceController {
         }
     }
 
-    /**
-     * Gets the entity name of the entity managed by this Controller instance.
-     * This entity name will be used to display the available options. <br />
-     * For example, if entity name is "Guest Profile" <br />
-     * The following options will be displayed for user to select: <br />
-     * <ol>
-     * 	<li>Create guest profile</li>
-     * 	<li>Retrieve/Search guest profile</li>
-     * 	<li>Update guest profile</li>
-     * 	<li>Delete guest profile</li>
-     * </ol>
-     * @return The name to be displayed.
-     */
+
     protected abstract String getEntityName();
 
-    /**
-     * Prompts the user to enter relevant information required and creates a new
-     * Entity instance.
-     * @param view - A view interface that provides input/output.
-     */
+
     protected abstract void create(View view) throws Exception;
 
-    /**
-     * Prompts the user to enter relevant information required to retrieve and display
-     * entity instances.
-     * @param view - A view interface that provides input/output.
-     * @return A flag indicating if any entity is displayed.
-     */
+
     protected abstract boolean retrieve(View view) throws Exception;
 
-    /**
-     * Prompts the user to enter relevant information required and updates an
-     * Entity instance.
-     * @param view - A view interface that provides input/output.
-     */
+
     protected abstract void update(View view) throws Exception;
 
-    /**
-     * Prompts the user to enter relevant information required and deletes an
-     * Entity instance.
-     * @param view - A view interface that provides input/output.
-     */
+
     protected abstract void delete(View view) throws Exception;
 
-    /**
-     * Prompts the user to select an Entity instance managed by this EntityController.
-     * @param view - A view interface that provides input/output.
-     * @return Entity selected by the user.
-     */
+
     public abstract T select(View view) throws Exception;
 
 }

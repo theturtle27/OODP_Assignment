@@ -1,118 +1,140 @@
 package Model.Guest;
 
-public class Guest {
-    String guestID;
-    String creditNo;
-    short CVV;
-    String address;
-    String country;
-    char gender;
-    String identityNo;
-    String identityType;
-    String nationality;
-    String contact;
-    String email;
+import Model.BillingInformation;
+import Persistence.Entity;
 
-    public String getGuestID() {
-        return guestID;
+/**
+ * Guest is an {@link Entity} class that encapsulates information about a Guest.
+ * @author YingHao
+ */
+public class Guest extends Entity {
+    private final BillingInformation billing;
+    private final String identification;
+    private final String nationality;
+    private String name;
+    private String contactNo;
+    private String emailAddress;
+    private char gender;
+
+    /**
+     * Guest constructor. For Persistence API usage.
+     */
+    protected Guest() {
+        this.identification = null;
+        this.nationality = null;
+        this.billing = null;
     }
 
-    public void setGuestID(String guestID) {
-        this.guestID = guestID;
+    /**
+     * Guest constructor.
+     * @param identification - The unique identification number of this Guest.
+     * @param nationality - The nationality of this Guest.
+     */
+    public Guest(String identification, String nationality) {
+        this.identification = identification;
+        this.nationality = nationality;
+        this.billing = new BillingInformation();
     }
 
-    public String getCreditNo() {
-        return creditNo;
+    /**
+     * Gets the name.
+     * @return name
+     */
+    public String getName() {
+        return name;
     }
 
-    public void setCreditNo(String creditNo) {
-        this.creditNo = creditNo;
+    /**
+     * Sets the name.
+     * @param name
+     */
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public int getCVV() {
-        return CVV;
+    /**
+     * Gets the contact number.
+     * @return contactNo
+     */
+    public String getContactNo() {
+        return contactNo;
     }
 
-    public void setCVV(short CVV) {
-        this.CVV = CVV;
+    /**
+     * Sets the contact number.
+     * @param contactNo
+     */
+    public void setContactNo(String contactNo) {
+        this.contactNo = contactNo;
     }
 
-    public String getAddress() {
-        return address;
+    /**
+     * Gets the email address.
+     * @return emailAddress
+     */
+    public String getEmailAddress() {
+        return emailAddress;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
+    /**
+     * Sets the email address.
+     * @param emailAddress
+     */
+    public void setEmailAddress(String emailAddress) {
+        this.emailAddress = emailAddress;
     }
 
-    public String getCountry() {
-        return country;
-    }
-
-    public void setCountry(String country) {
-        this.country = country;
-    }
-
+    /**
+     * Gets the gender.
+     * @return gender
+     */
     public char getGender() {
         return gender;
     }
 
+    /**
+     * Sets the gender.
+     * @param gender
+     */
     public void setGender(char gender) {
         this.gender = gender;
     }
 
-    public String getIdentityNo() {
-        return identityNo;
+    /**
+     * Gets the billing information. Note that the lifetime of the returned {@link BillingInformation} is tied to the
+     * Guest. Clone this instance for a seperate {@link BillingInformation} instance with an independent lifetime.
+     * @return address
+     */
+    public BillingInformation getBillingInformation() {
+        return billing;
     }
 
-    public void setIdentityNo(String identityNo) {
-        this.identityNo = identityNo;
+    /**
+     * Gets the identification.
+     * @return identification
+     */
+    public String getIdentification() {
+        return identification;
     }
 
-    public String getIdentityType() {
-        return identityType;
-    }
-
-    public void setIdentityType(String identityType) {
-        this.identityType = identityType;
-    }
-
+    /**
+     * Gets the nationality.
+     * @return nationality
+     */
     public String getNationality() {
         return nationality;
     }
 
-    public void setNationality(String nationality) {
-        this.nationality = nationality;
+    @Override
+    public String toString() {
+        return super.toString() +
+                "Name: " + this.getName() + "\n" +
+                "Identification number: " + this.getIdentification() + "\n" +
+                "Nationality: " + this.getNationality() + "\n" +
+                "Gender: " + this.getGender() + "\n" +
+                "Contact number: " + this.getContactNo() + "\n" +
+                "Email address: " + this.getEmailAddress() + "\n\n" +
+                this.getBillingInformation().toString();
     }
 
-    public String getContact() {
-        return contact;
-    }
-
-    public void setContact(String contact) {
-        this.contact = contact;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public Guest(String guestID, String creditNo, short CVV, String address, String country, char gender, String identityNo, String identityType, String nationality, String contact, String email) {
-        this.guestID = guestID;
-        this.creditNo = creditNo;
-        this.CVV = CVV;
-        this.address = address;
-        this.country = country;
-        this.gender = gender;
-        this.identityNo = identityNo;
-        this.identityType = identityType;
-        this.nationality = nationality;
-        this.contact = contact;
-        this.email = email;
-    }
 }
-

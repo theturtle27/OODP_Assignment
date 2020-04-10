@@ -1,15 +1,13 @@
 import Controller.NavigationController;
-import Controller.RoomController;
 import Persistence.Persistence;
 import View.ConsoleView;
 
-import java.io.File;
 import java.util.Scanner;
 
 public class Main {
 
     public static void main(String[] args) {
-	// write your code here
+        // write your code here
         Scanner sc = new Scanner(System.in);
         Persistence persistence;
         try {
@@ -51,6 +49,5 @@ public class Main {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
     }
 }
