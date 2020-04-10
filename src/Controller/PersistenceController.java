@@ -19,8 +19,5 @@ public abstract class PersistenceController implements Controller{
         return null;
     }
 
-    @Override
-    public void onSelected() {
-
-    }
+    
 }

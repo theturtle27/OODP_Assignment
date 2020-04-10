@@ -22,7 +22,7 @@ public abstract class EntityController<T> extends PersistenceController {
     }
 
     @Override
-    protected onOptionSelected(View view, int option) throws Exception {
+    public void onOptionSelected(View view, int option) throws Exception{
         switch(option) {
             case 0:
                 create(view);

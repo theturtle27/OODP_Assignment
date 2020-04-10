@@ -8,5 +8,5 @@ public interface Controller {
 
     public List<String> getOptions();
 
-    public void onOptionSelected(View view, int option);
+    public void onOptionSelected(View view, int option) throws Exception;
 }
