@@ -217,9 +217,9 @@ public class GuestController extends EntityController<Guest> {
                         retry = true;
                     }
                     else {
-//                        guest = persistence.retrieveByID(Long.parseLong(input), Guest.class);
-//                        if(guest == null)
-//                            view.error(Arrays.asList(KEY_ID));
+                        guest = persistence.retrieveByID(Long.parseLong(input), Guest.class);
+                        if(guest == null)
+                            view.error(Arrays.asList(KEY_ID));
                     }
                 } catch(NumberFormatException e) {
                     view.error(Arrays.asList(KEY_ID));

@@ -1,3 +1,6 @@
+import Controller.EntityManager.GuestController;
+import Controller.EntityManager.MenuController;
+import Controller.EntityManager.RoomController;
 import Controller.NavigationController;
 import Persistence.Persistence;
 import View.ConsoleView;
@@ -18,13 +21,13 @@ public class Main {
 //            ReservationController rController = new ReservationController(persistence, gController);
 //            ServiceOrderController soController = new ServiceOrderController(persistence, new MenuItemController(persistence));
 
-//            NavigationController managementController = new NavigationController();
-//            managementController.addView(new ConsoleView(new GuestController(persistence), "Manage Guest", sc));
-//            managementController.addView(new ConsoleView(new MenuItemController(persistence), "Manage Menu Item", sc));
-//            managementController.addView(new ConsoleView(new RoomController(persistence, rtController), "Manage Room", sc));
+            NavigationController managementController = new NavigationController();
+            managementController.addView(new ConsoleView(new GuestController(persistence), "Manage Guest", sc));
+            managementController.addView(new ConsoleView(new MenuController(persistence), "Manage Menu Item", sc));
+            managementController.addView(new ConsoleView(new RoomController(persistence), "Manage Room", sc));
 //            managementController.addView(new ConsoleView(rtController, "Manage Room Type", sc));
 
-//            ConsoleView managementView = new ConsoleView(managementController, "Management View", sc);
+            ConsoleView managementView = new ConsoleView(managementController, "Management View", sc);
 //
 //            NavigationController hrsController = new NavigationController();
 //            hrsController.addView(new ConsoleView(rController, "Reservation System", sc));
@@ -39,7 +42,7 @@ public class Main {
 //            ConsoleView reportView = new ConsoleView(new ReportController(persistence), "Room occupancy report", sc);
 
             NavigationController mainNav = new NavigationController();
-//            mainNav.addView(managementView);
+            mainNav.addView(managementView);
 //            mainNav.addView(hrsView);
 //            mainNav.addView(hssView);
 //            mainNav.addView(reportView);

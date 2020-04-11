@@ -7,7 +7,6 @@ import Persistence.Entity;
 import View.View;
 
 import java.util.*;
-import java.util.regex.Pattern;
 
 public class MenuController extends EntityController<MenuItem> {
 
@@ -188,9 +187,9 @@ public class MenuController extends EntityController<MenuItem> {
                         retry = true;
                     }
                     else {
-//                        menuItem = persistence.retrieveByID(Long.parseLong(input), Guest.class);
-//                        if(guest == null)
-//                            view.error(Arrays.asList(KEY_ID));
+                        menuItem = persistence.retrieveByID(Long.parseLong(input), MenuItem.class);
+                        if(menuItem == null)
+                            view.error(Arrays.asList(KEY_ID));
                     }
                 } catch(NumberFormatException e) {
                     view.error(Arrays.asList(KEY_ID));

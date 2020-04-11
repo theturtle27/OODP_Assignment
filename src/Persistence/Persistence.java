@@ -34,4 +34,12 @@ public class Persistence {
     public <T extends Entity> boolean delete(T entity, Class<T> type){
         return true;
     }
+
+
+    public <T extends Entity> T retrieveByID(long id, Class<T> type) throws Exception {
+        T entity = null;
+
+
+        return entity;
+    }
 }
