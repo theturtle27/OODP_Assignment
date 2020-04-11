@@ -1,10 +1,12 @@
 package Model;
 
+import Model.RoomServiceOrder.RoomServiceOrder;
+
 public class Payment {
     int paymentID;
     double charge;
     double tax;
-    RoomService roomService;
+    RoomServiceOrder roomService;
     double discount;
     boolean weekend;
     String paymentMethod;
@@ -34,11 +36,11 @@ public class Payment {
         this.tax = tax;
     }
 
-    public RoomService getRoomService() {
+    public RoomServiceOrder getRoomService() {
         return roomService;
     }
 
-    public void setRoomService(RoomService roomService) {
+    public void setRoomService(RoomServiceOrder roomService) {
         this.roomService = roomService;
     }
 
@@ -74,7 +76,7 @@ public class Payment {
         this.billingAddress = billingAddress;
     }
 
-    public Payment(int paymentID, double charge, double tax, RoomService roomService, double discount, boolean weekend, String paymentMethod, String billingAddress) {
+    public Payment(int paymentID, double charge, double tax, RoomServiceOrder roomService, double discount, boolean weekend, String paymentMethod, String billingAddress) {
         this.paymentID = paymentID;
         this.charge = charge;
         this.tax = tax;

@@ -1,6 +1,6 @@
 package Model.Room;
 
-import persistence.Entity;
+import Persistence.Entity;
 
 /**
  * RoomDescription is an {@link Entity} that encapsulates description about a {@link Room}.
