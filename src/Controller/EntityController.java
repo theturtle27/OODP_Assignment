@@ -17,7 +17,8 @@ public abstract class EntityController<T> extends PersistenceController {
                 "Create " + this.getEntityName().toLowerCase(),
                 "Retrieve/Search " + this.getEntityName().toLowerCase(),
                 "Update " + this.getEntityName().toLowerCase(),
-                "Delete " + this.getEntityName().toLowerCase()
+                "Delete " + this.getEntityName().toLowerCase(),
+                "Show" + this.getEntityName().toLowerCase()
         );
     }
 
@@ -36,6 +37,9 @@ public abstract class EntityController<T> extends PersistenceController {
             case 3:
                 delete(view);
                 break;
+            case 4:
+                show(view);
+                break;
         }
     }
 
@@ -53,6 +57,8 @@ public abstract class EntityController<T> extends PersistenceController {
 
 
     protected abstract void delete(View view) throws Exception;
+
+    protected abstract void show(View view) throws Exception;
 
 
     public abstract T select(View view) throws Exception;

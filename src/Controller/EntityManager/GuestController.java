@@ -56,6 +56,9 @@ public class GuestController extends EntityController<Guest> {
             case 3:
                 delete(view);
                 break;
+            case 4:
+                show(view);
+                break;
         }
     }
 
@@ -128,9 +131,10 @@ public class GuestController extends EntityController<Guest> {
         Iterable<Guest> guests = persistence.search(Guest.class);
 
         // Loop through results and add it into the list
-        for(Entity entity: guests)
-            entityList.add(entity);
-
+        for(Guest entity: guests) {
+            if (entity.getName().equals(inputMap.get(KEY_SEARCH)))
+                entityList.add(entity);
+        }
         // Display guests
         view.display(entityList);
 
@@ -231,4 +235,17 @@ public class GuestController extends EntityController<Guest> {
     }
 
 
+    @Override
+    public void show(View view) throws Exception{
+        Persistence persistence = this.getPersistenceImpl();
+        List entityList = new ArrayList();
+        // Provide a predicate to search for matching items
+        Iterable<Guest> guests = persistence.search(Guest.class);
+
+        // Loop through results and add it into the list
+        for(Entity entity: guests)
+            entityList.add(entity);
+
+        view.display(entityList);
+    }
 }

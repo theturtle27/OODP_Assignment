@@ -32,11 +32,38 @@ public class Persistence {
         DEFAULT_CONFIGURATION = new Properties();
     }
 
-    public Persistence(File configurationFile){
+    public Persistence(File configurationFile) throws Exception{
         this.fCache = new HashMap<Class<?>, Field[]>();
         this.entityCache = new HashMap<Class<?>, Map<Long, SoftReference<Entity>>>();
         this.configurationFile = configurationFile;
         this.configuration = new Properties(DEFAULT_CONFIGURATION);
+
+        AutoCloseable stream = null;
+        try {
+            if(this.configurationFile.createNewFile()) {
+                FileOutputStream out = new FileOutputStream(this.configurationFile);
+                stream = out;
+
+                // Initializes configuration file with the defaults
+                DEFAULT_CONFIGURATION.store(out, null);
+            }
+            else {
+                FileInputStream in = new FileInputStream(this.configurationFile);
+                stream = in;
+
+                // Loads configurations from the configuration file
+                this.configuration.load(in);
+            }
+        } finally {
+            if(stream != null)
+                stream.close();
+        }
+
+        File dataDir = new File(DATA_DIR);
+        File tmpDir = new File(TMP_DIR);
+
+        dataDir.mkdir();
+        tmpDir.mkdir();
     }
 
     public <T extends Entity> T create(T entity, Class<T> type) throws Exception{

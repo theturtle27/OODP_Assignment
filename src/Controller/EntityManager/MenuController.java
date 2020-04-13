@@ -48,6 +48,9 @@ public class MenuController extends EntityController<MenuItem> {
             case 3:
                 delete(view);
                 break;
+            case 4:
+                show(view);
+                break;
         }
     }
 
@@ -107,8 +110,10 @@ public class MenuController extends EntityController<MenuItem> {
         Iterable<MenuItem> menuItems = persistence.search(MenuItem.class);
 
         // Loop through results and add it into the list
-        for(Entity entity: menuItems)
-            entityList.add(entity);
+        for(MenuItem entity: menuItems) {
+            if (entity.getName().equals(inputMap.get(KEY_SEARCH)))
+                entityList.add(entity);
+        }
 
         // Display guests
         view.display(entityList);
@@ -198,6 +203,20 @@ public class MenuController extends EntityController<MenuItem> {
         } while(menuItem == null && !view.bailout());
 
         return menuItem;
+    }
+
+    @Override
+    public void show(View view) throws Exception{
+        Persistence persistence = this.getPersistenceImpl();
+        List entityList = new ArrayList();
+        // Provide a predicate to search for matching items
+        Iterable<MenuItem> menuItems = persistence.search(MenuItem.class);
+
+        // Loop through results and add it into the list
+        for(MenuItem entity: menuItems)
+            entityList.add(entity);
+
+        view.display(entityList);
     }
 
 }

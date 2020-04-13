@@ -23,12 +23,12 @@ public class ConsoleView extends View {
 
     @Override
     public void show(){
-        System.out.println("==============" + this.getTitle() + "===================");
         List<String> options = controller.getOptions();
 
         int option;
         do {
-            System.out.println("==========" + title + "==========");
+            System.out.println("|=======================================|");
+            System.out.println("|                                       |");
 
             // Loop through and display the list of options
             for(int i = 0; i < options.size(); i++)

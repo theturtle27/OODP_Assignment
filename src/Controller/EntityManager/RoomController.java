@@ -13,7 +13,7 @@ public class RoomController extends EntityController<Room> {
     public final static String KEY_ROOM_NUMBER = "room number";
     public final static String KEY_VIEW = "view";
     public final static String KEY_PRICE = "price";
-    public final static String KEY_SEARCH = "name of the menuitem to search for";
+    public final static String KEY_SEARCH = "room number to search for";
     public final static String KEY_ID = "ID of guest or 'Search' to search for guest ID by name";
 
     public RoomController(Persistence persistence) {
@@ -47,6 +47,9 @@ public class RoomController extends EntityController<Room> {
                 break;
             case 3:
                 delete(view);
+                break;
+            case 4:
+                show(view);
                 break;
         }
     }
@@ -101,8 +104,10 @@ public class RoomController extends EntityController<Room> {
         Iterable<Room> rooms = persistence.search(Room.class);
 
         // Loop through results and add it into the list
-        for(Entity entity: rooms)
-            entityList.add(entity);
+        for(Room entity: rooms) {
+            if (entity.getNumber().equals(inputMap.get(KEY_SEARCH)))
+                entityList.add(entity);
+        }
 
         // Display guests
         view.display(entityList);
@@ -192,6 +197,20 @@ public class RoomController extends EntityController<Room> {
         } while(room == null && !view.bailout());
 
         return room;
+    }
+
+    @Override
+    public void show(View view) throws Exception{
+        Persistence persistence = this.getPersistenceImpl();
+        List entityList = new ArrayList();
+        // Provide a predicate to search for matching items
+        Iterable<Room> rooms = persistence.search(Room.class);
+
+        // Loop through results and add it into the list
+        for(Entity entity: rooms)
+            entityList.add(entity);
+
+        view.display(entityList);
     }
 
 }
