@@ -8,6 +8,13 @@ public class MenuItem extends Entity {
     private String description;
     private double price;
     //
+
+    protected MenuItem() {
+        this.name = null;
+        this.description = null;
+        this.price = 0;
+    }
+
     public MenuItem(String name, String description, double price)
     {
         this.name = name;
