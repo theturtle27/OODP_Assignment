@@ -133,8 +133,8 @@ public class Guest extends Entity {
                 "Nationality: " + this.getNationality() + "\n" +
                 "Gender: " + this.getGender() + "\n" +
                 "Contact number: " + this.getContactNo() + "\n" +
-                "Email address: " + this.getEmailAddress() + "\n\n" +
-                this.getBillingInformation().toString();
+                "Email address: " + this.getEmailAddress() + "\n\n";
+//                this.getBillingInformation().toString();
     }
 
 }

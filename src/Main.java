@@ -5,6 +5,7 @@ import Controller.NavigationController;
 import Persistence.Persistence;
 import View.ConsoleView;
 
+import java.io.File;
 import java.util.Scanner;
 
 public class Main {
@@ -14,7 +15,7 @@ public class Main {
         Scanner sc = new Scanner(System.in);
         Persistence persistence;
         try {
-            persistence = new Persistence();
+            persistence = new Persistence(new File("aotoid.cfg"));
 
 //            RoomTypeController rtController = new RoomTypeController(persistence);
 //            GuestController gController = new GuestController(persistence);
