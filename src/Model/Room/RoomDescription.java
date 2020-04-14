@@ -150,8 +150,6 @@ public class RoomDescription extends Entity {
 		String wifi = "Not required";
 		String smoking = "Not required";
 		
-		if(getRoomType() != null)
-			roomType = getRoomType().getName();
 		if(getBedType() != null)
 			bedType = getBedType().toString();
 		if(getView() != null)

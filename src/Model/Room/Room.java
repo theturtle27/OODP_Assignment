@@ -6,28 +6,17 @@ import Model.reservation.Reservation;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Room is a {@link StatusEntity} class that encapsulates information about a Room.
- * @author Yijie
- */
 public class Room extends StatusEntity<RoomStatus> {
 	private final String number;
 	private final List<Reservation> reservations;
 	private final RoomDescription description;
-	
-	/**
-	 * Room Constructor. For Persistence API Usage
-	 */
+
 	protected Room() {
 		this.number = null;
 		this.reservations = null;
 		this.description = null;
 	}
-	
-	/**
-	 * Room Constructor
-	 * @param number - The room number.
-	 */
+
 	public Room(String number) {
 		this.number = number;
 		this.reservations = new ArrayList<Reservation>();
@@ -144,7 +133,6 @@ public class Room extends StatusEntity<RoomStatus> {
 		return super.toString() +
 				"Room Number: " + this.getNumber() + "\n" +
 				"Room View: " + this.getView() + "\n" +
-				"Room Type: " + this.getType().getName() + "\n" +
 				"Room Status: " + this.getStatus() +"\n" +
 				"Bed Type: " + this.getBedType() + "\n" +
 				"Wifi-Enabled: " + this.isWifi() + "\n" +

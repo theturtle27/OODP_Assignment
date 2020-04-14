@@ -66,7 +66,7 @@ public class Payment extends Entity {
 		for(Reservation reservation: reservations) {
 			// Loop through all reservations and add up all the room prices
 			long numOfDays = (reservation.getEndDate().getTime() - reservation.getStartDate().getTime()) / TimeUnit.DAYS.toMillis(1);
-			totalSum += reservation.getAssignedRoom().getType().getPrice() * numOfDays;
+//			totalSum += reservation.getAssignedRoom().getType().getPrice() * numOfDays;
 			
 			for(RoomServiceOrder order: reservation.getOrderList()) {
 				// Loop through all the service orders and add up all the service orders.
@@ -100,9 +100,9 @@ public class Payment extends Entity {
 			
 			long days = (reservation.getEndDate().getTime() - reservation.getStartDate().getTime()) / TimeUnit.DAYS.toMillis(1);
 			builder.append("----- Room " + room.getNumber() + " -----\n");
-			builder.append("Cost per night: " + room.getType().getPrice() + "\n");
-			builder.append("Number of nights stayed: " + days + "\n");
-			roomSubTotal = days * room.getType().getPrice();
+//			builder.append("Cost per night: " + room.getType().getPrice() + "\n");
+//			builder.append("Number of nights stayed: " + days + "\n");
+//			roomSubTotal = days * room.getType().getPrice();
 			
 			int count = 0;
 			builder.append("--- Service Orders ---\n");

@@ -85,7 +85,7 @@ public class MenuController extends EntityController<MenuItem> {
 
                     view.message("\nThe menu item has been added to the menu.\n");
                     valid = true;
-
+                    this.show(view);
                 }
                 else {
                     view.error(invalids);

@@ -127,10 +127,9 @@ public class GuestController extends EntityController<Guest> {
         Persistence persistence = this.getPersistenceImpl();
 
         List entityList = new ArrayList();
-        // Provide a predicate to search for matching items
+
         Iterable<Guest> guests = persistence.search(Guest.class);
 
-        // Loop through results and add it into the list
         for(Guest entity: guests) {
             if (entity.getName().equals(inputMap.get(KEY_SEARCH)))
                 entityList.add(entity);
