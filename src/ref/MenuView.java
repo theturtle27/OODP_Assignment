@@ -23,11 +23,10 @@ public class MenuView {
 	{
 		int option;
 
+		printMenu(menuController.getMenu());
+		
 		do
 		{
-
-			printMenu(menuController.getMenu());
-			System.out.println();
 			
 			System.out.println("|=======================================|");
 			System.out.println("|                                       |");

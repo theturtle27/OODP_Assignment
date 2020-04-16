@@ -1,17 +1,13 @@
 package Controller.FunctionManager;
 
 import Controller.EntityController;
-import Model.reservation.Reservation;
+import Model.Stay;
 import Persistence.Persistence;
 import View.View;
 import Persistence.Entity;
-
 import java.util.*;
-import java.util.regex.Pattern;
 
-public class ReservationController extends EntityController<Reservation> {
-
-
+public class StayController extends EntityController<Stay> {
     public final static String KEY_NAME = "Reservation name";
     public final static String KEY_IDENTIFICATION = "identification number";
     public final static String KEY_NATIONALITY = "nationality";
@@ -19,10 +15,10 @@ public class ReservationController extends EntityController<Reservation> {
     public final static String KEY_CONTACT_NUMBER = "contact number";
     public final static String KEY_EMAIL_ADDRESS = "email address";
     public final static String KEY_SEARCH = "name of the guest to search for";
-    public final static String KEY_ID = "ID of guest or 'Search' to search for guest ID by name";
+    public final static String KEY_ID = "ID of stay or 'Search' to search for guest ID by name";
 
 
-    public ReservationController(Persistence persistence) {
+    public StayController(Persistence persistence) {
         super(persistence);
     }
 
@@ -191,8 +187,8 @@ public class ReservationController extends EntityController<Reservation> {
     }
 
     @Override
-    public Reservation select(View view) throws Exception {
-        Reservation guest = null;
+    public Stay select(View view) throws Exception {
+        Stay stay = null;
 
         Map<String, String> inputMap = new LinkedHashMap<String, String>();
         inputMap.put(KEY_ID, null);
@@ -212,17 +208,17 @@ public class ReservationController extends EntityController<Reservation> {
                         retry = true;
                     }
                     else {
-                        guest = persistence.retrieveByID(Long.parseLong(input), Reservation.class);
-                        if(guest == null)
+                        stay = persistence.retrieveByID(Long.parseLong(input), Stay.class);
+                        if(stay == null)
                             view.error(Arrays.asList(KEY_ID));
                     }
                 } catch(NumberFormatException e) {
                     view.error(Arrays.asList(KEY_ID));
                 }
             } while(retry);
-        } while(guest == null && !view.bailout());
+        } while(stay == null && !view.bailout());
 
-        return guest;
+        return stay;
     }
 
 
@@ -231,10 +227,10 @@ public class ReservationController extends EntityController<Reservation> {
         Persistence persistence = this.getPersistenceImpl();
         List entityList = new ArrayList();
         // Provide a predicate to search for matching items
-        Iterable<Reservation> guests = persistence.search(Reservation.class);
+        Iterable<Stay> stays = persistence.search(Stay.class);
 
         // Loop through results and add it into the list
-        for(Entity entity: guests)
+        for(Entity entity: stays)
             entityList.add(entity);
 
         view.display(entityList);

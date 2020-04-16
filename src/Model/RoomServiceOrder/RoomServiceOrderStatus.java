@@ -2,9 +2,11 @@ package Model.RoomServiceOrder;
 
 public enum RoomServiceOrderStatus {
 
-    Confirmed,
+    ORDERING,
 
-    Preparing,
+    CONFIRMED,
 
-    Delivered
+    PREPARING,
+
+    DELIVERED
 }

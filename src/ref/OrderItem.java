@@ -33,14 +33,4 @@ public class OrderItem {
 				+ menuItem.toString()
 				+ "\norder remark: " + orderRemark;
 	}
-	
-	public static void main(String args[])
-	{
-		MenuItem menuItem = new MenuItem("Classic Smash", "6 oz. beef, american cheese, onion, lettuce, mayo, mustard & pickle", 7.5);
-		System.out.println(menuItem.toString());
-		OrderItem orderItem = new OrderItem(menuItem, "less salt");
-		System.out.println(orderItem.toString());
-	}
-	
-
 }

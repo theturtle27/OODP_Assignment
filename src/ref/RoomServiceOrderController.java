@@ -47,7 +47,8 @@ public class RoomServiceOrderController {
 					break;
 			case 4: exitRoomServiceOrderEditor(roomServiceOrderView);
 					break;
-			default:roomServiceOrderView.displayText("\nThis option is not available. Please enter a number between [1] and [4].\n\n\n\n\n"); 
+			default:roomServiceOrderView.displayText("\nThis option is not available. Please enter a number between [1] and [4].\n\n\n\n\n");
+					break;
 
 		}
 	}
@@ -88,10 +89,17 @@ public class RoomServiceOrderController {
 	
 	private void exitRoomServiceOrderEditor(RoomServiceOrderView roomServiceOrderView)
 	{
-		roomServiceOrder.confirmRoomServiceOrder();
-		roomServiceOrderView.displayText("\nThe order has been placed.\n");
+		if(roomServiceOrder.getTotalPrice() != 0)
+		{
+			roomServiceOrder.confirmRoomServiceOrder();
+			roomServiceOrderView.displayText("\nThe order has been placed.\n");
+		}
+		else
+		{
+			roomServiceOrderView.displayText("\nThe order is empty and will not be placed.\n\n");
+		}
 		roomServiceOrderView.printRoomServiceOrder(roomServiceOrder);
-		roomServiceOrderView.displayText("\n\n\n\n");
+		//roomServiceOrderView.displayText("\n\n\n\n");
 	}
 	
 	

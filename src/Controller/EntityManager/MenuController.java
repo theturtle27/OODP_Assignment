@@ -10,11 +10,11 @@ import java.util.*;
 
 public class MenuController extends EntityController<MenuItem> {
 
-    public final static String KEY_NAME = "menu item name";
-    public final static String KEY_DESCRIPTION = "description";
-    public final static String KEY_PRICE = "price";
-    public final static String KEY_SEARCH = "name of the menuitem to search for";
-    public final static String KEY_ID = "ID of guest or 'Search' to search for guest ID by name";
+    public final static String KEY_NAME = "name of the menu item";
+    public final static String KEY_DESCRIPTION = "description of the menu item";
+    public final static String KEY_PRICE = "price of the menu item";
+    public final static String KEY_SEARCH = "name of the menu item to search for";
+    public final static String KEY_ID = "ID of the menu item";
 
     public MenuController(Persistence persistence) {
         super(persistence);
@@ -173,6 +173,7 @@ public class MenuController extends EntityController<MenuItem> {
 
     @Override
     public MenuItem select(View view) throws Exception {
+        this.show(view);
         MenuItem menuItem = null;
 
         Map<String, String> inputMap = new LinkedHashMap<String, String>();

@@ -79,6 +79,14 @@ public class RoomServiceOrderView {
 
 	public void printRoomServiceOrder(RoomServiceOrder roomServiceOrder)
 	{
+		
+		//check whether there are order items in the room service order
+		if(roomServiceOrder.getOrderItems().size() == 0)
+		{
+			//do not print
+			return;
+		}
+		
 		// define different types of lines
 		String doubleLine = buildString('=',MENU_WIDTH);
 		String singleLine = buildString('-', MENU_WIDTH);

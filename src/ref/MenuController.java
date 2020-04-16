@@ -26,7 +26,8 @@ public class MenuController {
 			case 4: exitMenuEditor(menuView);
 					break;
 					
-			default:menuView.displayText("\nThis option is not available. Please enter a number between [1] and [4].\n\n\n\n\n\n"); 
+			default:menuView.displayText("\nThis option is not available. Please enter a number between [1] and [4].\n\n\n\n\n\n");
+					break;
 		}
 	}
 	

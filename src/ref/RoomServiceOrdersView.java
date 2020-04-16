@@ -21,22 +21,26 @@ public class RoomServiceOrdersView {
 	
 	public void displayOptions()
 	{
+		//TODO: only show if non-empty
+		printRoomServiceOrders(roomServiceOrdersController.getRoomServiceOrders());
+		
 		int option;
 		
 		do
 		{
-			System.out.println("|================================================|");
-			System.out.println("|                                                |");
-			System.out.println("|           Manage Room Service Orders           |");
-			System.out.println("|                                                |");
-			System.out.println("|------------------------------------------------|");
-			System.out.println("|                                                |");
-			System.out.println("| [1] Add a room service order                   |");
-			System.out.println("| [2] Update the status of a room service order  |");
-			System.out.println("| [3] Remove a room service order                |");
-			System.out.println("| [4] Exit                                       |");
-			System.out.println("|                                                |");
-			System.out.println("|================================================|");
+			
+			System.out.println("|===============================================|");
+			System.out.println("|                                               |");
+			System.out.println("|   Manage the Summary of Room Service Orders   |");
+			System.out.println("|                                               |");
+			System.out.println("|-----------------------------------------------|");
+			System.out.println("|                                               |");
+			System.out.println("| [1] Add a room service order                  |");
+			System.out.println("| [2] Update the status of a room service order |");
+			System.out.println("| [3] Remove a room service order               |");
+			System.out.println("| [4] Exit                                      |");
+			System.out.println("|                                               |");
+			System.out.println("|===============================================|");
 			System.out.println();
 			System.out.print("Please select an option: ");
 
@@ -80,7 +84,6 @@ public class RoomServiceOrdersView {
 	{
 		System.out.println("Update the status of the room service order to: ");
 		
-		//TODO: get rid of first enum option (ORDERING)
 		int iterator = 0;
 		for (RoomServiceOrderStatus roomServiceOrderStatus : RoomServiceOrderStatus.values()) { 
 		    if(iterator>0)
@@ -94,6 +97,14 @@ public class RoomServiceOrdersView {
 	
 	public void printRoomServiceOrders(ArrayList<RoomServiceOrder> roomServiceOrders)
 	{
+		
+		//check whether there are room service orders in the array
+		if(roomServiceOrders.size() == 0)
+		{
+			//do not print
+			return;
+		}
+		
 		// define different types of lines
 		String doubleLine = buildString('=',MENU_WIDTH);
 		String singleLine = buildString('-', MENU_WIDTH);
@@ -105,11 +116,11 @@ public class RoomServiceOrdersView {
 		System.out.printf("|%s|\n", spaceLine);
 		if(MENU_WIDTH % 2 == 0)
 		{
-			System.out.printf("|%sROOM SERVICE ORDERS%s|\n",spaceLine.substring(0,spaceLine.length()/2-10),spaceLine.substring(0,spaceLine.length()/2-9));
+			System.out.printf("|%sSUMMARY OF ROOM SERVICE ORDERS%s|\n",spaceLine.substring(0,spaceLine.length()/2-15),spaceLine.substring(0,spaceLine.length()/2-15));
 		}
 		else
 		{
-			System.out.printf("|%sROOM SERVICE ORDERS%s|\n",spaceLine.substring(0,spaceLine.length()/2-9),spaceLine.substring(0,spaceLine.length()/2-9));
+			System.out.printf("|%sSUMMARY OF ROOM SERVICE ORDERS%s|\n",spaceLine.substring(0,spaceLine.length()/2-15),spaceLine.substring(0,spaceLine.length()/2-14));
 		}
 		System.out.printf("|%s|\n", spaceLine);
 		System.out.printf("|%s|\n", singleLine);
@@ -123,6 +134,31 @@ public class RoomServiceOrdersView {
 			// print name and price of MenuItem
 			System.out.printf("|%s|\n",spaceLine);
 			System.out.printf("| %3d. %-" + (MENU_WIDTH-PRICE_WIDTH-15) + "S TOTAL: %" + PRICE_WIDTH + ".2f |\n", iterator, "Room Service Order", roomServiceOrder.getTotalPrice());
+			
+			System.out.printf("|%s|\n",spaceLine);
+			
+			//print names of menu items of each order
+			int iteratorOrderItem = 1;
+			
+			for(OrderItem orderItem : roomServiceOrder.getOrderItems())
+			{
+				//get menu item
+				MenuItem menuItem = orderItem.getMenuItem();
+				
+				//break name of MenuItem into multiple lines if necessary
+				ArrayList<String> nameMenuItem = breakString(menuItem.getName(), MENU_WIDTH-PRICE_WIDTH-NAME_PRICE_WIDTH-9);
+				
+				//print name of menu item
+				System.out.printf("|    %3d. %-" + (MENU_WIDTH-9) + "S|\n", iteratorOrderItem, nameMenuItem.get(0));
+				
+				for(int i = 1; i < nameMenuItem.size(); i++)
+				{
+					System.out.printf("|         %-" + (MENU_WIDTH-9) + "S|\n", nameMenuItem.get(i));
+				}
+				
+				iteratorOrderItem++;
+			}
+			
 			System.out.printf("|%s|\n",spaceLine);
 			System.out.printf("|      STATUS      : %-" + (MENU_WIDTH-PRICE_WIDTH-13) + "s|\n", roomServiceOrder.getRoomServiceOrderStatus());
 			System.out.printf("|      ROOM NUMBER : %-" + (MENU_WIDTH-PRICE_WIDTH-13) + "s|\n", roomServiceOrder.getRoomNumber());
@@ -142,14 +178,58 @@ public class RoomServiceOrdersView {
 	}
 
 	// create a String which is made up of one char being repeated a given amount of times
-		private String buildString(char stringChar,int stringLength)
+	private String buildString(char stringChar,int stringLength)
+	{
+		StringBuilder sb = new StringBuilder(stringLength);
+		for (int i=0; i < stringLength; i++){
+			sb.append(stringChar);
+		}
+
+		return sb.toString();
+	}
+	
+	// break String into multiple lines
+	private ArrayList<String> breakString(String string, int stringLength)
+	{	
+		// container to save the multiple strings
+		ArrayList<String> stringLines = new ArrayList<String>();
+
+		// starting position of temporary String
+		int j = 0;
+
+		// indicates where to split the String
+		int split = 0;
+
+		// iterate through each Char of the given string
+		for(int i = 0; i < string.length(); i++)
 		{
-			StringBuilder sb = new StringBuilder(stringLength);
-			for (int i=0; i < stringLength; i++){
-				sb.append(stringChar);
+			// create temporary String containing all Chars of one line 
+			String temp = string.substring(j, i+1);
+
+			// if the newly added char is a ' ', then save the location of that space
+			if(temp.charAt(temp.length()-1) == ' ')
+			{
+				split = temp.length()-1;
 			}
 
-			return sb.toString();
+			// check whether the String has reached a certain length
+			if(temp.length() == stringLength-2)
+			{
+				// String is added to the container
+				stringLines.add(" " + temp.substring(0, split));
+
+				// starting position of the next line's String
+				j += split+1;
+
+				// reset int indicating where to split String
+				split = 0;
+			}
 		}
+		// add remaining part of String into new line
+		stringLines.add(" " + string.substring(j, string.length()));
+
+		// return the String broken up into multiple lines
+		return stringLines;
+	}
 
 }
