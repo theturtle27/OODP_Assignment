@@ -32,7 +32,7 @@ public class RoomServiceManagementController extends PersistenceController {
                 addRoomServiceOrder(view);
                 break;
             case 1:
-                updataRoomServiceOrderStatus(view);
+                updateRoomServiceOrderStatus(view);
                 break;
             case 2:
                 updateRoomServiceOrder(view);
@@ -47,7 +47,7 @@ public class RoomServiceManagementController extends PersistenceController {
 
     }
 
-    public void updataRoomServiceOrderStatus(View view){
+    public void updateRoomServiceOrderStatus(View view){
 
     }
 

@@ -70,7 +70,7 @@ public class Payment extends Entity {
 			
 			for(RoomServiceOrder order: reservation.getOrderList()) {
 				// Loop through all the service orders and add up all the service orders.
-				if(order.getStatus() == RoomServiceOrderStatus.Delivered)
+				if(order.getStatus() == RoomServiceOrderStatus.DELIVERED)
 					totalSum += order.getTotalPrice();
 			}
 		}
@@ -108,7 +108,7 @@ public class Payment extends Entity {
 			builder.append("--- Service Orders ---\n");
 			for(RoomServiceOrder order: reservation.getOrderList()) {
 				// Loop through all the service orders and count the number of delivered service order.
-				if(order.getStatus() == RoomServiceOrderStatus.Delivered) {
+				if(order.getStatus() == RoomServiceOrderStatus.DELIVERED) {
 					count++;
 					builder.append(order);
 					roomSubTotal += order.getTotalPrice();
