@@ -23,7 +23,7 @@ public class RoomController extends EntityController<Room> {
 
     @Override
     protected String getEntityName() {
-        return "MenuItem Controller";
+        return "Room";
     }
 
     @Override

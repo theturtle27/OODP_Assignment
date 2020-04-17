@@ -18,7 +18,7 @@ public abstract class EntityController<T> extends PersistenceController {
                 "Retrieve/Search " + this.getEntityName().toLowerCase(),
                 "Update " + this.getEntityName().toLowerCase(),
                 "Delete " + this.getEntityName().toLowerCase(),
-                "Show" + this.getEntityName().toLowerCase()
+                "Show " + this.getEntityName().toLowerCase()
         );
     }
 

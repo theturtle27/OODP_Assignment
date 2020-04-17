@@ -29,7 +29,7 @@ public class ReservationController extends EntityController<Reservation> {
 
     @Override
     protected String getEntityName() {
-        return "Reservation Controller";
+        return "Reservation";
     }
 
     @Override
