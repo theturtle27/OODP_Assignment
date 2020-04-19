@@ -98,6 +98,7 @@ public class Persistence {
         for (Map.Entry entry : this.entityCacheArray.entrySet()) {
             Class<T> type = (Class<T>)entry.getKey();
             File dataFile = this.getDataFile(type);
+            dataFile.delete();
             dataFile.createNewFile();
 
             BufferedWriter writer = new BufferedWriter(new FileWriter(this.getDataFile(type), true));
@@ -224,7 +225,8 @@ public class Persistence {
             this.entityCacheArray.put(type, entityArray);
         }
 
-        // Adds a new soft reference for the entity into cache.
+        // Adds a new soft reference for the entity into c6
+        // ache.
         entityArray.remove(index);
     }
 

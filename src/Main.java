@@ -45,6 +45,8 @@ public class Main {
 
             ConsoleView mainView = new ConsoleView(mainNav, "Main View", sc);
             mainView.show();
+
+            persistence.writeAllData();
         } catch (Exception e) {
             e.printStackTrace();
         }
