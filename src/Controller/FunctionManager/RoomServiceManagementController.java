@@ -18,7 +18,7 @@ public class RoomServiceManagementController extends PersistenceController {
     public List<String> getOptions() {
         return Arrays.asList(
                 "Add " + this.getEntityName().toLowerCase(),
-                "Update " + this.getEntityName().toLowerCase(),
+                "Update " + this.getEntityName().toLowerCase() + " status",
                 "Update " + this.getEntityName().toLowerCase(),
                 "Delete " + this.getEntityName().toLowerCase()
         );

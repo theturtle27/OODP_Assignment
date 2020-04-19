@@ -1,5 +1,6 @@
 package Controller.EntityManager;
 
+import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -7,26 +8,48 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import Controller.Controller;
 import Controller.EntityController;
+import Model.Guest.CreditCard;
+import Model.Guest.Gender;
 import Model.Guest.Guest;
+import Model.Guest.IdentityType;
 import Persistence.Entity;
 import Persistence.Persistence;
+import View.ConsoleView;
 import View.View;
 
 
 public class GuestController extends EntityController<Guest> {
-    public final static String KEY_NAME = "guest name";
-    public final static String KEY_IDENTIFICATION = "identification number";
-    public final static String KEY_NATIONALITY = "nationality";
-    public final static String KEY_GENDER = "gender";
-    public final static String KEY_CONTACT_NUMBER = "contact number";
-    public final static String KEY_EMAIL_ADDRESS = "email address";
-    public final static String KEY_SEARCH = "name of the guest to search for";
-    public final static String KEY_ID = "ID of guest or 'Search' to search for guest ID by name";
 
-    public GuestController(Persistence persistence) {
+    private static final String REGEX_NUMBERS = "[0-9]+";
+    private static final String REGEX_ONE_ALPHA_NUMERIC_CHARACTER = "^.*[a-zA-Z0-9]+.*$";
+    private static final String REGEX_EMAIL = "^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
+    private static final String REGEX_PHONE_NUMBER = "^\\+(?:[0-9] ?){6,14}[0-9]$";
+
+    private static final String GUEST_NAME = "guest name";
+    private static final String STREET_NAME = "street name";
+    private static final String CITY_NAME = "city name";
+    private static final String POSTAL_CODE = "postal code";
+    private static final String COUNTRY = "name of the country";
+    private static final String GENDER = "gender";
+    private static final String NATIONALITY = "nationality";
+    private static final String IDENTITY_TYPE = "identity type";
+    private static final String IDENTITY_NUMBER = "identity number";
+    private static final String EMAIL_ADDRESS = "eMail address";
+    private static final String PHONE_NUMBER = "phone number";
+    private static final String GUEST = "guest";
+    private static final String NUMBER_GUEST = "number of the guest";
+
+
+    private static final String NOT_FOUND = "not found";
+
+    private ConsoleView creditCardView;
+    private CreditCardController creditCardController;
+
+    public GuestController(Persistence persistence, ConsoleView creditCardView) {
         super(persistence);
+        this.creditCardView = creditCardView;
+        this.creditCardController = (CreditCardController)creditCardView.getController();
     }
 
     @Override
@@ -36,9 +59,13 @@ public class GuestController extends EntityController<Guest> {
 
     @Override
     public List<String> getOptions() {
-        List<String> options = new ArrayList<>(super.getOptions());
 
-        return options;
+        return Arrays.asList("Create a new guest",
+                        "Update guest details",
+                        "Search guest details",
+                        "Remove guest details",
+                        "Print all guest details");
+
     }
 
     @Override
@@ -48,10 +75,10 @@ public class GuestController extends EntityController<Guest> {
                 create(view);
                 break;
             case 1:
-                retrieve(view);
+                update(view);
                 break;
             case 2:
-                update(view);
+                retrieve(view);
                 break;
             case 3:
                 delete(view);
@@ -64,187 +91,510 @@ public class GuestController extends EntityController<Guest> {
 
     @Override
     protected void create(View view) throws Exception {
-        Map<String, String> inputMap = new LinkedHashMap<String, String>();
-        inputMap.put(KEY_NAME, null);
-        inputMap.put(KEY_IDENTIFICATION, null);
-        inputMap.put(KEY_NATIONALITY, null);
-        inputMap.put(KEY_GENDER, null);
-        inputMap.put(KEY_CONTACT_NUMBER, null);
-        inputMap.put(KEY_EMAIL_ADDRESS, null);
+        // get name of the guest
+        String guestName = view.getInputRegex(GUEST_NAME, REGEX_ONE_ALPHA_NUMERIC_CHARACTER);
 
-        boolean valid = false;
-        do {
-            view.input(inputMap);
+        // break out of function
+        if(guestName == null)
+        {
+            return;
+        }
 
-            try {
-                Guest guest = new Guest(inputMap.get(KEY_IDENTIFICATION), inputMap.get(KEY_NATIONALITY));
-                guest.setName(inputMap.get(KEY_NAME));
-                guest.setGender(Character.toUpperCase(inputMap.get(KEY_GENDER).charAt(0)));
-                guest.setContactNo(inputMap.get(KEY_CONTACT_NUMBER));
-                guest.setEmailAddress(inputMap.get(KEY_EMAIL_ADDRESS));
+        // get street name
+        String streetName = view.getInputRegex(STREET_NAME, REGEX_ONE_ALPHA_NUMERIC_CHARACTER);
 
-                // Validate all fields
-                List<String> invalids = new ArrayList<String>();
-                if(guest.getName().length() == 0)
-                    invalids.add(KEY_NAME);
-                if(guest.getIdentification().length() == 0)
-                    invalids.add(KEY_IDENTIFICATION);
-                if(guest.getNationality().length() == 0)
-                    invalids.add(KEY_NATIONALITY);
-                if(guest.getGender() != 'M' && guest.getGender() != 'F')
-                    invalids.add(KEY_GENDER);
-                if(!Pattern.matches("\\+?(\\d|-|\\s|\\(|\\))+", guest.getContactNo()))
-                    invalids.add(KEY_CONTACT_NUMBER);
-                if(!Pattern.matches("^.+@.+\\..+$", guest.getEmailAddress()))
-                    invalids.add(KEY_EMAIL_ADDRESS);
+        // break out of function
+        if(streetName == null)
+        {
+            return;
+        }
 
-                if(invalids.size() == 0) {
-                    // Ensure no duplicate guest record, with same identification and nationality
-                    Persistence persistence = this.getPersistenceImpl();
+        // get city name
+        String cityName = view.getInputRegex(CITY_NAME, REGEX_ONE_ALPHA_NUMERIC_CHARACTER);
 
-                    persistence.create(guest, Guest.class);
+        // break out of function
+        if(cityName == null)
+        {
+            return;
+        }
 
-                    view.message("Guest profile successfully added!");
-                    valid = true;
+        // get postal code
+        String postalCode = view.getInputRegex(POSTAL_CODE, REGEX_ONE_ALPHA_NUMERIC_CHARACTER);
 
+        // break out of function
+        if(postalCode == null)
+        {
+            return;
+        }
+
+        // get country
+        String country = view.getInputRegex(COUNTRY, REGEX_ONE_ALPHA_NUMERIC_CHARACTER);
+
+        // break out of function
+        if(country == null)
+        {
+            return;
+        }
+
+        // get gender
+        Gender gender = (Gender)view.getInputEnum(Gender.class, GENDER, REGEX_NUMBERS);
+
+        // break out of function
+        if(gender == null)
+        {
+            return;
+        }
+
+        // get nationality
+        String nationality = view.getInputRegex(NATIONALITY, REGEX_ONE_ALPHA_NUMERIC_CHARACTER);
+
+        // break out of function
+        if(nationality == null)
+        {
+            return;
+        }
+
+        //get identity type
+        IdentityType identityType = (IdentityType)view.getInputEnum(IdentityType.class, IDENTITY_TYPE, REGEX_NUMBERS);
+
+        // break out of function
+        if(identityType == null)
+        {
+            return;
+        }
+
+        // get identity number
+        String identityNumber = view.getInputRegex(IDENTITY_NUMBER, REGEX_ONE_ALPHA_NUMERIC_CHARACTER);
+
+        // break out of function
+        if(identityNumber == null)
+        {
+            return;
+        }
+
+        // check whether guest already exists
+        if(guestExists(view, identityType, identityNumber, nationality))
+        {
+            return;
+        }
+
+        // get email
+        String eMail = view.getInputRegex(EMAIL_ADDRESS, REGEX_EMAIL);
+
+        // break out of function
+        if(eMail == null)
+        {
+            return;
+        }
+
+        // get phoneNumber
+        String phoneNumber = view.getInputRegex(PHONE_NUMBER, REGEX_PHONE_NUMBER);
+
+        // break out of function
+        if(phoneNumber == null)
+        {
+            return;
+        }
+
+        CreditCard creditCard = (CreditCard)creditCardController.createCreditCard(view);
+
+        // break out of function
+        if(creditCard == null)
+        {
+            return;
+        }
+
+        // create ArrayList of credit cards
+        ArrayList<CreditCard> creditCards = new ArrayList<CreditCard>();
+        creditCards.add(creditCard);
+
+        // create guest
+        Guest guest = new Guest(guestName, streetName, cityName, postalCode, country, gender, nationality, identityType, identityNumber, eMail, phoneNumber, creditCards);
+
+        // get persistence
+        Persistence persistence = this.getPersistenceImpl();
+
+        // add guest to ArrayList of guests
+        persistence.createCache(guest, Guest.class);
+
+        // print guest with credit card information
+        view.displayText(guest.toString() + guest.getCreditCards().get(0).toString());
+
+        // display text
+        view.displayText("\nThe guest has been added to the system.\n\n");
+    }
+
+    private boolean guestExists(View view, IdentityType identitytType, String identityNumber, String nationality)
+    {
+        // get persistence
+        Persistence persistence = this.getPersistenceImpl();
+
+        try {
+
+            // get all guests
+            ArrayList<SoftReference<Entity>> guests = persistence.retrieveAll(Guest.class);
+
+            // iterate through all existing guests
+            for (SoftReference<Entity> softReference : guests) {
+
+                // cast to guest object
+                Guest guest = (Guest)softReference.get();
+
+                // check whether identity type, identity number and nationality are the same
+                if (guest.getIdentityType().equals(identitytType) && guest.getIdentityNumber().equals(identityNumber) && guest.getNationality().equals(nationality)) {
+                    view.displayText("\nA guest with these credentials already exists.\nPlease update the guest's information instead of creating a duplicate guest.\n\n");
+
+                    return true;
                 }
-                else {
-                    view.error(invalids);
-                }
-            } catch(IndexOutOfBoundsException e) {
-                view.error(Arrays.asList(KEY_GENDER));
             }
-        } while(!valid && !view.bailout());
+
+        }
+        catch(Exception e)
+        {
+
+        }
+
+        return false;
     }
 
     @Override
     protected boolean retrieve(View view) throws Exception {
-        Map<String, String> inputMap = new LinkedHashMap<String, String>();
-        inputMap.put(KEY_SEARCH, null);
-
-        view.input(inputMap);
-
-        Persistence persistence = this.getPersistenceImpl();
-
-        List entityList = new ArrayList();
-
-        Iterable<Guest> guests = persistence.search(Guest.class);
-
-        for(Guest entity: guests) {
-            if (entity.getName().equals(inputMap.get(KEY_SEARCH)))
-                entityList.add(entity);
-        }
-        // Display guests
-        view.display(entityList);
-
-        return entityList.size() > 0;
+        return false;
     }
 
     @Override
     protected void update(View view) throws Exception {
-        Guest guest = select(view);
 
-        if(guest != null) {
-            Persistence persistence = this.getPersistenceImpl();
-            Map<String, String> inputMap = new LinkedHashMap<String, String>();
-            inputMap.put(KEY_NAME, null);
-            inputMap.put(KEY_GENDER, null);
-            inputMap.put(KEY_CONTACT_NUMBER, null);
-            inputMap.put(KEY_EMAIL_ADDRESS, null);
+        // search for guest via name
+        Guest guest = getGuest(view);
 
-            boolean valid = false;
-            do {
-                // Retrieve user input for updateable fields
-                view.input(inputMap);
-
-                try {
-                    guest.setName(inputMap.get(KEY_NAME));
-                    guest.setGender(Character.toUpperCase(inputMap.get(KEY_GENDER).charAt(0)));
-                    guest.setContactNo(inputMap.get(KEY_CONTACT_NUMBER));
-                    guest.setEmailAddress(inputMap.get(KEY_EMAIL_ADDRESS));
-
-                    // Validate all fields
-                    List<String> invalids = new ArrayList<String>();
-                    if(guest.getName().length() == 0)
-                        invalids.add(KEY_NAME);
-                    if(guest.getGender() != 'M' && guest.getGender() != 'F')
-                        invalids.add(KEY_GENDER);
-                    if(!Pattern.matches("\\+?(\\d|-|\\s|\\(|\\))+", guest.getContactNo()))
-                        invalids.add(KEY_CONTACT_NUMBER);
-                    if(!Pattern.matches("^.+@.+\\..+$", guest.getEmailAddress()))
-                        invalids.add(KEY_EMAIL_ADDRESS);
-
-                    // Attempts to update entity
-                    if(invalids.size() == 0 && persistence.update(guest, Guest.class)) {
-                        valid = true;
-                        view.message("Guest profile successfully updated!");
-                    }
-                    else {
-                        view.error(invalids);
-                    }
-                } catch(IndexOutOfBoundsException e) {
-                    view.error(Arrays.asList(KEY_GENDER));
-                }
-            } while(!valid && !view.bailout());
+        //check whether guest was found
+        if(guest == null)
+        {
+            return;
         }
+
+        // get name of the guest
+        String guestName = view.getInputRegex(GUEST_NAME, REGEX_ONE_ALPHA_NUMERIC_CHARACTER);
+
+        // break out of function
+        if(guestName == null)
+        {
+            return;
+        }
+
+        // get street name
+        String streetName = view.getInputRegex(STREET_NAME, REGEX_ONE_ALPHA_NUMERIC_CHARACTER);
+
+        // break out of function
+        if(streetName == null)
+        {
+            return;
+        }
+
+        // get city name
+        String cityName = view.getInputRegex(CITY_NAME, REGEX_ONE_ALPHA_NUMERIC_CHARACTER);
+
+        // break out of function
+        if(cityName == null)
+        {
+            return;
+        }
+
+        // get postal code
+        String postalCode = view.getInputRegex(POSTAL_CODE, REGEX_ONE_ALPHA_NUMERIC_CHARACTER);
+
+        // break out of function
+        if(postalCode == null)
+        {
+            return;
+        }
+
+        // get country
+        String country = view.getInputRegex(COUNTRY, REGEX_ONE_ALPHA_NUMERIC_CHARACTER);
+
+        // break out of function
+        if(country == null)
+        {
+            return;
+        }
+
+        // get gender
+        Gender gender = (Gender)view.getInputEnum(Gender.class, GENDER, REGEX_NUMBERS);
+
+        // break out of function
+        if(gender == null)
+        {
+            return;
+        }
+
+        // get nationality
+        String nationality = view.getInputRegex(NATIONALITY, REGEX_ONE_ALPHA_NUMERIC_CHARACTER);
+
+        // break out of function
+        if(nationality == null)
+        {
+            return;
+        }
+
+        //get identity type
+        IdentityType identityType = (IdentityType)view.getInputEnum(IdentityType.class, IDENTITY_TYPE, REGEX_NUMBERS);
+
+        // break out of function
+        if(identityType == null)
+        {
+            return;
+        }
+
+        // get identity number
+        String identityNumber = view.getInputRegex(IDENTITY_NUMBER, REGEX_ONE_ALPHA_NUMERIC_CHARACTER);
+
+        // break out of function
+        if(identityNumber == null)
+        {
+            return;
+        }
+
+        // get email
+        String eMail = view.getInputRegex(EMAIL_ADDRESS, REGEX_EMAIL);
+
+        // break out of function
+        if(eMail == null)
+        {
+            return;
+        }
+
+        // get phoneNumber
+        String phoneNumber = view.getInputRegex(PHONE_NUMBER, REGEX_PHONE_NUMBER);
+
+        // break out of function
+        if(phoneNumber == null)
+        {
+            return;
+        }
+
+        // set everything if there were no errors
+        // set name of the guest
+        guest.setName(guestName);
+
+        // set street name
+        guest.setStreetName(streetName);
+
+        // set city name
+        guest.setCityName(cityName);
+
+        // set postal code
+        guest.setPostalCode(postalCode);
+
+        // set country
+        guest.setCountry(country);
+
+        // set gender
+        guest.setGender(gender);
+
+        // set nationality
+        guest.setNationality(nationality);
+
+        // set identity type
+        guest.setIdentityType(identityType);
+
+        // set identity number
+        guest.setIdentityNumber(identityNumber);
+
+        // set eMail
+        guest.setEMail(eMail);
+
+        // set phone number
+        guest.setPhoneNumber(phoneNumber);
+
+        // print guest
+        view.displayText(guest.toString());
+
+        // display text
+        view.displayText("\n\nThe guest's details have been updated.\n\n");
+    }
+
+    private Guest getGuest(View view)
+    {
+        // initialize guest
+        Guest guest = null;
+
+        // get persistence
+        Persistence persistence = this.getPersistenceImpl();
+
+        try {
+
+            // get all guests
+            ArrayList<SoftReference<Entity>> guests = persistence.retrieveAll(Guest.class);
+
+            // check whether any guests exist
+            if (guests.size() == 0) {
+                view.displayText("No guest exists. Create a guest before searching for the guest.\n\n");
+
+                return null;
+            }
+
+            // flag to check whether the entry of the guest name should be tried again
+            boolean repeatEntry;
+
+            //repeat
+            do {
+                // initialize repeat flag to false
+                repeatEntry = false;
+
+                // get name of the guest
+                String guestName = view.getInputRegex(GUEST_NAME, REGEX_ONE_ALPHA_NUMERIC_CHARACTER);
+
+                // break out of function
+                if (guestName == null) {
+                    return null;
+                }
+
+                // create ArrayList of guests
+                ArrayList<Guest> potentialGuests = new ArrayList<Guest>();
+
+                // convert guest name to lower case
+                String guestNameLowerCase = guestName.toLowerCase();
+
+                // get words in name
+                String[] names = guestNameLowerCase.trim().split("\\s+");
+
+                // iterate through all guests
+                for (SoftReference<Entity> softReference : guests) {
+
+                    // cast to guest object
+                    Guest guestIterator = (Guest)softReference.get();
+
+                    // flag to check whether all parts of the guests name are part of an existing guest
+                    boolean isPartOfName = true;
+
+                    // iterate through all names
+                    for (String name : names) {
+
+                        // check whether name is part of the guest's name
+                        if (!guestIterator.getName().toLowerCase().contains(name)) {
+                            // set flag to false
+                            isPartOfName = false;
+                            break;
+                        }
+                    }
+
+                    // check whether all parts of the name match with the guests name
+                    if (isPartOfName) {
+
+                        // add guest to potential guests
+                        potentialGuests.add(guestIterator);
+                    }
+                }
+
+                // check whether a guest was found
+                if (potentialGuests.isEmpty()) {
+
+                    // check whether the entry of the guest name should be tried again
+                    repeatEntry = view.repeatEntry(GUEST, NOT_FOUND);
+
+                } else if (potentialGuests.size() == 1) {
+                    // print guest details
+                    System.out.println(potentialGuests.get(0).toString() + "\n");
+
+                    // get guest
+                    guest = potentialGuests.get(0);
+                } else {
+
+                    // select guest from potential guests
+                    guest = view.getInputArray(potentialGuests, NUMBER_GUEST, REGEX_NUMBERS);
+
+                    // break out of method
+                    if (guest == null) {
+                        return null;
+                    }
+
+                    // print guest details
+                    view.displayText(guest.toString() + "\n\n");
+                }
+
+            } while (guest == null && repeatEntry);
+        }
+        catch(Exception e)
+        {
+
+        }
+
+        return guest;
     }
 
     @Override
     protected void delete(View view) throws Exception {
-        Guest guest = select(view);
 
+        // get persistence
         Persistence persistence = this.getPersistenceImpl();
-        if(guest != null && persistence.delete(guest, Guest.class))
-            view.message("Guest profile deleted successfully!");
+
+        try {
+
+            // get all guests
+            ArrayList<SoftReference<Entity>> guests = persistence.retrieveAll(Guest.class);
+
+            // search for guest via name
+            Guest guest = getGuest(view);
+
+            //check whether guest was found
+            if (guest == null) {
+                return;
+            }
+
+            // remove guest
+            guests.remove(guest);
+
+            view.displayText("The guest's information has been removed.\n\n");
+        }
+        catch(Exception e)
+        {
+
+        }
     }
 
     @Override
     public Guest select(View view) throws Exception {
-        Guest guest = null;
-
-        Map<String, String> inputMap = new LinkedHashMap<String, String>();
-        inputMap.put(KEY_ID, null);
-
-        Persistence persistence = this.getPersistenceImpl();
-        do {
-            boolean retry;
-            do {
-                retry = false;
-                // Retrieve user input for ID
-                view.input(inputMap);
-
-                try {
-                    String input = inputMap.get(KEY_ID);
-                    if(input.toLowerCase().equals("search")) {
-                        retrieve(view);
-                        retry = true;
-                    }
-                    else {
-                        guest = persistence.retrieveByID(Long.parseLong(input), Guest.class);
-                        if(guest == null)
-                            view.error(Arrays.asList(KEY_ID));
-                    }
-                } catch(NumberFormatException e) {
-                    view.error(Arrays.asList(KEY_ID));
-                }
-            } while(retry);
-        } while(guest == null && !view.bailout());
-
-        return guest;
+        return null;
     }
 
 
     @Override
     public void show(View view) throws Exception{
+
+        // get persistence
         Persistence persistence = this.getPersistenceImpl();
-        List entityList = new ArrayList();
-        // Provide a predicate to search for matching items
-        Iterable<Guest> guests = persistence.search(Guest.class);
 
-        // Loop through results and add it into the list
-        for(Entity entity: guests)
-            entityList.add(entity);
+        try {
 
-        view.display(entityList);
+            // get all guests
+            ArrayList<SoftReference<Entity>> guests = persistence.retrieveAll(Guest.class);
+
+            // check whether any guests exist
+            if (guests.size() == 0) {
+                view.displayText("No guest exists. Create a guest before printing the guest details.\n\n");
+
+                return;
+            }
+
+            view.displayText("The following guests are on file:\n");
+
+            // iterate through all guests
+            for (SoftReference<Entity> softReference : guests) {
+
+                // cast to guest object
+                Guest guest = (Guest)softReference.get();
+
+                //print guest
+                view.displayText(guest.toString() + "\n");
+
+            }
+
+            view.displayText("\n");
+        }
+        catch(Exception e)
+        {
+
+        }
     }
 }

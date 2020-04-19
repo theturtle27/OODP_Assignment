@@ -1,6 +1,5 @@
 package Persistence;
 
-import Model.Guest.Guest;
 import Model.Menu.MenuItem;
 
 import java.io.*;
@@ -157,7 +156,7 @@ public class Persistence {
         return entity;
     }
 
-    public <T extends Entity> ArrayList<SoftReference<Entity>> retrieveAll(int index, Class<T> type) throws Exception {
+    public <T extends Entity> ArrayList<SoftReference<Entity>> retrieveAll(Class<T> type) throws Exception {
         ArrayList<SoftReference<Entity>> entityArray = this.entityCacheArray.get(type);
         return entityArray;
     }

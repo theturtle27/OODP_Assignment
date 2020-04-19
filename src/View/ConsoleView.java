@@ -6,10 +6,16 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.time.YearMonth;
+import java.util.ArrayList;
+import java.time.format.DateTimeFormatter;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ConsoleView extends View {
 
     public final static String KEY_OPTION = "Option";
+    private static final String INVALID = "invalid";
     private final Scanner scanner;
     private final Controller controller;
 
@@ -19,6 +25,11 @@ public class ConsoleView extends View {
         super(title);
         this.scanner = scanner;
         this.controller = controller;
+    }
+
+    public Controller getController()
+    {
+        return controller;
     }
 
     @Override
@@ -132,4 +143,325 @@ public class ConsoleView extends View {
 
         return selected;
     }
+
+    public YearMonth getValidDate(String name, String patternDate, String regexDate)
+    {
+        // declare YearMonth variable
+        YearMonth date = null;
+
+        // flag to check whether the entry should be tried again
+        boolean repeatEntry;
+
+        // create a formatter for date
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(patternDate);
+
+        // repeat until valid date is plugged in
+        do
+        {
+            // initialize repeat flag to false
+            repeatEntry = false;
+
+            // get date
+            String stringDate = getInputRegex(name.trim() + " (" + patternDate + ")", regexDate);
+
+            // break out of method
+            if(stringDate == null)
+            {
+                return null;
+            }
+
+            // convert date from String to LocalDate
+            YearMonth testDate = YearMonth.parse(stringDate, formatter);
+
+            // check whether the date is after today
+            if(testDate.isBefore(YearMonth.now()))
+            {
+
+                // check whether the entry should be repeated
+                repeatEntry = repeatEntry(name, INVALID);
+
+            }
+            else
+            {
+                // assign valid date to date
+                date = testDate;
+            }
+
+        }while(date == null && repeatEntry);
+
+        return date;
+    }
+
+    public String getInputRegex(String name, String patternCondition)
+    {
+        //declare input
+        String input = null;
+
+        // flag to check whether the entry should be tried again
+        boolean repeatEntry;
+
+        // initialize the Pattern object
+        Pattern pattern = Pattern.compile(patternCondition);
+
+        // declare matcher
+        Matcher matcher;
+
+        // repeat
+        do
+        {
+
+            // initialize repeat flag to false
+            repeatEntry = false;
+
+            // print
+            System.out.print("Enter the " + name.trim() + ": ");
+
+            // get input
+            String testInput = scanner.nextLine();
+
+            // initialize matcher
+            matcher = pattern.matcher(testInput);
+
+            // check whether the pattern matches
+            if(!matcher.matches())
+            {
+
+                // check whether the entry should be repeated
+                repeatEntry = repeatEntry(name, INVALID);
+
+            }
+            else
+            {
+                input = testInput;
+            }
+
+
+        }while(input == null && repeatEntry);
+
+        return input;
+    }
+
+    public <E extends Enum<?>> Enum<?> getInputEnum(Class<E> e, String name, String patternEnum)
+    {
+
+        // declare enum
+        Object enumInput = null;
+
+        // flag to check whether the entry should be tried again
+        boolean repeatEntry;
+
+        // initialize the Pattern object
+        Pattern pattern = Pattern.compile(patternEnum);
+
+        // declare matcher
+        Matcher matcher;
+
+        // repeat
+        do
+        {
+
+            // initialize repeat flag to false
+            repeatEntry = false;
+
+            // print
+            System.out.print("Enter the " + name.trim() + ": \n");
+
+            // initialize iterator
+            int iterator = 1;
+
+            // iterate through enum
+            for(Object eIterator : e.getEnumConstants())
+            {
+                // print
+                System.out.println(iterator + ". " + capitalizeFirstLetter(eIterator.toString()));
+
+                // increment iterator
+                iterator++;
+            }
+
+            // print
+            System.out.print("\nPlease select an option: ");
+
+            // get input
+            String testInput = scanner.nextLine();
+
+            // initialize matcher
+            matcher = pattern.matcher(testInput);
+
+            // declare input
+            int input = 0;
+
+            // check whether the pattern matches
+            if(!matcher.matches())
+            {
+
+                // check whether the entry should be repeated
+                repeatEntry = repeatEntry(name, INVALID);
+
+                continue;
+
+            }
+            else
+            {
+                input = Integer.parseInt(testInput);
+            }
+
+            // check whether the number is out of bounds
+            if(!((input > 0) && (input < e.getEnumConstants().length+1)))
+            {
+
+                // check whether the entry should be repeated
+                repeatEntry = repeatEntry(name, INVALID);
+
+            }
+            else
+            {
+                enumInput = e.getEnumConstants()[input-1];
+            }
+
+
+        }while(enumInput == null && repeatEntry);
+
+        return (E)enumInput;
+    }
+
+    public <E> E getInputArray(ArrayList<E> e, String name, String patternEnum)
+    {
+        // declare output
+        E output = null;
+
+        // flag to check whether the entry should be tried again
+        boolean repeatEntry;
+
+        // initialize the Pattern object
+        Pattern pattern = Pattern.compile(patternEnum);
+
+        // declare matcher
+        Matcher matcher;
+
+        // repeat
+        do
+        {
+
+            // initialize repeat flag to false
+            repeatEntry = false;
+
+            // print
+            System.out.print("Enter the " + name.trim() + ": \n\n");
+
+            // initialize iterator
+            int iterator = 1;
+
+            // iterate through ArrayList
+            for(E eIterator : e)
+            {
+
+                // print
+                System.out.println("[" + iterator + "]\n" + eIterator.toString() + "\n");
+
+                // increment iterator
+                iterator++;
+
+            }
+
+            // print
+            System.out.print("\nPlease select an option: ");
+
+            // get input
+            String testInput = scanner.nextLine();
+
+            // initialize matcher
+            matcher = pattern.matcher(testInput);
+
+            // declare input
+            int input = 0;
+
+            // check whether the pattern matches
+            if(!matcher.matches())
+            {
+
+                // check whether the entry should be repeated
+                repeatEntry = repeatEntry(name, INVALID);
+
+                continue;
+
+            }
+            else
+            {
+                input = Integer.parseInt(testInput);
+            }
+
+            // check whether the number is out of bounds
+            if(!((input > 0) && (input < iterator)))
+            {
+
+                // check whether the entry should be repeated
+                repeatEntry = repeatEntry(name, INVALID);
+
+            }
+            else
+            {
+                output = e.get(input-1);
+            }
+
+        }while(output == null && repeatEntry);
+
+        return output;
+
+    }
+
+    public boolean repeatEntry(String name, String operation)
+    {
+
+
+        // print
+        System.out.print("\nThe " + name.trim() + " is " + operation.trim() + ".\n\nDo you want to try again?\n[1] Yes\n[0] No\n\nPlease select an option: ");
+
+        // check whether the entry should be tried again
+        String stringRepeatEntry = scanner.nextLine();
+
+        //TODO: error checking for this
+        // return boolean
+        return "1".equals(stringRepeatEntry.trim());
+    }
+
+    public void displayText(String OutputMessage)
+    {
+        System.out.print(OutputMessage);
+    }
+
+    public String capitalizeFirstLetter(String str) {
+        StringBuffer s = new StringBuffer();
+
+        // Declare a character of space
+        // To identify that the next character is the starting
+        // of a new word
+        char ch = ' ';
+        for (int i = 0; i < str.length(); i++) {
+
+            // If previous character is space and current
+            // character is not space then it shows that
+            // current letter is the starting of the word
+            if (ch == ' ' && str.charAt(i) != ' ')
+            {
+                ch = str.charAt(i);
+                s.append(Character.toUpperCase(ch));
+            }
+            else if(str.charAt(i) == '_')
+            {
+                ch = ' ';
+                s.append(ch);
+            }
+            else
+            {
+                ch = str.charAt(i);
+                s.append(Character.toLowerCase(ch));
+            }
+        }
+
+        // Return the string with trimming
+        return s.toString().trim();
+    }
+
+
 }

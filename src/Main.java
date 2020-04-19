@@ -1,3 +1,4 @@
+import Controller.EntityManager.CreditCardController;
 import Controller.EntityManager.GuestController;
 import Controller.EntityManager.MenuController;
 import Controller.EntityManager.RoomController;
@@ -36,9 +37,13 @@ public class Main {
 
             ConsoleView frontDeskView = new ConsoleView(frontDeskController, "Front Desk", sc);
 
+            CreditCardController creditCardController = new CreditCardController(persistence);
+
+            ConsoleView creditCardView = new ConsoleView(creditCardController, "Credit Card Management", sc);
+
             NavigationController mainNav = new NavigationController();
             mainNav.addView(hotelmanagementView);
-            mainNav.addView(new ConsoleView(new GuestController(persistence), "Guest Management", sc));
+            mainNav.addView(new ConsoleView(new GuestController(persistence, creditCardView), "Guest Management", sc));
             mainNav.addView(new ConsoleView(new ReservationController(persistence), "Reservation System", sc));
             mainNav.addView(frontDeskView);
             mainNav.addView(new ConsoleView(new ReportController(persistence), "Report System", sc));

@@ -1,5 +1,7 @@
 package View;
 
+import java.time.YearMonth;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -29,4 +31,20 @@ public abstract class View {
     public abstract void show();
 
     public abstract void onSelected();
+
+    public abstract YearMonth getValidDate(String name, String patternDate, String regexDate);
+
+    public abstract String getInputRegex(String name, String patternCondition);
+
+    public abstract <E extends Enum<?>> Enum<?> getInputEnum(Class<E> e, String name, String patternEnum);
+
+    public abstract <E> E getInputArray(ArrayList<E> e, String name, String patternEnum);
+
+    public abstract boolean repeatEntry(String name, String operation);
+
+    public abstract void displayText(String OutputMessage);
+
+    public abstract String capitalizeFirstLetter(String str);
+
+
 }

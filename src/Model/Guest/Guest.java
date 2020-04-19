@@ -1,140 +1,146 @@
 package Model.Guest;
 
-import Model.BillingInformation;
+import java.util.ArrayList;
 import Persistence.Entity;
 
-/**
- * Guest is an {@link Entity} class that encapsulates information about a Guest.
- * @author YingHao
- */
-public class Guest extends Entity {
-    private final BillingInformation billing;
-    private final String identification;
-    private final String nationality;
+public class Guest extends Entity{
     private String name;
-    private String contactNo;
-    private String emailAddress;
-    private char gender;
+    private String streetName;
+    private String cityName;
+    private String postalCode;
+    private String country;
+    private Gender gender;
+    private String nationality;
+    private IdentityType identityType;
+    private String identityNumber;
+    private String eMail;
+    private String phoneNumber;
+    private ArrayList<CreditCard> creditCards;
 
-    /**
-     * Guest constructor. For Persistence API usage.
-     */
-    protected Guest() {
-        this.identification = null;
-        this.nationality = null;
-        this.billing = null;
-    }
-
-    /**
-     * Guest constructor.
-     * @param identification - The unique identification number of this Guest.
-     * @param nationality - The nationality of this Guest.
-     */
-    public Guest(String identification, String nationality) {
-        this.identification = identification;
+    public Guest(String name, String streetName, String cityName, String postalCode, String country, Gender gender, String nationality, IdentityType identityType, String identityNumber, String eMail, String phoneNumber, ArrayList<CreditCard> creditCards) {
+        this.name = name;
+        this.streetName = streetName;
+        this.cityName = cityName;
+        this.postalCode = postalCode;
+        this.country = country;
+        this.gender = gender;
         this.nationality = nationality;
-        this.billing = new BillingInformation();
+        this.identityType = identityType;
+        this.identityNumber = identityNumber;
+        this.eMail = eMail;
+        this.phoneNumber = phoneNumber;
+        this.creditCards = creditCards;
     }
 
-    /**
-     * Gets the name.
-     * @return name
-     */
-    public String getName() {
+    public String getName()
+    {
         return name;
     }
 
-    /**
-     * Sets the name.
-     * @param name
-     */
-    public void setName(String name) {
+    public void setName(String name)
+    {
         this.name = name;
     }
 
-    /**
-     * Gets the contact number.
-     * @return contactNo
-     */
-    public String getContactNo() {
-        return contactNo;
+    public void setStreetName(String streetName)
+    {
+        this.streetName = streetName;
     }
 
-    /**
-     * Sets the contact number.
-     * @param contactNo
-     */
-    public void setContactNo(String contactNo) {
-        this.contactNo = contactNo;
+    public void setCityName(String cityName)
+    {
+        this.cityName = cityName;
     }
 
-    /**
-     * Gets the email address.
-     * @return emailAddress
-     */
-    public String getEmailAddress() {
-        return emailAddress;
+    public void setPostalCode(String postalCode)
+    {
+        this.postalCode = postalCode;
     }
 
-    /**
-     * Sets the email address.
-     * @param emailAddress
-     */
-    public void setEmailAddress(String emailAddress) {
-        this.emailAddress = emailAddress;
+    public void setCountry(String country)
+    {
+        this.country = country;
     }
 
-    /**
-     * Gets the gender.
-     * @return gender
-     */
-    public char getGender() {
-        return gender;
-    }
-
-    /**
-     * Sets the gender.
-     * @param gender
-     */
-    public void setGender(char gender) {
+    public void setGender(Gender gender)
+    {
         this.gender = gender;
     }
 
-    /**
-     * Gets the billing information. Note that the lifetime of the returned {@link BillingInformation} is tied to the
-     * Guest. Clone this instance for a seperate {@link BillingInformation} instance with an independent lifetime.
-     * @return address
-     */
-    public BillingInformation getBillingInformation() {
-        return billing;
-    }
-
-    /**
-     * Gets the identification.
-     * @return identification
-     */
-    public String getIdentification() {
-        return identification;
-    }
-
-    /**
-     * Gets the nationality.
-     * @return nationality
-     */
-    public String getNationality() {
+    public String getNationality()
+    {
         return nationality;
     }
 
-    @Override
-    public String toString() {
-        return super.toString() +
-                "Name: " + this.getName() + "\n" +
-                "Identification number: " + this.getIdentification() + "\n" +
-                "Nationality: " + this.getNationality() + "\n" +
-                "Gender: " + this.getGender() + "\n" +
-                "Contact number: " + this.getContactNo() + "\n" +
-                "Email address: " + this.getEmailAddress() + "\n\n";
-//                this.getBillingInformation().toString();
+    public void setNationality(String nationality)
+    {
+        this.nationality = nationality;
+    }
+
+    public IdentityType getIdentityType()
+    {
+        return this.identityType;
+    }
+
+    public void setIdentityType(IdentityType identityType)
+    {
+        this.identityType = identityType;
+    }
+
+    public String getIdentityNumber()
+    {
+        return this.identityNumber;
+    }
+
+    public void setIdentityNumber(String identityNumber)
+    {
+        this.identityNumber = identityNumber;
+    }
+
+    public void setEMail(String eMail)
+    {
+        this.eMail = eMail;
+    }
+
+    public void setPhoneNumber(String phoneNumber)
+    {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public ArrayList<CreditCard> getCreditCards()
+    {
+        return this.creditCards;
+    }
+
+    public String toString()
+    {
+        // convert gender to String
+        String stringGender = capitalizeFirstLetter(gender.toString());
+
+        // convert identity type to String
+        String stringIdentityType = capitalizeFirstLetter(identityType.toString());
+
+        //TODO: change to regular String
+        // String for guest information
+        StringBuffer stringGuest = new StringBuffer();
+        stringGuest.append("\n===============Guest==============="
+                + "\nName             : " + name
+                + "\n-----------Identification----------"
+                + "\nGender           : " + stringGender
+                + "\nNationality      : " + nationality
+                + "\nIdentity Type    : " + stringIdentityType
+                + "\nIdentity Number  : " + identityNumber
+                + "\n--------------Address--------------"
+                + "\nStreet Name      : " + streetName
+                + "\nCity Name        : " + cityName
+                + "\nPostal Code      : " + postalCode
+                + "\nCountry          : " + country
+                + "\n--------------Contact--------------"
+                + "\nEmail Address    : " + eMail
+                + "\nPhone Number     : " + phoneNumber);
+
+        return stringGuest.toString();
+
     }
 
 }
