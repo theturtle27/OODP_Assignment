@@ -43,23 +43,17 @@ public abstract class EntityController<T> extends PersistenceController {
         }
     }
 
-
     protected abstract String getEntityName();
-
 
     protected abstract void create(View view) throws Exception;
 
-
     protected abstract boolean retrieve(View view) throws Exception;
 
-
     protected abstract void update(View view) throws Exception;
-
 
     protected abstract void delete(View view) throws Exception;
 
     protected abstract void show(View view) throws Exception;
-
 
     public abstract T select(View view) throws Exception;
 

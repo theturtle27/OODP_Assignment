@@ -36,7 +36,7 @@ public class GuestController extends EntityController<Guest> {
 
     @Override
     public List<String> getOptions() {
-        List<String> options = new ArrayList<String>(super.getOptions());
+        List<String> options = new ArrayList<>(super.getOptions());
 
         return options;
     }

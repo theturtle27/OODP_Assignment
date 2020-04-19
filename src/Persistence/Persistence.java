@@ -1,6 +1,7 @@
 package Persistence;
 
 import Model.Guest.Guest;
+import Model.Menu.MenuItem;
 
 import java.io.*;
 import java.lang.ref.SoftReference;
@@ -24,6 +25,7 @@ public class Persistence {
 
     private final Map<Class<?>, Field[]> fCache;
     private final Map<Class<?>, Map<Long, SoftReference<Entity>>> entityCache;
+    private final Map<Class<?>, ArrayList<SoftReference<Entity>>> entityCacheArray;
     private final Properties configuration;
     private final File configurationFile;
     public final static Properties DEFAULT_CONFIGURATION;
@@ -35,6 +37,7 @@ public class Persistence {
     public Persistence(File configurationFile) throws Exception{
         this.fCache = new HashMap<Class<?>, Field[]>();
         this.entityCache = new HashMap<Class<?>, Map<Long, SoftReference<Entity>>>();
+        this.entityCacheArray = new HashMap<Class<?>, ArrayList<SoftReference<Entity>>>();
         this.configurationFile = configurationFile;
         this.configuration = new Properties(DEFAULT_CONFIGURATION);
 
@@ -59,12 +62,172 @@ public class Persistence {
                 stream.close();
         }
 
+
         File dataDir = new File(DATA_DIR);
         File tmpDir = new File(TMP_DIR);
 
         dataDir.mkdir();
         tmpDir.mkdir();
+        loadAllData();
     }
+
+    private void loadAllData() throws Exception{
+        loadCacheArray(MenuItem.class);
+    }
+
+    private <T extends Entity> void loadCacheArray(Class<T> type) throws Exception{
+        File dataFile = this.getDataFile(type);
+        dataFile.createNewFile();
+
+        T entity = null;
+
+        BufferedReader reader = new BufferedReader(new FileReader(dataFile));
+
+        try {
+            String entityString = null;
+            while((entityString = reader.readLine()) != null) {
+                entity = this.deserialize(entityString, false);
+                addEntityToCacheArray(type,entity);
+            }
+        } finally {
+            reader.close();
+        }
+    }
+
+    public <T extends Entity> void writeAllData() throws Exception{
+        for (Map.Entry entry : this.entityCacheArray.entrySet()) {
+            Class<T> type = (Class<T>)entry.getKey();
+            File dataFile = this.getDataFile(type);
+            dataFile.createNewFile();
+
+            BufferedWriter writer = new BufferedWriter(new FileWriter(this.getDataFile(type), true));
+            try {
+                // Writes the serialized entity into the data file
+                for (SoftReference<Entity> e : (ArrayList<SoftReference<Entity>>)entry.getValue()) {
+                    writer.write(this.serialize(e.get()).toString());
+                    writer.newLine();
+                }
+            } catch(IOException e) {
+                throw e;
+            } finally {
+                writer.close();
+            }
+
+        }
+    }
+
+    public <T extends Entity> T createCache(T entity, Class<T> type) throws Exception{
+        Field idField = getFieldsForType(Entity.class)[0];
+        String idKey = KEY_AUTO_ID.replace(AUTO_ID_TYPE_REGEX, type.getName().toLowerCase());
+        long identifier = Long.parseLong(this.configuration.getProperty(idKey, Long.toString(0))) + 1;
+        idField.set(entity, identifier);
+
+        addEntityToCacheArray(type,entity);
+
+        this.configuration.setProperty(idKey, Long.toString(identifier));
+
+        FileOutputStream out = new FileOutputStream(this.configurationFile);
+        try {
+            this.configuration.store(out, null);
+        } finally {
+            out.close();
+        }
+
+        return entity;
+    }
+
+    public <T extends Entity> boolean updateCache(T entity,int index, Class<T> type) throws Exception {
+        boolean success = false;
+        try{
+            updateEntityToCacheArray(type,index,entity);
+            success = true;
+        }catch (Exception e){
+
+        }
+
+        return success;
+    }
+
+    public <T extends Entity> T retrieveByIndex(int index, Class<T> type) throws Exception {
+        T entity = null;
+
+        entity = getEntityFromCacheArray(type,index);
+
+        return entity;
+    }
+
+    public <T extends Entity> ArrayList<SoftReference<Entity>> retrieveAll(int index, Class<T> type) throws Exception {
+        ArrayList<SoftReference<Entity>> entityArray = this.entityCacheArray.get(type);
+        return entityArray;
+    }
+
+    public <T extends Entity> boolean deleteCache(T entity,int index, Class<T> type) throws Exception {
+        deleteEntityToCacheArray(type,index);
+        return true;
+    }
+
+    private <T extends Entity> T getEntityFromCacheArray(Class<T> type, int index) {
+        T entity = null;
+
+        if(this.entityCache.containsKey(type)) {
+            ArrayList<SoftReference<Entity>> entityArray = this.entityCacheArray.get(type);
+
+            // Attempts to retrieve entity from soft reference
+            entity = (T) entityArray.get(index).get();
+            // Remove soft reference from cache if it gets invalid
+            if(entity == null)
+                entityArray.remove(index);
+
+        }
+
+        return entity;
+    }
+
+    private <T extends Entity> void addEntityToCacheArray(Class<T> type , T entity) {
+        ArrayList<SoftReference<Entity>> entityArray;
+
+        if(this.entityCacheArray.containsKey(type))
+            entityArray = this.entityCacheArray.get(type);
+        else {
+            // Creates a new map for the specific type.
+            entityArray = new ArrayList<SoftReference<Entity>>();
+            this.entityCacheArray.put(type, entityArray);
+        }
+
+        // Adds a new soft reference for the entity into cache.
+        entityArray.add(new SoftReference<Entity>(entity));
+    }
+
+    private <T extends Entity> void updateEntityToCacheArray(Class<T> type ,int index, T entity) {
+        ArrayList<SoftReference<Entity>> entityArray;
+
+        if(this.entityCacheArray.containsKey(type))
+            entityArray = this.entityCacheArray.get(type);
+        else {
+            // Creates a new map for the specific type.
+            entityArray = new ArrayList<SoftReference<Entity>>();
+            this.entityCacheArray.put(type, entityArray);
+        }
+
+        // Adds a new soft reference for the entity into cache.
+        entityArray.set(index,new SoftReference<Entity>(entity));
+    }
+
+    private <T extends Entity> void deleteEntityToCacheArray(Class<T> type ,int index) {
+        ArrayList<SoftReference<Entity>> entityArray;
+
+        if(this.entityCacheArray.containsKey(type))
+            entityArray = this.entityCacheArray.get(type);
+        else {
+            // Creates a new map for the specific type.
+            entityArray = new ArrayList<SoftReference<Entity>>();
+            this.entityCacheArray.put(type, entityArray);
+        }
+
+        // Adds a new soft reference for the entity into cache.
+        entityArray.remove(index);
+    }
+
 
     public <T extends Entity> T create(T entity, Class<T> type) throws Exception{
         Field idField = getFieldsForType(Entity.class)[0];
