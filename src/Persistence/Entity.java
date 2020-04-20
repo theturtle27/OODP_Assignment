@@ -1,7 +1,9 @@
 package Persistence;
 
 
-public abstract class Entity {
+import java.io.Serializable;
+
+public abstract class Entity implements Serializable {
     private final long _id;
 
 

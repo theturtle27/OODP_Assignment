@@ -25,6 +25,7 @@ public class Persistence {
     private final Map<Class<?>, Field[]> fCache;
     private final Map<Class<?>, Map<Long, SoftReference<Entity>>> entityCache;
     private final Map<Class<?>, ArrayList<SoftReference<Entity>>> entityCacheArray;
+    private final Map<Class<?>, ArrayList<Entity>> entityArray;
     private final Properties configuration;
     private final File configurationFile;
     public final static Properties DEFAULT_CONFIGURATION;
@@ -37,6 +38,7 @@ public class Persistence {
         this.fCache = new HashMap<Class<?>, Field[]>();
         this.entityCache = new HashMap<Class<?>, Map<Long, SoftReference<Entity>>>();
         this.entityCacheArray = new HashMap<Class<?>, ArrayList<SoftReference<Entity>>>();
+        this.entityArray = new HashMap<Class<?>, ArrayList<Entity>>();
         this.configurationFile = configurationFile;
         this.configuration = new Properties(DEFAULT_CONFIGURATION);
 
@@ -71,7 +73,18 @@ public class Persistence {
     }
 
     private void loadAllData() throws Exception{
-        loadCacheArray(MenuItem.class);
+        loadArray(MenuItem.class);
+    }
+
+    private <T extends Entity> void loadArray(Class<T> type) throws Exception{
+        File dataFile = this.getDataFile(type);
+        dataFile.createNewFile();
+
+        ArrayList list;
+
+        list = (ArrayList)readSerializedObject(type);
+
+        this.entityArray.put(type,list);
     }
 
     private <T extends Entity> void loadCacheArray(Class<T> type) throws Exception{
@@ -90,6 +103,18 @@ public class Persistence {
             }
         } finally {
             reader.close();
+        }
+    }
+
+    public <T extends Entity> void writeAllDataArray() throws Exception{
+        for (Map.Entry entry : this.entityArray.entrySet()) {
+            Class<T> type = (Class<T>)entry.getKey();
+            File dataFile = this.getDataFile(type);
+            dataFile.delete();
+            dataFile.createNewFile();
+
+            writeSerializedObject(type,(ArrayList)entry.getValue());
+
         }
     }
 
@@ -156,13 +181,13 @@ public class Persistence {
         return entity;
     }
 
-    public <T extends Entity> ArrayList<SoftReference<Entity>> retrieveAll(Class<T> type) throws Exception {
-        ArrayList<SoftReference<Entity>> entityArray = this.entityCacheArray.get(type);
+    public <T extends Entity> ArrayList<Entity> retrieveAll(Class<T> type) throws Exception {
+        ArrayList<Entity> entityArray = this.entityArray.get(type);
         return entityArray;
     }
 
-    public <T extends Entity> boolean deleteCache(T entity,int index, Class<T> type) throws Exception {
-        deleteEntityToCacheArray(type,index);
+    public <T extends Entity> boolean deleteCache(T entity, Class<T> type) throws Exception {
+        deleteEntityToCacheArray(type,entity);
         return true;
     }
 
@@ -170,10 +195,10 @@ public class Persistence {
         T entity = null;
 
         if(this.entityCache.containsKey(type)) {
-            ArrayList<SoftReference<Entity>> entityArray = this.entityCacheArray.get(type);
+            ArrayList<Entity> entityArray = this.entityArray.get(type);
 
             // Attempts to retrieve entity from soft reference
-            entity = (T) entityArray.get(index).get();
+            entity = (T) entityArray.get(index);
             // Remove soft reference from cache if it gets invalid
             if(entity == null)
                 entityArray.remove(index);
@@ -184,49 +209,49 @@ public class Persistence {
     }
 
     private <T extends Entity> void addEntityToCacheArray(Class<T> type , T entity) {
-        ArrayList<SoftReference<Entity>> entityArray;
+        ArrayList<Entity> entityArray;
 
-        if(this.entityCacheArray.containsKey(type))
-            entityArray = this.entityCacheArray.get(type);
+        if(this.entityArray.containsKey(type))
+            entityArray = this.entityArray.get(type);
         else {
             // Creates a new map for the specific type.
-            entityArray = new ArrayList<SoftReference<Entity>>();
-            this.entityCacheArray.put(type, entityArray);
+            entityArray = new ArrayList<Entity>();
+            this.entityArray.put(type, entityArray);
         }
 
         // Adds a new soft reference for the entity into cache.
-        entityArray.add(new SoftReference<Entity>(entity));
+        entityArray.add(entity);
     }
 
     private <T extends Entity> void updateEntityToCacheArray(Class<T> type ,int index, T entity) {
-        ArrayList<SoftReference<Entity>> entityArray;
+        ArrayList<Entity> entityArray;
 
-        if(this.entityCacheArray.containsKey(type))
-            entityArray = this.entityCacheArray.get(type);
+        if(this.entityArray.containsKey(type))
+            entityArray = this.entityArray.get(type);
         else {
             // Creates a new map for the specific type.
-            entityArray = new ArrayList<SoftReference<Entity>>();
-            this.entityCacheArray.put(type, entityArray);
+            entityArray = new ArrayList<Entity>();
+            this.entityArray.put(type, entityArray);
         }
 
         // Adds a new soft reference for the entity into cache.
-        entityArray.set(index,new SoftReference<Entity>(entity));
+        entityArray.set(index,entity);
     }
 
-    private <T extends Entity> void deleteEntityToCacheArray(Class<T> type ,int index) {
-        ArrayList<SoftReference<Entity>> entityArray;
+    private <T extends Entity> void deleteEntityToCacheArray(Class<T> type ,T entity) {
+        ArrayList<Entity> entityArray;
 
-        if(this.entityCacheArray.containsKey(type))
-            entityArray = this.entityCacheArray.get(type);
+        if(this.entityArray.containsKey(type))
+            entityArray = this.entityArray.get(type);
         else {
             // Creates a new map for the specific type.
-            entityArray = new ArrayList<SoftReference<Entity>>();
-            this.entityCacheArray.put(type, entityArray);
+            entityArray = new ArrayList<Entity>();
+            this.entityArray.put(type, entityArray);
         }
 
         // Adds a new soft reference for the entity into c6
         // ache.
-        entityArray.remove(index);
+        entityArray.remove(entity);
     }
 
 
@@ -385,7 +410,7 @@ public class Persistence {
             // Persist identifier of Entity reference
             builder.append(reference.getIdentifier());
         }
-        else if(type.isArray() || List.class.isAssignableFrom(type)) {
+        else if(type.isArray() || List.class.isAssignableFrom(type) || ArrayList.class.isAssignableFrom(type)) {
             String arrDelimiter = ",";
             Class componentType = type.getComponentType();
 
@@ -471,7 +496,7 @@ public class Persistence {
                         value = this.retrieveByID(id, type);
                 }
             }
-            else if(type.isArray() || List.class.isAssignableFrom(type)) {
+            else if(type.isArray() || List.class.isAssignableFrom(type) || ArrayList.class.isAssignableFrom(type)) {
                 Class componentType = type.getComponentType();
 
                 // Split the data string into the array elements
@@ -621,6 +646,46 @@ public class Persistence {
 
         // Adds a new soft reference for the entity into cache.
         idMap.put(entity.getIdentifier(), new SoftReference<Entity>(entity));
+    }
+
+    public <T extends Entity> List readSerializedObject(Class<T> type) {
+        List pDetails = null;
+        FileInputStream fis = null;
+        ObjectInputStream in = null;
+        try {
+            fis = new FileInputStream(getDataFileString((type)));
+            in = new ObjectInputStream(fis);
+            pDetails = (ArrayList) in.readObject();
+            in.close();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        } catch (ClassNotFoundException ex) {
+            ex.printStackTrace();
+        }
+        // print out the size
+        //System.out.println(" Details Size: " + pDetails.size());
+        //System.out.println();
+        return pDetails;
+    }
+
+    public <T extends Entity> void writeSerializedObject(Class<T> type, List list) {
+        FileOutputStream fos = null;
+        ObjectOutputStream out = null;
+        try {
+            fos = new FileOutputStream(getDataFileString((type)));
+            out = new ObjectOutputStream(fos);
+            out.writeObject(list);
+            out.close();
+            //	System.out.println("Object Persisted");
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    private <T extends Entity> String getDataFileString(Class<T> type) {
+        return DATA_DIR +
+                File.separator + type.getName().toLowerCase().replace(".", "-") +
+                DATA_EXT;
     }
 
 
