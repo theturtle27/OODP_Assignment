@@ -232,13 +232,13 @@ public class GuestController extends EntityController<Guest> {
         try {
 
             // get all guests
-            ArrayList<SoftReference<Entity>> guests = persistence.retrieveAll(Guest.class);
+            ArrayList<Entity> guests = persistence.retrieveAll(Guest.class);
 
             // iterate through all existing guests
-            for (SoftReference<Entity> softReference : guests) {
+            for (Entity entity : guests) {
 
                 // cast to guest object
-                Guest guest = (Guest)softReference.get();
+                Guest guest = (Guest)entity;
 
                 // check whether identity type, identity number and nationality are the same
                 if (guest.getIdentityType().equals(identitytType) && guest.getIdentityNumber().equals(identityNumber) && guest.getNationality().equals(nationality)) {
@@ -425,7 +425,7 @@ public class GuestController extends EntityController<Guest> {
         try {
 
             // get all guests
-            ArrayList<SoftReference<Entity>> guests = persistence.retrieveAll(Guest.class);
+            ArrayList<Entity> guests = persistence.retrieveAll(Guest.class);
 
             // check whether any guests exist
             if (guests.size() == 0) {
@@ -460,10 +460,10 @@ public class GuestController extends EntityController<Guest> {
                 String[] names = guestNameLowerCase.trim().split("\\s+");
 
                 // iterate through all guests
-                for (SoftReference<Entity> softReference : guests) {
+                for (Entity entity : guests) {
 
                     // cast to guest object
-                    Guest guestIterator = (Guest)softReference.get();
+                    Guest guestIterator = (Guest)entity;
 
                     // flag to check whether all parts of the guests name are part of an existing guest
                     boolean isPartOfName = true;
@@ -532,7 +532,7 @@ public class GuestController extends EntityController<Guest> {
         try {
 
             // get all guests
-            ArrayList<SoftReference<Entity>> guests = persistence.retrieveAll(Guest.class);
+            ArrayList<Entity> guests = persistence.retrieveAll(Guest.class);
 
             // search for guest via name
             Guest guest = getGuest(view);
@@ -544,6 +544,8 @@ public class GuestController extends EntityController<Guest> {
 
             // remove guest
             guests.remove(guest);
+
+            //persistence.deleteCache(guests, )
 
             view.displayText("The guest's information has been removed.\n\n");
         }
@@ -568,7 +570,7 @@ public class GuestController extends EntityController<Guest> {
         try {
 
             // get all guests
-            ArrayList<SoftReference<Entity>> guests = persistence.retrieveAll(Guest.class);
+            ArrayList<Entity> guests = persistence.retrieveAll(Guest.class);
 
             // check whether any guests exist
             if (guests.size() == 0) {
@@ -580,10 +582,10 @@ public class GuestController extends EntityController<Guest> {
             view.displayText("The following guests are on file:\n");
 
             // iterate through all guests
-            for (SoftReference<Entity> softReference : guests) {
+            for (Entity entity : guests) {
 
                 // cast to guest object
-                Guest guest = (Guest)softReference.get();
+                Guest guest = (Guest)entity;
 
                 //print guest
                 view.displayText(guest.toString() + "\n");

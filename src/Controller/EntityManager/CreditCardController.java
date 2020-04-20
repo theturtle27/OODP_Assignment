@@ -267,7 +267,7 @@ public class CreditCardController extends EntityController<CreditCard> {
         try {
 
             // get all guests
-            ArrayList<SoftReference<Entity>> guests = persistence.retrieveAll(Guest.class);
+            ArrayList<Entity> guests = persistence.retrieveAll(Guest.class);
 
             // check whether any guests exist
             if (guests.size() == 0) {
@@ -302,10 +302,10 @@ public class CreditCardController extends EntityController<CreditCard> {
                 String[] names = guestNameLowerCase.trim().split("\\s+");
 
                 // iterate through all guests
-                for (SoftReference<Entity> softReference : guests) {
+                for (Entity entity : guests) {
 
                     // cast to guest object
-                    Guest guestIterator = (Guest)softReference.get();
+                    Guest guestIterator = (Guest)entity;
 
                     // flag to check whether all parts of the guests name are part of an existing guest
                     boolean isPartOfName = true;

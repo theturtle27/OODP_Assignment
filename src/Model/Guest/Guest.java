@@ -120,10 +120,7 @@ public class Guest extends Entity{
         // convert identity type to String
         String stringIdentityType = capitalizeFirstLetter(identityType.toString());
 
-        //TODO: change to regular String
-        // String for guest information
-        StringBuffer stringGuest = new StringBuffer();
-        stringGuest.append("\n===============Guest==============="
+        return "\n===============Guest==============="
                 + "\nName             : " + name
                 + "\n-----------Identification----------"
                 + "\nGender           : " + stringGender
@@ -137,9 +134,7 @@ public class Guest extends Entity{
                 + "\nCountry          : " + country
                 + "\n--------------Contact--------------"
                 + "\nEmail Address    : " + eMail
-                + "\nPhone Number     : " + phoneNumber);
-
-        return stringGuest.toString();
+                + "\nPhone Number     : " + phoneNumber;
 
     }
 
