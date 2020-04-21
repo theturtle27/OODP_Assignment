@@ -1,7 +1,9 @@
 package Model.Room;
 
 public enum BedType {
-	Single,
-	Double,
-	Master
+
+	SINGLE,
+	DOUBLE,
+	MASTER
+
 }

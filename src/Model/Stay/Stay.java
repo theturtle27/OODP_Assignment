@@ -1,6 +1,10 @@
 package Model.Stay;
 
 import Model.Guest.Guest;
+import Model.Room.Room;
+import Model.Room.RoomStatus;
+import Model.reservation.Reservation;
+import Model.reservation.ReservationStatus;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,7 +13,7 @@ import java.time.LocalDate;
 public class Stay {
 
     private Guest guest;
-    private ArrayList<Room> rooms;
+    private Room room;
     private LocalDate checkInDate;
     private LocalDate checkOutDate;
     private int numberOfAdults;
@@ -18,10 +22,10 @@ public class Stay {
     //TODO: Add room service orders
 
     //check-in for walk-in guest
-    public Stay(Guest guest, ArrayList<Room> rooms, LocalDate checkInDate, LocalDate checkOutDate, int numberOfAdults, int numberOfChildren)
+    public Stay(Guest guest, Room room, LocalDate checkInDate, LocalDate checkOutDate, int numberOfAdults, int numberOfChildren)
     {
         this.guest = guest;
-        this.rooms = rooms;
+        this.room = room;
         this.checkInDate = checkInDate;
         this.checkOutDate = checkOutDate;
         this.numberOfAdults = numberOfAdults;
@@ -36,14 +40,14 @@ public class Stay {
     {
         // pass details from reservation to stay
         guest = reservation.getGuest();
-        rooms = reservation.getRooms();
+        room = reservation.getRoom();
         checkInDate = reservation.getCheckInDate();
         checkOutDate = reservation.getCheckOutDate();
         numberOfAdults = reservation.getNumberOfAdults();
         numberOfChildren = reservation.getNumberOfChildren();
 
         // set reservation status to checked in
-        reservation.setReservationStatus(ReservationStatus.CHECKEDIN);
+        reservation.setReservationStatus(ReservationStatus.CHECKED_IN);
 
         // set room status of rooms to occupied
         checkInRooms();

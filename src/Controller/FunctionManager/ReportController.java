@@ -9,11 +9,8 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import Controller.PersistenceController;
-import Model.reservation.Reservation;
-import Model.reservation.ReservationStatus;
-import Model.Room.Room;
 import Model.Room.RoomStatus;
-import Model.Room.RoomType;
+import Model.Room.RoomTypeEnum;
 import Persistence.Persistence;
 import View.View;
 
@@ -75,7 +72,7 @@ public class ReportController extends PersistenceController {
 
         view.message("\n--- Room Occupancy By Room Type ---");
 
-        for(RoomType roomType: RoomType.values())
+        for(RoomTypeEnum roomType: RoomTypeEnum.values())
             printOccupancyByRoomType(view, roomType);
 
 
@@ -120,7 +117,7 @@ public class ReportController extends PersistenceController {
 //                persistence.getCount(new ReservationPredicate(Arrays.asList(ReservationStatus.Cancelled), startDate, endDate),
 //                        Reservation.class, false));
 
-        RoomType popular = getMostPopularRoomType(startDate, endDate);
+        RoomTypeEnum popular = getMostPopularRoomType(startDate, endDate);
         if(popular != null)
 //            view.message("Most popular room type: " + popular.getName());
         view.message("");
@@ -160,9 +157,9 @@ public class ReportController extends PersistenceController {
     /**
      * Prints the rooms with this room type and is occupied.
      * @param view - A view interface that provides input/output.
-     * @param roomType - The occupied rooms with this {@link RoomType} to print.
+     * @param roomType - The occupied rooms with this {@link RoomTypeEnum} to print.
      */
-    private void printOccupancyByRoomType(View view, RoomType roomType) throws Exception {
+    private void printOccupancyByRoomType(View view, RoomTypeEnum roomType) throws Exception {
 //        Persistence persistence = this.getPersistenceImpl();
 ////        Iterable<Room> rooms = persistence.search(new Predicate<Room>() {
 //
@@ -197,10 +194,10 @@ public class ReportController extends PersistenceController {
      * @return A RoomType instance that is the most popular in the specified date range.
      * @throws Exception
      */
-    private RoomType getMostPopularRoomType(Date startDate, Date endDate) throws Exception {
-        RoomType popular = null;
+    private RoomTypeEnum getMostPopularRoomType(Date startDate, Date endDate) throws Exception {
+        RoomTypeEnum popular = null;
 
-        Map<RoomType, Integer> map = new HashMap<RoomType, Integer>();
+        Map<RoomTypeEnum, Integer> map = new HashMap<RoomTypeEnum, Integer>();
         Persistence persistence = this.getPersistenceImpl();
 //        Iterable<Reservation> reservations = persistence.search(new ReservationPredicate(Arrays.asList(ReservationStatus.values()), startDate, endDate),
 //                Reservation.class, false);
@@ -217,7 +214,7 @@ public class ReportController extends PersistenceController {
 //        }
 
         int max = 0;
-        for(RoomType roomType: map.keySet()) {
+        for(RoomTypeEnum roomType: map.keySet()) {
             int count = map.get(roomType);
             if(count > max) {
                 max = count;
