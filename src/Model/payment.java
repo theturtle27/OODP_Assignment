@@ -2,7 +2,7 @@ package Model;
 
 import Model.RoomServiceOrder.RoomServiceOrder;
 
-public class Payment {
+public class payment {
     int paymentID;
     double charge;
     double tax;
@@ -76,7 +76,7 @@ public class Payment {
         this.billingAddress = billingAddress;
     }
 
-    public Payment(int paymentID, double charge, double tax, RoomServiceOrder roomService, double discount, boolean weekend, String paymentMethod, String billingAddress) {
+    public payment(int paymentID, double charge, double tax, RoomServiceOrder roomService, double discount, boolean weekend, String paymentMethod, String billingAddress) {
         this.paymentID = paymentID;
         this.charge = charge;
         this.tax = tax;
