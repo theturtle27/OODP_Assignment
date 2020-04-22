@@ -1,16 +1,18 @@
 package Model.Stay;
 
 import Model.Guest.Guest;
+import Model.Payment.Payment;
 import Model.Room.Room;
 import Model.Room.RoomStatus;
 import Model.reservation.Reservation;
 import Model.reservation.ReservationStatus;
+import Persistence.Entity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.time.LocalDate;
 
-public class Stay {
+public class Stay extends Entity {
 
     private Guest guest;
     private Room room;
@@ -47,7 +49,7 @@ public class Stay {
         numberOfChildren = reservation.getNumberOfChildren();
 
         // set reservation status to checked in
-        reservation.setReservationStatus(ReservationStatus.CHECKED_IN);
+        reservation.setStatus(ReservationStatus.CHECKED_IN);
 
         // set room status of rooms to occupied
         checkInRooms();
@@ -56,8 +58,7 @@ public class Stay {
     //TODO: not finished
     private void checkInRooms()
     {
-        // create hashmap
-        HashMap<LocalDate, RoomStatus> roomStatus = new HashMap<LocalDate, RoomStatus>();
+
 
         //iterate through all dates of the reservation up to day before check-out
         for (LocalDate date = checkInDate; date.isBefore(checkOutDate); date = date.plusDays(1))
@@ -65,12 +66,9 @@ public class Stay {
             roomStatus.put(date, RoomStatus.OCCUPIED);
         }
 
-        // iterate through all rooms of the reservation
-        for(Room room : rooms)
-        {
-            //pass rooms the reference of this reservation
-            room.setRoomStatus(roomStatus);
-        }
+        //pass rooms the reference of this reservation
+        room.setRoomStatus(roomStatus);
+
     }
 
     // TODO: not finished

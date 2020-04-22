@@ -2,12 +2,13 @@ package Model.reservation;
 
 import Model.Guest.Guest;
 import Model.Room.Room;
+import Model.StatusEntity;
 import Persistence.Entity;
 
 import java.time.LocalDate;
 
 
-public class Reservation extends Entity{
+public class Reservation extends StatusEntity<ReservationStatus>{
 
 	private Guest guest;
 	private Room room;
@@ -15,7 +16,6 @@ public class Reservation extends Entity{
 	private LocalDate checkOutDate;
 	private short numberOfAdults;
 	private short numberOfChildren;
-	private ReservationStatus reservationStatus;
 
 	// constructor for use in program
 	public Reservation(Guest guest, Room room, LocalDate checkInDate, LocalDate checkOutDate, short numberOfAdults, short numberOfChildren)
@@ -27,7 +27,7 @@ public class Reservation extends Entity{
 		this.checkOutDate = checkOutDate;
 		this.numberOfAdults = numberOfAdults;
 		this.numberOfChildren = numberOfChildren;
-		reservationStatus = ReservationStatus.CONFIRMED;
+		super.setStatus(ReservationStatus.CONFIRMED);
 		this.room.setReservation(this);
 	}
 
@@ -61,9 +61,5 @@ public class Reservation extends Entity{
 		return numberOfChildren;
 	}
 
-	public void setReservationStatus(ReservationStatus reservationStatus)
-	{
-		this.reservationStatus = reservationStatus;
-	}
 
 }

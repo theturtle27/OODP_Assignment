@@ -1,6 +1,10 @@
 package Persistence;
 
+import Model.Guest.Guest;
 import Model.Menu.MenuItem;
+import Model.Room.Room;
+import Model.Stay.Stay;
+import Model.reservation.Reservation;
 
 import java.io.*;
 import java.lang.ref.SoftReference;
@@ -74,6 +78,10 @@ public class Persistence {
 
     private void loadAllData() throws Exception{
         loadArray(MenuItem.class);
+        loadArray(Guest.class);
+        loadArray(Room.class);
+        loadArray(Stay.class);
+        loadArray(Reservation.class);
     }
 
     private <T extends Entity> void loadArray(Class<T> type) throws Exception{

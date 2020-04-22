@@ -1,5 +1,7 @@
 package Model.Payment;
 
+import Model.reservation.Reservation;
+
 public class Payment {
     // private final List<Reservation> reservations;
     private double totalPrice;
@@ -7,9 +9,7 @@ public class Payment {
     private double weekendSurcharge;
     private double discount;
     private DiscountType discountType;
-	/*public Payment(List<Reservation> reservations) {
-		this.reservations = reservations;
-	}*/
+    private PaymentType paymentType;
 
     public Payment(double tax, double weekendSurcharge, double discount) {
         this.tax = tax;
@@ -46,6 +46,8 @@ public class Payment {
         this.discountType = discountType;
     }
 
+
+
     public void calTotalPrice(Reservation reservation) {
         double totalPrice = 0;
 
@@ -69,4 +71,12 @@ public class Payment {
         }
         totalPrice *= (100 + tax)/100;
         this.totalPrice = totalPrice;
+    }
+
+    public PaymentType getPaymentType() {
+        return paymentType;
+    }
+
+    public void setPaymentType(PaymentType paymentType) {
+        this.paymentType = paymentType;
     }
