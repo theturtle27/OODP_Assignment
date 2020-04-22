@@ -11,7 +11,7 @@ import java.util.ArrayList;
 public class Room extends Entity{
 
 	private String roomNumber;
-	private RoomTypeEnum roomType;
+	private RoomType roomType;
 	private BedType bedType;
 	private boolean enabledWifi;
 	private boolean withView;
@@ -22,7 +22,7 @@ public class Room extends Entity{
 	private Stay stay;
 
 	// TODO: all rooms as vacant initialized
-	public Room(String roomNumber, RoomTypeEnum roomType, BedType bedType, boolean enabledWifi, boolean withView, boolean smoking)
+	public Room(String roomNumber, RoomType roomType, BedType bedType, boolean enabledWifi, boolean withView, boolean smoking)
 	{
 		this.roomNumber = roomNumber;
 		this.roomType = roomType;
@@ -38,12 +38,12 @@ public class Room extends Entity{
 		return roomNumber;
 	}
 
-	public RoomTypeEnum getRoomType()
+	public RoomType getRoomType()
 	{
 		return roomType;
 	}
 
-	public void setRoomType(RoomTypeEnum roomType)
+	public void setRoomType(RoomType roomType)
 	{
 		this.roomType = roomType;
 	}

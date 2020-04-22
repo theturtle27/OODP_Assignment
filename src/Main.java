@@ -1,3 +1,4 @@
+import Controller.Controller;
 import Controller.EntityManager.CreditCardController;
 import Controller.EntityManager.GuestController;
 import Controller.EntityManager.MenuController;
@@ -22,6 +23,10 @@ public class Main {
         try {
             persistence = new Persistence(new File("aotoid.cfg"));
 
+            CreditCardController creditCardController = new CreditCardController(persistence);
+            GuestController guestController = new GuestController(persistence, creditCardController);
+            ReservationController reservationController = new ReservationController(persistence);
+
             NavigationController hotelmanagementController = new NavigationController();
             hotelmanagementController.addView(new ConsoleView(new RoomController(persistence), "Manage Room", sc));
             hotelmanagementController.addView(new ConsoleView(new MenuController(persistence), "Manage Menu Item", sc));
@@ -32,19 +37,18 @@ public class Main {
 
 
             NavigationController frontDeskController = new NavigationController();
-            frontDeskController.addView(new ConsoleView(new StayController(persistence), "Check-In/Check-Out Management", sc));
+            frontDeskController.addView(new ConsoleView(new StayController(persistence,guestController,reservationController), "Check-In/Check-Out Management", sc));
             frontDeskController.addView(new ConsoleView(new RoomServiceManagementController(persistence), "Room Service Management", sc));
 
             ConsoleView frontDeskView = new ConsoleView(frontDeskController, "Front Desk", sc);
 
-            CreditCardController creditCardController = new CreditCardController(persistence);
 
             ConsoleView creditCardView = new ConsoleView(creditCardController, "Credit Card Management", sc);
 
             NavigationController mainNav = new NavigationController();
             mainNav.addView(hotelmanagementView);
-            mainNav.addView(new ConsoleView(new GuestController(persistence, creditCardView), "Guest Management", sc));
-            mainNav.addView(new ConsoleView(new ReservationController(persistence), "Reservation System", sc));
+            mainNav.addView(new ConsoleView(guestController, "Guest Management", sc));
+            mainNav.addView(new ConsoleView(reservationController, "Reservation System", sc));
             mainNav.addView(frontDeskView);
             mainNav.addView(new ConsoleView(new ReportController(persistence), "Report System", sc));
 

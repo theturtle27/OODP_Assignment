@@ -3,7 +3,7 @@ package Controller.EntityManager;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import Model.Stay;
+import Model.Stay.Stay;
 import Model.reservation.Reservation;
 
 public class StayController {

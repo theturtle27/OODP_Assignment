@@ -1,36 +1,23 @@
 package Model.Payment;
 
+import Model.RoomServiceOrder.RoomServiceOrder;
+import Model.RoomServiceOrder.RoomServiceOrderStatus;
+import Model.Stay.Stay;
 import Model.reservation.Reservation;
+
+import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 public class Payment {
     // private final List<Reservation> reservations;
-    private double totalPrice;
-    private double tax;
+    private ArrayList<Stay> stays;
     private double weekendSurcharge;
     private double discount;
     private DiscountType discountType;
     private PaymentType paymentType;
 
-    public Payment(double tax, double weekendSurcharge, double discount) {
-        this.tax = tax;
-        this.weekendSurcharge = weekendSurcharge;
-        this.discount = discount;
-    }
-
-    public double getTotalPrice() {
-        return totalPrice;
-    }
-
-    public void setTotalPrice(double totalPrice) {
-        this.totalPrice = totalPrice;
-    }
-
-    public double getTax() {
-        return tax;
-    }
-
-    public void setTax(double tax) {
-        this.tax = tax;
+    public Payment(ArrayList<Stay> stays) {
+        this.stays = stays;
     }
 
     public double getWeekendSurcharge() {
@@ -46,31 +33,31 @@ public class Payment {
         this.discountType = discountType;
     }
 
+    public double getTotalSum() {
+        double totalSum = 0;
+
+        // Loop through all reservations and add up all the room prices
+        for(Stay stay: stays) {
+            long numOfDays = (stay.getCheckOutDate().getTime() - stay.getCheckInDate().getTime()) / TimeUnit.DAYS.toMillis(1);
+            totalSum += stay.getRoom().getRoomType().getRoomRate() * numOfDays;
+
+            for (RoomServiceOrder order : stay.getRoomServiceOrders()) {
+                // Loop through all the service orders and add up all the service orders.
+                if (order.getStatus() == RoomServiceOrderStatus.DELIVERED)
+                    totalSum += order.getTotalPrice();
+            }
+        }
 
 
-    public void calTotalPrice(Reservation reservation) {
-        double totalPrice = 0;
-
-        //for (Reservation reservation: reservations) {
-        //long numOfDaysWD = reservation.getWeekDay();
-        long numOfDaysWE = reservation.getWeekEnd();
-        //totalPrice += reservation.getAssignedRoom().getType().getPrice() * numOfDaysWD;
-        totalPrice += (reservation.getPrice() * (100 + weekendSurcharge)/100) * numOfDaysWE;
-
-				/* for(RoomServiceOrder order: reservation.getOrderList()) {
-					// Loop through all the service orders and add up all the service orders.
-					if(order.getStatus() == OrderStatus.Delivered)
-						totalPrice += order.getItem().getPrice();
-		}
-	}*/
+        // Perform discount operation
         if(discountType != null) {
             if(discountType == DiscountType.FIXED)
-                totalPrice -= discount;
+                totalSum -= discount;
             else
-                totalPrice *= (100 - discount) / 100;
+                totalSum *= (100 - discount) / 100;
         }
-        totalPrice *= (100 + tax)/100;
-        this.totalPrice = totalPrice;
+
+        return totalSum;
     }
 
     public PaymentType getPaymentType() {
@@ -80,3 +67,5 @@ public class Payment {
     public void setPaymentType(PaymentType paymentType) {
         this.paymentType = paymentType;
     }
+
+}

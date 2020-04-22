@@ -3,9 +3,11 @@ package Controller.FunctionManager;
 import Controller.EntityController;
 import Controller.EntityManager.GuestController;
 import Model.Guest.Guest;
+import Model.Payment.DiscountType;
 import Model.Payment.Payment;
 import Model.Room.RoomStatus;
 import Model.Stay.Stay;
+import Model.Stay.StayStatus;
 import Model.reservation.Reservation;
 import Model.reservation.ReservationStatus;
 import Persistence.Persistence;
@@ -14,6 +16,7 @@ import View.Options;
 import Persistence.Entity;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.*;
 
 public class StayController extends EntityController<Stay> {
@@ -51,25 +54,25 @@ public class StayController extends EntityController<Stay> {
     protected void safeOnOptionSelected(View view, int option) throws Exception {
         switch (option) {
             case 0:
-                PerformchechInReservation(view);
+                performchechInReservation(view);
                 break;
             case 1:
-                chechInWalkedin(view);
+                performchechInWalkedin(view);
                 break;
             case 2:
-                checkOut(view);
+                performCheckOut(view);
                 break;
         }
     }
 
 
-    private void PerformchechInReservation(View view) throws Exception {
+    private void performchechInReservation(View view) throws Exception {
         Guest guest = guestController.select(view);
 
 
         if(guest != null) {
             Persistence persistence = this.getPersistenceImpl();
-            ArrayList<Reservation> reservations = reservationController.getReservationsAvalible(guest);
+            ArrayList<Reservation> reservations = getReservationsAvalible(guest);
 
             long count = reservations.size();
 
@@ -78,7 +81,7 @@ public class StayController extends EntityController<Stay> {
                 // There are no reservations, ask user to make reservation
                 view.message("You have no reservations for today, do you want to make one?");
                 if(view.options(ynOptionList) == Options.Yes) {
-                    chechInWalkedin(view);
+                    performchechInWalkedin(view);
                 }
             }
             else {
@@ -116,7 +119,7 @@ public class StayController extends EntityController<Stay> {
         Guest guest = guestController.select(view);
 
         if(guest != null) {
-            ArrayList<Stay> stays = reservationController.getStaysAvalibleCheckout(guest);
+            ArrayList<Stay> stays = getStaysAvalibleCheckout(guest);
             long count = stays.size();
             if(count == 0) {
                 view.message("No checked-in room that is available for check-out.");
@@ -134,7 +137,7 @@ public class StayController extends EntityController<Stay> {
                         checkoutStays.add(stay);
                     }
                     else {
-                        view.message("Room number: " + stay.getAssignedRoom().getNumber());
+                        view.message("Room number: " + stay.getRoom().getRoomNumber());
                         view.display(stay);
                         view.message("Do you wish to check-out of the above room?");
                         if(view.options(ynOptionList) == Options.Yes)
@@ -160,15 +163,12 @@ public class StayController extends EntityController<Stay> {
         ArrayList<Entity> stays = persistence.retrieveAll(Stay.class);
         for(Reservation reservation: reservations) {
             String message;
-            if(reservation.getStatus() == ReservationStatus.IN_WAITLIST)
-                reservation.setAssignedRoom(findVacantAndAvailableRoom(reservation));
-
             if(reservation.getStatus() == ReservationStatus.CONFIRMED) {
-                if(reservation.getAssignedRoom().getStatus() == RoomStatus.VACANT) {
+                if(reservation.getRoom().getRoomStatus() == RoomStatus.VACANT) {
                     reservation.setStatus(ReservationStatus.CHECKED_IN);
                     Stay stay = new Stay(reservation);
                     stays.add(stay);
-                    message = "The above reservation has been checked-in successfully, the room number assigned is " + stay.getAssignedRoom().getNumber();
+                    message = "The above reservation has been checked-in successfully, the room number assigned is " + stay.getRoom().getRoomNumber();
                 }
                 else {
                     message = "The hotel is still preparing your hotel room, please come back in an hour time, we apologise for any inconvenience caused.";
@@ -183,14 +183,13 @@ public class StayController extends EntityController<Stay> {
         }
     }
 
-    private void checkOut(View view, List<Stay> stays) throws Exception {
+    private void checkOut(View view, ArrayList<Stay> stays) throws Exception {
         Persistence persistence = this.getPersistenceImpl();
 
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-        Date today = sdf.parse(sdf.format(new Date()));
+        Date today = new Date();
         for(Stay stay: stays) {
             // Update the end date of the reservations to today's date;
-            stay.setEndDate(today);
+            stay.setCheckOutDate(today);
         }
 
         Payment payment = new Payment(stays);
@@ -238,12 +237,39 @@ public class StayController extends EntityController<Stay> {
         view.display(payment);
     }
 
-    private void chechInWalkedin(View view) throws Exception {
+
+    private void performchechInWalkedin(View view) throws Exception {
         Persistence persistence = this.getPersistenceImpl();
 
         ArrayList<Entity> stays = persistence.retrieveAll(Stay.class);
 
         Guest guest = guestController.select(view);
+    }
+
+    private ArrayList<Stay> getStaysAvalibleCheckout(Guest guest) throws Exception{
+        Persistence persistence = getPersistenceImpl();
+        ArrayList<Entity> stays = persistence.retrieveAll(Stay.class);
+        ArrayList<Stay> relatedStays = new ArrayList<>();
+        for (Entity entity: stays) {
+            Stay stay = (Stay)entity;
+            if ((stay.getGuest() == guest)&&(stay.getStatus()== StayStatus.CHECKEDIN)){
+                relatedStays.add(stay);
+            }
+        }
+        return relatedStays;
+    }
+
+    private ArrayList<Reservation> getReservationsAvalible(Guest guest) throws Exception{
+        Persistence persistence = getPersistenceImpl();
+        ArrayList<Entity> reservations = persistence.retrieveAll(Reservation.class);
+        ArrayList<Reservation> relatedReservations = new ArrayList<>();
+        for (Entity entity: reservations) {
+            Reservation reservation = (Reservation) entity;
+            if ((reservation.getGuest() == guest)&&(reservation.getStatus()== ReservationStatus.CONFIRMED)){
+                relatedReservations.add(reservation);
+            }
+        }
+        return relatedReservations;
     }
 
     @Override

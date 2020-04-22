@@ -4,32 +4,36 @@ import Model.Guest.Guest;
 import Model.Payment.Payment;
 import Model.Room.Room;
 import Model.Room.RoomStatus;
+import Model.RoomServiceOrder.RoomServiceOrder;
+import Model.StatusEntity;
 import Model.reservation.Reservation;
 import Model.reservation.ReservationStatus;
 import Persistence.Entity;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.time.LocalDate;
 
-public class Stay extends Entity {
+public class Stay extends StatusEntity<StayStatus> {
 
     private Guest guest;
     private Room room;
-    private LocalDate checkInDate;
-    private LocalDate checkOutDate;
+    private Date checkInDate;
+    private Date checkOutDate;
     private int numberOfAdults;
     private int numberOfChildren;
+    private ArrayList<RoomServiceOrder> roomServiceOrders;
 
     //TODO: Add room service orders
 
     //check-in for walk-in guest
-    public Stay(Guest guest, Room room, LocalDate checkInDate, LocalDate checkOutDate, int numberOfAdults, int numberOfChildren)
+    public Stay(Guest guest, Room room, Date checkInDate, int numberOfAdults, int numberOfChildren)
     {
         this.guest = guest;
         this.room = room;
         this.checkInDate = checkInDate;
-        this.checkOutDate = checkOutDate;
+        this.checkOutDate = null;
         this.numberOfAdults = numberOfAdults;
         this.numberOfChildren = numberOfChildren;
 
@@ -44,7 +48,7 @@ public class Stay extends Entity {
         guest = reservation.getGuest();
         room = reservation.getRoom();
         checkInDate = reservation.getCheckInDate();
-        checkOutDate = reservation.getCheckOutDate();
+        checkOutDate = null;
         numberOfAdults = reservation.getNumberOfAdults();
         numberOfChildren = reservation.getNumberOfChildren();
 
@@ -55,42 +59,74 @@ public class Stay extends Entity {
         checkInRooms();
     }
 
-    //TODO: not finished
     private void checkInRooms()
     {
 
-
-        //iterate through all dates of the reservation up to day before check-out
-        for (LocalDate date = checkInDate; date.isBefore(checkOutDate); date = date.plusDays(1))
-        {
-            roomStatus.put(date, RoomStatus.OCCUPIED);
-        }
-
-        //pass rooms the reference of this reservation
-        room.setRoomStatus(roomStatus);
+        room.setRoomStatus(RoomStatus.OCCUPIED);
 
     }
 
-    // TODO: not finished
     public void checkOut()
     {
-        // create a new payment object
-        Payment payment = new Payment();
 
-        // calculate the total price of the stay
-        payment.calculateTotalPrice(this);
+        room.setRoomStatus(RoomStatus.VACANT);
 
-        // iterate through all rooms of the reservation
-        for(Room room : rooms)
-        {
-            // create HashMap
-            HashMap<LocalDate, RoomStatus> roomStatus = new HashMap<LocalDate, RoomStatus>();
-            roomStatus.put(LocalDate.now(), RoomStatus.VACANT);
-
-            //pass rooms the reference of this reservation
-            room.setRoomStatus(roomStatus);
-        }
     }
 
+    public Guest getGuest() {
+        return guest;
+    }
+
+    public void setGuest(Guest guest) {
+        this.guest = guest;
+    }
+
+    public Room getRoom() {
+        return room;
+    }
+
+    public void setRoom(Room room) {
+        this.room = room;
+    }
+
+    public Date getCheckInDate() {
+        return checkInDate;
+    }
+
+    public void setCheckInDate(Date checkInDate) {
+        this.checkInDate = checkInDate;
+    }
+
+    public Date getCheckOutDate() {
+        return checkOutDate;
+    }
+
+    public void setCheckOutDate(Date checkOutDate) {
+        this.checkOutDate = checkOutDate;
+    }
+
+    public int getNumberOfAdults() {
+        return numberOfAdults;
+    }
+
+    public void setNumberOfAdults(int numberOfAdults) {
+        this.numberOfAdults = numberOfAdults;
+    }
+
+    public int getNumberOfChildren() {
+        return numberOfChildren;
+    }
+
+    public void setNumberOfChildren(int numberOfChildren) {
+        this.numberOfChildren = numberOfChildren;
+    }
+
+    public void addRoomSerciceOrder(RoomServiceOrder roomServiceOrder){
+        this.roomServiceOrders.add(roomServiceOrder);
+    }
+
+    public ArrayList<RoomServiceOrder> getRoomServiceOrders() {
+        return roomServiceOrders;
+    }
 }
 

@@ -43,13 +43,11 @@ public class GuestController extends EntityController<Guest> {
 
     private static final String NOT_FOUND = "not found";
 
-    private ConsoleView creditCardView;
     private CreditCardController creditCardController;
 
-    public GuestController(Persistence persistence, ConsoleView creditCardView) {
+    public GuestController(Persistence persistence, CreditCardController creditCardController) {
         super(persistence);
-        this.creditCardView = creditCardView;
-        this.creditCardController = (CreditCardController)creditCardView.getController();
+        this.creditCardController = creditCardController;
     }
 
     @Override
