@@ -5,6 +5,7 @@ import Controller.EntityManager.GuestController;
 import Model.Guest.Guest;
 import Model.Payment.DiscountType;
 import Model.Payment.Payment;
+import Model.Payment.PaymentType;
 import Model.Room.RoomStatus;
 import Model.Stay.Stay;
 import Model.Stay.StayStatus;
@@ -15,8 +16,6 @@ import View.View;
 import View.Options;
 import Persistence.Entity;
 
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.util.*;
 
 public class StayController extends EntityController<Stay> {
@@ -26,7 +25,7 @@ public class StayController extends EntityController<Stay> {
     public final static String KEY_GENDER = "gender";
     public final static String KEY_CONTACT_NUMBER = "contact number";
     public final static String KEY_EMAIL_ADDRESS = "email address";
-    public final static String KEY_SEARCH = "name of the guest to search for";
+    public final static String KEY_DISCOUNT_VALUE = "value for discount";
     public final static String KEY_ID = "ID of stay or 'Search' to search for guest ID by name";
 
     private final GuestController guestController;
@@ -128,7 +127,7 @@ public class StayController extends EntityController<Stay> {
                 view.message("You have " + count + " rooms eligible for check-out");
                 view.message("Do you wish to add check-out all your rooms (Select no to inspect each reservation to decide which ones to check-out)?");
 
-                List<Stay> checkoutStays = new ArrayList<Stay>();
+                ArrayList<Stay> checkoutStays = new ArrayList<Stay>();
                 List<Options> ynOptionList = Arrays.asList(Options.Yes, Options.No);
                 Options selectedOption = view.options(ynOptionList);
 
@@ -223,16 +222,9 @@ public class StayController extends EntityController<Stay> {
         payment.setPaymentType(view.options(Arrays.asList(PaymentType.values())));
 
         // Create payment
-        persistence.create(payment, Payment.class);
+        ArrayList<Entity> payments = persistence.retrieveAll(Payment.class);
+        payments.add(payment);
         view.message("Your payment is successful, thank you for staying with us, we hope to see you again!");
-        for(Reservation reservation: reservations) {
-            // Update status and save changes to file
-            reservation.setStatus(ReservationStatus.CheckedOut);
-            reservation.setPayment(payment);
-            persistence.update(reservation, Reservation.class);
-
-            view.message("Successfully checked out from room " + reservation.getAssignedRoom().getNumber() + ".");
-        }
         view.message("Please take not of your receipt below");
         view.display(payment);
     }
