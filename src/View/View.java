@@ -35,7 +35,7 @@ public abstract class View {
 
     public abstract YearMonth getValidDate(String name, String patternDate, String regexDate);
 
-    public abstract LocalDate getValidDate(String name, String patternDate, String printPatternDate, String regexDate, LocalDate dateInput)
+    public abstract LocalDate getValidDate(String name, String patternDate, String printPatternDate, String regexDate, LocalDate dateInput);
 
     public abstract String getInputRegex(String name, String patternCondition);
 
