@@ -543,6 +543,7 @@ public class GuestController extends EntityController<Guest> {
             // remove guest
             guests.remove(guest);
 
+            //TODO: guest needs to be deleted
             //persistence.deleteCache(guests, )
 
             view.displayText("The guest's information has been removed.\n\n");

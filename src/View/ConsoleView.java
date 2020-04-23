@@ -2,6 +2,7 @@ package View;
 
 import Controller.Controller;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -175,6 +176,54 @@ public class ConsoleView extends View {
 
             // check whether the date is after today
             if(testDate.isBefore(YearMonth.now()))
+            {
+
+                // check whether the entry should be repeated
+                repeatEntry = repeatEntry(name, INVALID);
+
+            }
+            else
+            {
+                // assign valid date to date
+                date = testDate;
+            }
+
+        }while(date == null && repeatEntry);
+
+        return date;
+    }
+
+    public LocalDate getValidDate(String name, String patternDate, String printPatternDate, String regexDate, LocalDate dateInput)
+    {
+        // declare LocalDate variable
+        LocalDate date = null;
+
+        // flag to check whether the entry should be tried again
+        boolean repeatEntry;
+
+        // create a formatter for date
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(patternDate);
+
+        // repeat until valid date is plugged in
+        do
+        {
+            // initialize repeat flag to false
+            repeatEntry = false;
+
+            // get date
+            String stringDate = getInputRegex(name.trim() + " (" + printPatternDate + ")", regexDate);
+
+            // break out of method
+            if(stringDate == null)
+            {
+                return null;
+            }
+
+            // convert date from String to LocalDate
+            LocalDate testDate = LocalDate.parse(stringDate, formatter);
+
+            // check whether the start date is after the input date
+            if(!testDate.isAfter(dateInput))
             {
 
                 // check whether the entry should be repeated

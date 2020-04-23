@@ -1,5 +1,6 @@
 package View;
 
+import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +34,8 @@ public abstract class View {
     public abstract void onSelected();
 
     public abstract YearMonth getValidDate(String name, String patternDate, String regexDate);
+
+    public abstract LocalDate getValidDate(String name, String patternDate, String printPatternDate, String regexDate, LocalDate dateInput)
 
     public abstract String getInputRegex(String name, String patternCondition);
 
