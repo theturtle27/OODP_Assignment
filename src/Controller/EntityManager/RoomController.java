@@ -82,15 +82,15 @@ public class RoomController extends EntityController<Room> {
                 updateRoomStatus(view);
                 break;
             case 3:
-                getRoom(view);
+                select(view);
                 break;
             case 4:
                 delete(view);
                 break;
-            case 5:
+            case 5: show(view);
                 break;
             case 6:
-                show(view);
+                checkRoomAvailability(view);
                 break;
             case 7:
                 updateRoomType(view);
@@ -101,7 +101,6 @@ public class RoomController extends EntityController<Room> {
         }
     }
 
-    //TODO: do we need the exception?
     @Override
     protected void create(View view) throws Exception {
 
@@ -145,14 +144,7 @@ public class RoomController extends EntityController<Room> {
         boolean enabledWifi;
 
         // convert String to boolean
-        if("1".equals(stringEnabledWifi))
-        {
-            enabledWifi = true;
-        }
-        else
-        {
-            enabledWifi = false;
-        }
+        enabledWifi = "1".equals(stringEnabledWifi);
 
         // get with view
         String stringWithView = view.getInputRegex(WITH_VIEW, REGEX_BOOLEAN);
@@ -167,14 +159,7 @@ public class RoomController extends EntityController<Room> {
         boolean withView;
 
         // convert String to boolean
-        if("1".equals(stringWithView))
-        {
-            withView = true;
-        }
-        else
-        {
-            withView = false;
-        }
+        withView = "1".equals(stringWithView);
 
         // get smoking
         String stringSmoking = view.getInputRegex(SMOKING, REGEX_BOOLEAN);
@@ -189,14 +174,7 @@ public class RoomController extends EntityController<Room> {
         boolean smoking;
 
         // convert String to boolean
-        if("1".equals(stringSmoking))
-        {
-            smoking = true;
-        }
-        else
-        {
-            smoking = false;
-        }
+        smoking = "1".equals(stringSmoking);
 
         // create room
         Room room = new Room(roomNumber, roomType, bedType, enabledWifi, withView, smoking);
@@ -341,11 +319,11 @@ public class RoomController extends EntityController<Room> {
 
     }
 
-    private void updateRoomStatus(View view)
+    private void updateRoomStatus(View view) throws Exception
     {
 
         // search for room via room number
-        Room room = getRoom(view);
+        Room room = select(view);
 
         //check whether room was found
         if(room == null)
@@ -408,85 +386,11 @@ public class RoomController extends EntityController<Room> {
 
     }
 
-    //TODO: this should be the retrieve method but retrieve method returns boolean
-    private Room getRoom(View view) {
-
-        // get persistence
-        Persistence persistence = this.getPersistenceImpl();
-
-        // initialize guest
-        Room room = null;
-
-        try {
-
-            // get all rooms
-            ArrayList<Entity> rooms = persistence.retrieveAll(Room.class);
-
-            // check whether any rooms exist
-            if (rooms.size() == 0) {
-                view.displayText("No room exists. Create a room before updating the room's details.\n\n");
-
-                return null;
-            }
-
-            // flag to check whether the entry of the guest name should be tried again
-            boolean repeatEntry;
-
-            //repeat
-            do {
-                // initialize repeat flag to false
-                repeatEntry = false;
-
-                // get the room number
-                String roomNumber = view.getInputRegex(ROOM_NUMBER, REGEX_VALID_ROOM_NUMBER);
-
-                // break out of method
-                if (roomNumber == null) {
-                    return null;
-                }
-
-                // iterate through all rooms
-                for (Entity entity : rooms) {
-
-                    // cast to room object
-                    Room roomIterator = (Room)entity;
-
-                    // check whether room Number exists
-                    if (roomIterator.getRoomNumber().equals(roomNumber)) {
-
-                        // print room details
-                        System.out.println(roomIterator.toString() + "\n");
-
-                        // get room
-                        room = roomIterator;
-
-                        break;
-                    }
-
-                }
-
-                // check whether a room was found
-                if (room == null) {
-
-                    // check whether the entry of the room number should be tried again
-                    repeatEntry = view.repeatEntry(ROOM_NUMBER, NOT_FOUND);
-
-                }
-
-
-            } while (room == null && repeatEntry);
-        } catch (Exception e) {
-
-        }
-
-        return room;
-    }
-
-    private void checkRoomAvailability(View view)
+    private void checkRoomAvailability(View view) throws Exception
     {
 
         // search for room via room number
-        Room room = getRoom(view);
+        Room room = select(view);
 
         //check whether room was found
         if(room == null)
@@ -614,7 +518,7 @@ public class RoomController extends EntityController<Room> {
     protected void update(View view) throws Exception {
 
         // search for room via room number
-        Room room = getRoom(view);
+        Room room = select(view);
 
         //check whether guest was found
         if(room == null)
@@ -653,14 +557,7 @@ public class RoomController extends EntityController<Room> {
         boolean enabledWifi;
 
         // convert String to boolean
-        if("1".equals(stringEnabledWifi))
-        {
-            enabledWifi = true;
-        }
-        else
-        {
-            enabledWifi = false;
-        }
+        enabledWifi = "1".equals(stringEnabledWifi);
 
         // get with view
         String stringWithView = view.getInputRegex(WITH_VIEW, REGEX_BOOLEAN);
@@ -675,14 +572,7 @@ public class RoomController extends EntityController<Room> {
         boolean withView;
 
         // convert String to boolean
-        if("1".equals(stringWithView))
-        {
-            withView = true;
-        }
-        else
-        {
-            withView = false;
-        }
+        withView = "1".equals(stringWithView);
 
         // get smoking
         String stringSmoking = view.getInputRegex(SMOKING, REGEX_BOOLEAN);
@@ -697,14 +587,7 @@ public class RoomController extends EntityController<Room> {
         boolean smoking;
 
         // convert String to boolean
-        if("1".equals(stringSmoking))
-        {
-            smoking = true;
-        }
-        else
-        {
-            smoking = false;
-        }
+        smoking = "1".equals(stringSmoking);
 
         // set everything if there were no errors
         // set room type
@@ -743,7 +626,7 @@ public class RoomController extends EntityController<Room> {
             ArrayList<Entity> rooms = persistence.retrieveAll(Room.class);
 
             // search for room via room number
-            Room room = getRoom(view);
+            Room room = select(view);
 
             //check whether guest was found
             if (room == null) {
@@ -768,7 +651,75 @@ public class RoomController extends EntityController<Room> {
 
     @Override
     public Room select(View view) throws Exception {
-        return null;
+        // get persistence
+        Persistence persistence = this.getPersistenceImpl();
+
+        // initialize guest
+        Room room = null;
+
+        try {
+
+            // get all rooms
+            ArrayList<Entity> rooms = persistence.retrieveAll(Room.class);
+
+            // check whether any rooms exist
+            if (rooms.size() == 0) {
+                view.displayText("No room exists. Create a room before updating the room's details.\n\n");
+
+                return null;
+            }
+
+            // flag to check whether the entry of the guest name should be tried again
+            boolean repeatEntry;
+
+            //repeat
+            do {
+                // initialize repeat flag to false
+                repeatEntry = false;
+
+                // get the room number
+                String roomNumber = view.getInputRegex(ROOM_NUMBER, REGEX_VALID_ROOM_NUMBER);
+
+                // break out of method
+                if (roomNumber == null) {
+                    return null;
+                }
+
+                // iterate through all rooms
+                for (Entity entity : rooms) {
+
+                    // cast to room object
+                    Room roomIterator = (Room)entity;
+
+                    // check whether room Number exists
+                    if (roomIterator.getRoomNumber().equals(roomNumber)) {
+
+                        // print room details
+                        System.out.println(roomIterator.toString() + "\n");
+
+                        // get room
+                        room = roomIterator;
+
+                        break;
+                    }
+
+                }
+
+                // check whether a room was found
+                if (room == null) {
+
+                    // check whether the entry of the room number should be tried again
+                    repeatEntry = view.repeatEntry(ROOM_NUMBER, NOT_FOUND);
+
+                }
+
+
+            } while (room == null && repeatEntry);
+        } catch (Exception e) {
+
+        }
+
+        return room;
     }
 
     @Override

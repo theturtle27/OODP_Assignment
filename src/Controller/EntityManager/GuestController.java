@@ -76,7 +76,7 @@ public class GuestController extends EntityController<Guest> {
                 update(view);
                 break;
             case 2:
-                retrieve(view);
+                select(view);
                 break;
             case 3:
                 delete(view);
@@ -264,7 +264,7 @@ public class GuestController extends EntityController<Guest> {
     protected void update(View view) throws Exception {
 
         // search for guest via name
-        Guest guest = getGuest(view);
+        Guest guest = select(view);
 
         //check whether guest was found
         if(guest == null)
@@ -412,8 +412,41 @@ public class GuestController extends EntityController<Guest> {
         view.displayText("\n\nThe guest's details have been updated.\n\n");
     }
 
-    private Guest getGuest(View view)
-    {
+    @Override
+    protected void delete(View view) throws Exception {
+
+        // get persistence
+        Persistence persistence = this.getPersistenceImpl();
+
+        try {
+
+            // get all guests
+            ArrayList<Entity> guests = persistence.retrieveAll(Guest.class);
+
+            // search for guest via name
+            Guest guest = select(view);
+
+            //check whether guest was found
+            if (guest == null) {
+                return;
+            }
+
+            // remove guest
+            guests.remove(guest);
+
+            //TODO: guest needs to be deleted
+            //persistence.deleteCache(guests, )
+
+            view.displayText("The guest's information has been removed.\n\n");
+        }
+        catch(Exception e)
+        {
+
+        }
+    }
+
+    @Override
+    public Guest select(View view) throws Exception {
         // initialize guest
         Guest guest = null;
 
@@ -519,44 +552,6 @@ public class GuestController extends EntityController<Guest> {
         }
 
         return guest;
-    }
-
-    @Override
-    protected void delete(View view) throws Exception {
-
-        // get persistence
-        Persistence persistence = this.getPersistenceImpl();
-
-        try {
-
-            // get all guests
-            ArrayList<Entity> guests = persistence.retrieveAll(Guest.class);
-
-            // search for guest via name
-            Guest guest = getGuest(view);
-
-            //check whether guest was found
-            if (guest == null) {
-                return;
-            }
-
-            // remove guest
-            guests.remove(guest);
-
-            //TODO: guest needs to be deleted
-            //persistence.deleteCache(guests, )
-
-            view.displayText("The guest's information has been removed.\n\n");
-        }
-        catch(Exception e)
-        {
-
-        }
-    }
-
-    @Override
-    public Guest select(View view) throws Exception {
-        return null;
     }
 
 
