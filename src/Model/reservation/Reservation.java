@@ -6,20 +6,19 @@ import Model.StatusEntity;
 import Persistence.Entity;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 
 public class Reservation extends StatusEntity<ReservationStatus>{
 
 	private Guest guest;
 	private Room room;
-	private Date checkInDate;
-	private Date checkOutDate;
+	private LocalDate checkInDate;
+	private LocalDate checkOutDate;
 	private short numberOfAdults;
 	private short numberOfChildren;
 
 	// constructor for use in program
-	public Reservation(Guest guest, Room room, Date checkInDate, Date checkOutDate, short numberOfAdults, short numberOfChildren)
+	public Reservation(Guest guest, Room room, LocalDate checkInDate, LocalDate checkOutDate, short numberOfAdults, short numberOfChildren)
 	{
 
 		this.guest = guest;
@@ -42,12 +41,12 @@ public class Reservation extends StatusEntity<ReservationStatus>{
 		return room;
 	}
 
-	public Date getCheckInDate()
+	public LocalDate getCheckInDate()
 	{
 		return checkInDate;
 	}
 
-	public Date getCheckOutDate()
+	public LocalDate getCheckOutDate()
 	{
 		return checkOutDate;
 	}

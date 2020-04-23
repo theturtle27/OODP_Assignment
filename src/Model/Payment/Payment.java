@@ -39,7 +39,7 @@ public class Payment extends Entity {
 
         // Loop through all reservations and add up all the room prices
         for(Stay stay: stays) {
-            long numOfDays = (stay.getCheckOutDate().getTime() - stay.getCheckInDate().getTime()) / TimeUnit.DAYS.toMillis(1);
+            long numOfDays = (stay.getCheckOutDate().toEpochDay() - stay.getCheckInDate().toEpochDay());
             totalSum += stay.getRoom().getRoomType().getRoomRate() * numOfDays;
 
             for (RoomServiceOrder order : stay.getRoomServiceOrders()) {

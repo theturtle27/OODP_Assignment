@@ -3,6 +3,7 @@ package Persistence;
 import Model.Guest.Guest;
 import Model.Menu.MenuItem;
 import Model.Room.Room;
+import Model.Room.RoomType;
 import Model.Stay.Stay;
 import Model.reservation.Reservation;
 
@@ -82,6 +83,7 @@ public class Persistence {
         loadArray(Room.class);
         loadArray(Stay.class);
         loadArray(Reservation.class);
+        loadArray(RoomType.class);
     }
 
     private <T extends Entity> void loadArray(Class<T> type) throws Exception{
@@ -91,6 +93,9 @@ public class Persistence {
         ArrayList list;
 
         list = (ArrayList)readSerializedObject(type);
+        if (list == null){
+            list = new ArrayList();
+        }
 
         this.entityArray.put(type,list);
     }

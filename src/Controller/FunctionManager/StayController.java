@@ -16,6 +16,7 @@ import View.View;
 import View.Options;
 import Persistence.Entity;
 
+import java.time.LocalDate;
 import java.util.*;
 
 public class StayController extends EntityController<Stay> {
@@ -185,7 +186,7 @@ public class StayController extends EntityController<Stay> {
     private void checkOut(View view, ArrayList<Stay> stays) throws Exception {
         Persistence persistence = this.getPersistenceImpl();
 
-        Date today = new Date();
+        LocalDate today = LocalDate.now();
         for(Stay stay: stays) {
             // Update the end date of the reservations to today's date;
             stay.setCheckOutDate(today);

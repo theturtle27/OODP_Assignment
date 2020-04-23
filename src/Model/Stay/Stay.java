@@ -19,8 +19,8 @@ public class Stay extends StatusEntity<StayStatus> {
 
     private Guest guest;
     private Room room;
-    private Date checkInDate;
-    private Date checkOutDate;
+    private LocalDate checkInDate;
+    private LocalDate checkOutDate;
     private int numberOfAdults;
     private int numberOfChildren;
     private ArrayList<RoomServiceOrder> roomServiceOrders;
@@ -28,7 +28,7 @@ public class Stay extends StatusEntity<StayStatus> {
     //TODO: Add room service orders
 
     //check-in for walk-in guest
-    public Stay(Guest guest, Room room, Date checkInDate, int numberOfAdults, int numberOfChildren)
+    public Stay(Guest guest, Room room, LocalDate checkInDate, int numberOfAdults, int numberOfChildren)
     {
         this.guest = guest;
         this.room = room;
@@ -89,19 +89,19 @@ public class Stay extends StatusEntity<StayStatus> {
         this.room = room;
     }
 
-    public Date getCheckInDate() {
+    public LocalDate getCheckInDate() {
         return checkInDate;
     }
 
-    public void setCheckInDate(Date checkInDate) {
+    public void setCheckInDate(LocalDate checkInDate) {
         this.checkInDate = checkInDate;
     }
 
-    public Date getCheckOutDate() {
+    public LocalDate getCheckOutDate() {
         return checkOutDate;
     }
 
-    public void setCheckOutDate(Date checkOutDate) {
+    public void setCheckOutDate(LocalDate checkOutDate) {
         this.checkOutDate = checkOutDate;
     }
 
