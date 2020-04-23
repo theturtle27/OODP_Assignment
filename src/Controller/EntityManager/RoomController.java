@@ -63,7 +63,9 @@ public class RoomController extends EntityController<Room> {
                 "Search a room",
                 "Remove a room",
                 "Check the availability of a room",
-                "Print all rooms");
+                "Print all rooms",
+                "Update a room type",
+                "Print all room types");
 
     }
 
@@ -89,6 +91,12 @@ public class RoomController extends EntityController<Room> {
                 break;
             case 6:
                 show(view);
+                break;
+            case 7:
+                updateRoomType(view);
+                break;
+            case 8:
+                printRoomTypes(view);
                 break;
         }
     }
@@ -798,6 +806,81 @@ public class RoomController extends EntityController<Room> {
         {
 
         }
+    }
+
+    private void updateRoomType(View view)
+    {
+
+        // get room type enum
+        RoomType roomType = getRoomType(view);
+
+        // break out of method
+        if(roomType == null)
+        {
+            return;
+        }
+
+        // get room rate
+        String stringRoomRate = view.getInputRegex(ROOM_RATE, REGEX_ROOM_RATE);
+
+        // break out of method
+        if(stringRoomRate == null)
+        {
+            return;
+        }
+
+        // convert String to double
+        double roomRate = Double.parseDouble(stringRoomRate);
+
+        // set the room rate
+        roomType.setRoomRate(roomRate);
+
+        // print room type
+        view.displayText(roomType.toString());
+
+        // display text
+        view.displayText("\n\nThe room type has been updated.\n\n");
+
+    }
+
+    private void printRoomTypes(View view)
+    {
+
+        // get persistence
+        Persistence persistence = this.getPersistenceImpl();
+
+        try {
+
+            // get all rooms
+            ArrayList<Entity> roomTypes = persistence.retrieveAll(RoomType.class);
+
+            // check whether any room types exist
+            if (roomTypes.size() == 0) {
+                view.displayText("No room type exists. Error!\n\n");
+
+                return;
+            }
+
+            view.displayText("The following room types exist:\n");
+
+            // iterate through all guests
+            for (Entity entity : roomTypes) {
+
+                // cast to guest object
+                RoomType roomType = (RoomType)entity;
+
+                //print guest
+                view.displayText(roomType.toString() + "\n");
+
+            }
+
+            view.displayText("\n");
+        }
+        catch(Exception e)
+        {
+
+        }
+
     }
 
 }
