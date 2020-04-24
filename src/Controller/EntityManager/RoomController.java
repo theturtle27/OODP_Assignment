@@ -1,15 +1,12 @@
 package Controller.EntityManager;
 
 import Model.Guest.Guest;
-import Model.Room.BedType;
-import Model.Room.RoomStatus;
-import Model.Room.RoomType;
+import Model.Room.*;
 import Model.Stay.Stay;
 import Model.reservation.Reservation;
 import Model.reservation.ReservationStatus;
 import Persistence.Entity;
 import Controller.EntityController;
-import Model.Room.Room;
 import Persistence.Persistence;
 import View.View;
 
@@ -266,6 +263,48 @@ public class RoomController extends EntityController<Room> {
         }
 
         return roomNumber;
+    }
+
+    //TODO: method belongs in room type controller
+    private void createRoomType(View view) throws Exception
+    {
+
+        // get room type
+        RoomTypeEnum roomTypeEnum = (RoomTypeEnum)view.getInputEnum(RoomTypeEnum.class, ROOM_TYPE, REGEX_NUMBERS);
+
+        // break out of method
+        if(roomTypeEnum == null)
+        {
+            return;
+        }
+
+        // get room rate
+        String stringRoomRate = view.getInputRegex(ROOM_RATE, REGEX_ROOM_RATE);
+
+        // break out of method
+        if(stringRoomRate == null)
+        {
+            return;
+        }
+
+        // convert String to double
+        double roomRate = Double.parseDouble(stringRoomRate);
+
+        // create room type
+        RoomType roomType = new RoomType(roomTypeEnum, roomRate);
+
+        // get persistence
+        Persistence persistence = this.getPersistenceImpl();
+
+        // add roomType to ArrayList of roomTypes
+        persistence.createCache(roomType, RoomType.class);
+
+        // print roomType
+        view.displayText(roomType.toString());
+
+        // display text
+        view.displayText("\n\nThe room type has been added to the system.\n\n");
+
     }
 
     //TODO: method belongs in room type controller
@@ -634,10 +673,9 @@ public class RoomController extends EntityController<Room> {
             }
 
 
+            //TODO: room needs to be deleted
             // remove room
             rooms.remove(room);
-
-            //TODO: room needs to be deleted
 
             view.displayText("\n\nThe room has been removed.\n\n");
         }
