@@ -47,7 +47,7 @@ public class CreditCardController extends EntityController<CreditCard> {
 
     }
 
-    public void addGuestController(GuestController guestcontroller)
+    public void addGuestController(GuestController guestController)
     {
         this.guestController = guestController;
     }
@@ -121,11 +121,8 @@ public class CreditCardController extends EntityController<CreditCard> {
             }
         }
 
-        // get persistence
-        Persistence persistence = this.getPersistenceImpl();
-
-        // add credit card to ArrayList of guests
-        persistence.createCache(creditCard, CreditCard.class);
+        // add credit card to ArrayList of creditCards
+        creditCards.add(creditCard);
 
         // print credit card
         view.displayText(creditCard.toString());
@@ -281,7 +278,7 @@ public class CreditCardController extends EntityController<CreditCard> {
     public void printCreditCards(View view, ArrayList<CreditCard> creditCards)
     {
 
-        view.displayText("\nThe following credit cards are on file for this guest:\n");
+        view.displayText("The following credit cards are on file for this guest:\n");
 
         // iterate through all credit cards of this guest
         for(CreditCard creditCard : creditCards)

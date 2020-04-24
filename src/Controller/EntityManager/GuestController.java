@@ -64,10 +64,10 @@ public class GuestController extends EntityController<Guest> {
     public List<String> getOptions() {
 
         return Arrays.asList("Create a new guest",
-                        "Update guest details",
-                        "Search guest details",
-                        "Remove guest details",
-                        "Print all guest details");
+                        "Update a guest's details",
+                        "Search a guest",
+                        "Remove a guest ",
+                        "Print all guests");
 
     }
 
@@ -463,6 +463,7 @@ public class GuestController extends EntityController<Guest> {
 
     @Override
     public Guest select(View view) throws Exception {
+
         // initialize guest
         Guest guest = null;
 
