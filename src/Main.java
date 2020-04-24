@@ -29,7 +29,7 @@ public class Main {
             GuestController guestController = new GuestController(persistence, creditCardController);
             ReservationController reservationController = new ReservationController(persistence, creditCardController, roomController, guestController);
 
-            reservationController.expireReservations();
+            reservationController.createExpirationTimer();
 
             NavigationController hotelmanagementController = new NavigationController();
             hotelmanagementController.addView(new ConsoleView(roomController, "Manage Room", sc));
