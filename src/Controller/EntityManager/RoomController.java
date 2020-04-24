@@ -689,10 +689,11 @@ public class RoomController extends EntityController<Room> {
 
     @Override
     public Room select(View view) throws Exception {
+
         // get persistence
         Persistence persistence = this.getPersistenceImpl();
 
-        // initialize guest
+        // initialize room
         Room room = null;
 
         try {
