@@ -84,10 +84,10 @@ public class RoomController extends EntityController<Room> {
             case 4:
                 delete(view);
                 break;
-            case 5: show(view);
-                break;
-            case 6:
+            case 5:
                 checkRoomAvailability(view);
+                break;
+            case 6: show(view);
                 break;
             case 7:
                 updateRoomType(view);
