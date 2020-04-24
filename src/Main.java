@@ -1,8 +1,5 @@
 import Controller.Controller;
-import Controller.EntityManager.CreditCardController;
-import Controller.EntityManager.GuestController;
-import Controller.EntityManager.MenuController;
-import Controller.EntityManager.RoomController;
+import Controller.EntityManager.*;
 import Controller.FunctionManager.ReportController;
 import Controller.FunctionManager.ReservationController;
 import Controller.FunctionManager.RoomServiceManagementController;
@@ -24,21 +21,27 @@ public class Main {
             persistence = new Persistence(new File("aotoid.cfg"));
 
             CreditCardController creditCardController = new CreditCardController(persistence);
-            RoomController roomController = new RoomController(persistence);
+            RoomTypeController roomTypeController = new RoomTypeController(persistence);
+            RoomController roomController = new RoomController(persistence, roomTypeController);
 
             GuestController guestController = new GuestController(persistence, creditCardController);
-            ReservationController reservationController = new ReservationController(persistence, creditCardController, roomController, guestController);
+            ReservationController reservationController = new ReservationController(persistence, creditCardController, roomController, roomTypeController, guestController);
 
             reservationController.createExpirationTimer();
 
             NavigationController hotelmanagementController = new NavigationController();
             hotelmanagementController.addView(new ConsoleView(roomController, "Manage Room", sc));
+            hotelmanagementController.addView(new ConsoleView(roomTypeController, "Manage Room Type", sc));
             hotelmanagementController.addView(new ConsoleView(new MenuController(persistence), "Manage Menu Item", sc));
-
 
 
             ConsoleView hotelmanagementView = new ConsoleView(hotelmanagementController, "Hotel Management", sc);
 
+            NavigationController guestmanagementController = new NavigationController();
+            guestmanagementController.addView(new ConsoleView(guestController, "Manage Guest", sc));
+            guestmanagementController.addView(new ConsoleView(creditCardController, "Manage Credit Card", sc));
+
+            ConsoleView guestmanagementView = new ConsoleView(guestmanagementController, "Guest Management", sc);
 
             NavigationController frontDeskController = new NavigationController();
             frontDeskController.addView(new ConsoleView(new StayController(persistence,guestController,reservationController), "Check-In/Check-Out Management", sc));
@@ -51,7 +54,7 @@ public class Main {
 
             NavigationController mainNav = new NavigationController();
             mainNav.addView(hotelmanagementView);
-            mainNav.addView(new ConsoleView(guestController, "Guest Management", sc));
+            mainNav.addView(guestmanagementView);
             mainNav.addView(new ConsoleView(reservationController, "Reservation System", sc));
             mainNav.addView(frontDeskView);
             mainNav.addView(new ConsoleView(new ReportController(persistence), "Report System", sc));

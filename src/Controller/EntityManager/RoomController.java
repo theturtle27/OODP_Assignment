@@ -41,8 +41,12 @@ public class RoomController extends EntityController<Room> {
     private static final String NOT_UNIQUE = "not unique";
     private static final String NOT_FOUND = "not found";
 
-    public RoomController(Persistence persistence) {
+    private final RoomTypeController roomTypeController;
+
+    public RoomController(Persistence persistence, RoomTypeController roomTypeController)
+    {
         super(persistence);
+        this.roomTypeController = roomTypeController;
     }
 
 
@@ -60,9 +64,7 @@ public class RoomController extends EntityController<Room> {
                 "Search a room",
                 "Remove a room",
                 "Check the availability of a room",
-                "Print all rooms",
-                "Update a room type",
-                "Print all room types");
+                "Print all rooms");
 
     }
 
@@ -89,12 +91,6 @@ public class RoomController extends EntityController<Room> {
                 break;
             case 6: show(view);
                 break;
-            case 7:
-                updateRoomType(view);
-                break;
-            case 8:
-                printRoomTypes(view);
-                break;
         }
     }
 
@@ -111,7 +107,7 @@ public class RoomController extends EntityController<Room> {
         }
 
         // get room type
-        RoomType roomType = getRoomType(view);
+        RoomType roomType = roomTypeController.select(view);
 
         //check whether guest was found
         if(roomType == null)
@@ -307,6 +303,7 @@ public class RoomController extends EntityController<Room> {
 
     }
 
+    /*
     //TODO: method belongs in room type controller
     public RoomType getRoomType(View view)
     {
@@ -356,7 +353,7 @@ public class RoomController extends EntityController<Room> {
 
         return roomType;
 
-    }
+    }*/
 
     private void updateRoomStatus(View view) throws Exception
     {
@@ -566,7 +563,7 @@ public class RoomController extends EntityController<Room> {
         }
 
         // get room type
-        RoomType roomType = getRoomType(view);
+        RoomType roomType = roomTypeController.select(view);
 
         //check whether room type was found
         if(roomType == null)
@@ -795,7 +792,7 @@ public class RoomController extends EntityController<Room> {
 
         }
     }
-
+    /*
     private void updateRoomType(View view)
     {
 
@@ -829,8 +826,8 @@ public class RoomController extends EntityController<Room> {
         // display text
         view.displayText("\n\nThe room type has been updated.\n\n");
 
-    }
-
+    }*/
+    /*
     private void printRoomTypes(View view)
     {
 
@@ -869,7 +866,7 @@ public class RoomController extends EntityController<Room> {
 
         }
 
-    }
+    }*/
 
     public Room getAvailableRoom(LocalDate checkInDate, LocalDate checkOutDate, RoomTypeEnum roomTypeEnum, BedType bedType, boolean enabledWifi, boolean withView, boolean smoking, boolean isWaitlist)
     {

@@ -4,6 +4,7 @@ import Controller.EntityController;
 import Controller.EntityManager.CreditCardController;
 import Controller.EntityManager.GuestController;
 import Controller.EntityManager.RoomController;
+import Controller.EntityManager.RoomTypeController;
 import Model.Guest.CreditCard;
 import Model.Guest.Guest;
 import Model.Room.BedType;
@@ -50,12 +51,14 @@ public class ReservationController extends EntityController<Reservation> {
 
     private final CreditCardController creditCardController;
     private final RoomController roomController;
+    private final RoomTypeController roomTypeController;
     private final GuestController guestController;
 
-    public ReservationController(Persistence persistence, CreditCardController creditCardController, RoomController roomController, GuestController guestController) {
+    public ReservationController(Persistence persistence, CreditCardController creditCardController, RoomController roomController, RoomTypeController roomTypeController, GuestController guestController) {
         super(persistence);
         this.creditCardController = creditCardController;
         this.roomController = roomController;
+        this.roomTypeController = roomTypeController;
         this.guestController = guestController;
     }
 
@@ -142,7 +145,7 @@ public class ReservationController extends EntityController<Reservation> {
         short numberOfChildren = Short.parseShort(stringNumberOfChildren);
 
         // get room type
-        RoomType roomType = roomController.getRoomType(view);
+        RoomType roomType = roomTypeController.select(view);
 
         //check whether room type was found
         if(roomType == null)
@@ -381,7 +384,7 @@ public class ReservationController extends EntityController<Reservation> {
         short numberOfChildren = Short.parseShort(stringNumberOfChildren);
 
         // get room type
-        RoomType roomType = roomController.getRoomType(view);
+        RoomType roomType = roomTypeController.select(view);
 
         //check whether room type was found
         if(roomType == null)

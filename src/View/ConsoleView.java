@@ -15,6 +15,8 @@ import java.util.regex.Pattern;
 
 public class ConsoleView extends View {
 
+    private static final int WIDTH = 40;
+
     public final static String KEY_OPTION = "Option";
     private static final String INVALID = "invalid";
     private final Scanner scanner;
@@ -39,14 +41,25 @@ public class ConsoleView extends View {
 
         int option;
         do {
-            System.out.println("|=======================================|");
-            System.out.println("|                                       |");
+            String doubleLine = buildString('=',WIDTH);
+            String spaceLine = buildString(' ', WIDTH);
+            String singleLine = buildString('-', WIDTH);
 
+            // length of the title
+            double lengthTitle = title.length();
+
+            System.out.printf("|%s|\n", doubleLine);
+            System.out.printf("|%s|\n", spaceLine);
+            System.out.printf("|%s%s%s|\n",buildString(' ', (int) Math.floor((WIDTH-lengthTitle)/2)),title.toUpperCase(), buildString(' ', (int) Math.ceil((WIDTH-lengthTitle)/2)));
+            System.out.printf("|%s|\n", spaceLine);
+            System.out.printf("|%s|\n", singleLine);
             // Loop through and display the list of options
-            for(int i = 0; i < options.size(); i++)
-                System.out.println((i + 1) + ") " + options.get(i));
+            for(int i = 0; i < options.size(); i++) {
+                System.out.printf("| " + (i + 1) + ") %-" + (WIDTH-4) + "s|\n", options.get(i));
+            }
 
-            System.out.println((options.size() + 1) + ") Exit from " + title);
+            System.out.printf("| " + (options.size() + 1) + ") Exit from %-" + (WIDTH-14) + "s|\n", title);
+            System.out.printf("|%s|\n", doubleLine);
             System.out.println();
 
             do {
@@ -143,6 +156,17 @@ public class ConsoleView extends View {
         System.out.println();
 
         return selected;
+    }
+
+    // create a String which is made up of one char being repeated a given amount of times
+    private String buildString(char stringChar,int stringLength)
+    {
+        StringBuilder sb = new StringBuilder(stringLength);
+        for (int i=0; i < stringLength; i++){
+            sb.append(stringChar);
+        }
+
+        return sb.toString();
     }
 
     public YearMonth getValidDate(String name, String patternDate, String regexDate)

@@ -42,9 +42,16 @@ public class CreditCardController extends EntityController<CreditCard> {
 
     private static final String NOT_FOUND = "not found";
 
+    private GuestController guestController;
+
     public CreditCardController(Persistence persistence) {
         super(persistence);
 
+    }
+
+    public void addGuestController(GuestController guestcontroller)
+    {
+        this.guestController = guestController;
     }
 
     @Override
@@ -80,7 +87,7 @@ public class CreditCardController extends EntityController<CreditCard> {
     protected void create(View view) throws Exception {
 
         // search for guest via name
-        Guest guest = getGuest(view);
+        Guest guest = guestController.select(view);
 
         // check whether guest was found
         if(guest == null)
@@ -219,10 +226,9 @@ public class CreditCardController extends EntityController<CreditCard> {
         return new CreditCard(cardHolderName, cardNumber, expirationDate, paymentNetwork, cardValidationCode);
     }
 
-    protected void delete(View view)
-    {
+    protected void delete(View view) throws Exception {
         // search for guest via name
-        Guest guest = getGuest(view);
+        Guest guest = guestController.select(view);
 
         //check whether guest was found
         if(guest == null)
@@ -258,119 +264,9 @@ public class CreditCardController extends EntityController<CreditCard> {
         view.displayText("\nThe credit card of this guest has been removed.\n\n");
     }
 
-    private Guest getGuest(View view)
-    {
-        // initialize guest
-        Guest guest = null;
-
-        // get persistence
-        Persistence persistence = this.getPersistenceImpl();
-
-        try {
-
-            // get all guests
-            ArrayList<Entity> guests = persistence.retrieveAll(Guest.class);
-
-            // check whether any guests exist
-            if (guests.size() == 0) {
-                view.displayText("No guest exists. Create a guest before searching for the guest.\n\n");
-
-                return null;
-            }
-
-            // flag to check whether the entry of the guest name should be tried again
-            boolean repeatEntry;
-
-            //repeat
-            do {
-                // initialize repeat flag to false
-                repeatEntry = false;
-
-                // get name of the guest
-                String guestName = view.getInputRegex(GUEST_NAME, REGEX_ONE_ALPHA_NUMERIC_CHARACTER);
-
-                // break out of function
-                if (guestName == null) {
-                    return null;
-                }
-
-                // create ArrayList of guests
-                ArrayList<Guest> potentialGuests = new ArrayList<Guest>();
-
-                // convert guest name to lower case
-                String guestNameLowerCase = guestName.toLowerCase();
-
-                // get words in name
-                String[] names = guestNameLowerCase.trim().split("\\s+");
-
-                // iterate through all guests
-                for (Entity entity : guests) {
-
-                    // cast to guest object
-                    Guest guestIterator = (Guest)entity;
-
-                    // flag to check whether all parts of the guests name are part of an existing guest
-                    boolean isPartOfName = true;
-
-                    // iterate through all names
-                    for (String name : names) {
-
-                        // check whether name is part of the guest's name
-                        if (!guestIterator.getName().toLowerCase().contains(name)) {
-                            // set flag to false
-                            isPartOfName = false;
-                            break;
-                        }
-                    }
-
-                    // check whether all parts of the name match with the guests name
-                    if (isPartOfName) {
-
-                        // add guest to potential guests
-                        potentialGuests.add(guestIterator);
-                    }
-                }
-
-                // check whether a guest was found
-                if (potentialGuests.isEmpty()) {
-
-                    // check whether the entry of the guest name should be tried again
-                    repeatEntry = view.repeatEntry(GUEST, NOT_FOUND);
-
-                } else if (potentialGuests.size() == 1) {
-                    // print guest details
-                    System.out.println(potentialGuests.get(0).toString() + "\n");
-
-                    // get guest
-                    guest = potentialGuests.get(0);
-                } else {
-
-                    // select guest from potential guests
-                    guest = view.getInputArray(potentialGuests, NUMBER_GUEST, REGEX_NUMBERS);
-
-                    // break out of method
-                    if (guest == null) {
-                        return null;
-                    }
-
-                    // print guest details
-                    view.displayText(guest.toString() + "\n\n");
-                }
-
-            } while (guest == null && repeatEntry);
-        }
-        catch(Exception e)
-        {
-
-        }
-
-        return guest;
-    }
-
-    protected void show(View view)
-    {
+    protected void show(View view) throws Exception {
         // search for guest via name
-        Guest guest = getGuest(view);
+        Guest guest = guestController.select(view);
 
         //check whether guest was found
         if(guest == null)

@@ -54,6 +54,7 @@ public class GuestController extends EntityController<Guest> {
     public GuestController(Persistence persistence, CreditCardController creditCardController) {
         super(persistence);
         this.creditCardController = creditCardController;
+        creditCardController.addGuestController(this);
     }
 
     @Override
