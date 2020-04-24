@@ -226,7 +226,7 @@ public class StayController extends EntityController<Stay> {
         ArrayList<Entity> payments = persistence.retrieveAll(Payment.class);
         payments.add(payment);
         view.message("Your payment is successful, thank you for staying with us, we hope to see you again!");
-        view.message("Please take not of your receipt below");
+        view.message("Please take note of your receipt below");
         view.display(payment);
     }
 

@@ -24,11 +24,12 @@ public class Main {
             persistence = new Persistence(new File("aotoid.cfg"));
 
             CreditCardController creditCardController = new CreditCardController(persistence);
+            RoomController roomController = new RoomController(persistence);
             GuestController guestController = new GuestController(persistence, creditCardController);
-            ReservationController reservationController = new ReservationController(persistence);
+            ReservationController reservationController = new ReservationController(persistence, creditCardController, roomController, guestController);
 
             NavigationController hotelmanagementController = new NavigationController();
-            hotelmanagementController.addView(new ConsoleView(new RoomController(persistence), "Manage Room", sc));
+            hotelmanagementController.addView(new ConsoleView(roomController, "Manage Room", sc));
             hotelmanagementController.addView(new ConsoleView(new MenuController(persistence), "Manage Menu Item", sc));
 
 

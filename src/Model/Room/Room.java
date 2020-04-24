@@ -31,6 +31,7 @@ public class Room extends Entity{
 		this.withView = withView;
 		this.smoking = smoking;
 		this.roomStatus = RoomStatus.VACANT;
+		this.reservations = new ArrayList<Reservation>();
 	}
 
 	public String getRoomNumber()
@@ -129,14 +130,38 @@ public class Room extends Entity{
 		// convert bed type to String
 		String stringBedType = capitalizeFirstLetter(bedType.toString());
 
+		String stringEnabledWifi;
+
 		// convert enabled Wifi to String
-		String stringEnabledWifi = capitalizeFirstLetter(String.valueOf(enabledWifi));
+		if(enabledWifi == true) {
+			stringEnabledWifi = "Yes";
+		}
+		else
+		{
+			stringEnabledWifi = "No";
+		}
 
-		// convert with View to String
-		String stringWithView = capitalizeFirstLetter(String.valueOf(withView));
+		String stringWithView;
 
-		// convert smoking to String
-		String stringSmoking = capitalizeFirstLetter(String.valueOf(smoking));
+		// convert enabled Wifi to String
+		if(withView == true) {
+			stringWithView = "Yes";
+		}
+		else
+		{
+			stringWithView = "No";
+		}
+
+		String stringSmoking;
+
+		// convert enabled Wifi to String
+		if(smoking == true) {
+			stringSmoking = "Yes";
+		}
+		else
+		{
+			stringSmoking = "No";
+		}
 
 		// convert room status to String
 		String stringRoomStatus = capitalizeFirstLetter(roomStatus.toString());

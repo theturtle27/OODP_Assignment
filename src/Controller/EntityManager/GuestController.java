@@ -1,6 +1,8 @@
 package Controller.EntityManager;
 
 import java.lang.ref.SoftReference;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -13,6 +15,10 @@ import Model.Guest.CreditCard;
 import Model.Guest.Gender;
 import Model.Guest.Guest;
 import Model.Guest.IdentityType;
+import Model.Room.BedType;
+import Model.Room.Room;
+import Model.Room.RoomType;
+import Model.reservation.Reservation;
 import Persistence.Entity;
 import Persistence.Persistence;
 import View.ConsoleView;
@@ -434,9 +440,6 @@ public class GuestController extends EntityController<Guest> {
             // remove guest
             guests.remove(guest);
 
-            //TODO: guest needs to be deleted
-            //persistence.deleteCache(guests, )
-
             view.displayText("The guest's information has been removed.\n\n");
         }
         catch(Exception e)
@@ -526,7 +529,7 @@ public class GuestController extends EntityController<Guest> {
 
                 } else if (potentialGuests.size() == 1) {
                     // print guest details
-                    System.out.println(potentialGuests.get(0).toString() + "\n");
+                    view.displayText(potentialGuests.get(0).toString() + "\n");
 
                     // get guest
                     guest = potentialGuests.get(0);

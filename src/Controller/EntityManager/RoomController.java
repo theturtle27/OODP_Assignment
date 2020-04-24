@@ -308,7 +308,7 @@ public class RoomController extends EntityController<Room> {
     }
 
     //TODO: method belongs in room type controller
-    private RoomType getRoomType(View view)
+    public RoomType getRoomType(View view)
     {
         // get persistence
         Persistence persistence = this.getPersistenceImpl();
@@ -473,7 +473,7 @@ public class RoomController extends EntityController<Room> {
 
     }
 
-    private boolean getRoomAvailability(Room room, LocalDate startDate, LocalDate endDate)
+    public boolean getRoomAvailability(Room room, LocalDate startDate, LocalDate endDate)
     {
 
         // get maintenance end date
@@ -672,8 +672,6 @@ public class RoomController extends EntityController<Room> {
                 return;
             }
 
-
-            //TODO: room needs to be deleted
             // remove room
             rooms.remove(room);
 
@@ -871,6 +869,57 @@ public class RoomController extends EntityController<Room> {
 
         }
 
+    }
+
+    public Room getAvailableRoom(LocalDate checkInDate, LocalDate checkOutDate, RoomTypeEnum roomTypeEnum, BedType bedType, boolean enabledWifi, boolean withView, boolean smoking)
+    {
+        // get persistence
+        Persistence persistence = this.getPersistenceImpl();
+
+        try {
+
+            // get all rooms
+            ArrayList<Entity> rooms = persistence.retrieveAll(Room.class);
+
+            // iterate through all rooms
+            for (Entity entity : rooms) {
+
+                // cast to room object
+                Room room = (Room)entity;
+
+                // check whether room is available
+                if (getRoomAvailability(room, checkInDate, checkOutDate)) {
+
+                    // check the room type
+                    boolean isRoomType = room.getRoomType().getRoomTypeEnum() == roomTypeEnum;
+
+                    // check bed type
+                    boolean isBedType = room.getBedType() == bedType;
+
+                    // check enabled wifi
+                    boolean isEnabledWifi = room.getEnabledWifi() == enabledWifi;
+
+                    // check with view
+                    boolean isWithView = room.getWithView() == withView;
+
+                    // check smoking
+                    boolean isSmoking = room.getSmoking() == smoking;
+
+                    // check whether all requirements are met
+                    if (isRoomType && isBedType && isEnabledWifi && isWithView && isSmoking) {
+                        return room;
+                    }
+
+                }
+
+            }
+        }
+        catch(Exception e)
+        {
+
+        }
+
+        return null;
     }
 
 }

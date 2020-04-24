@@ -35,9 +35,12 @@ public class RoomType extends Entity{
         // convert room type enum to String
         String stringRoomTypeEnum = capitalizeFirstLetter(roomTypeEnum.toString());
 
+        // format room rate
+        String stringRoomRate = String.format("%.2f",roomRate);
+
         return    "\n------------Room Type--------------"
                 + "\nRoom Type       : " + stringRoomTypeEnum
-                + "\nRoom Rate       : " + roomRate;
+                + "\nRoom Rate       : " + stringRoomRate;
 
     }
 

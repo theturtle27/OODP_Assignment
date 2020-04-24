@@ -28,6 +28,7 @@ public class CreditCardController extends EntityController<CreditCard> {
     private static final String REGEX_CREDIT_CARD_AMEX_CVC = "^[0-9]{4}$";
     private static final String PATTERN_VALID_DATE = "MM/yy";
     private static final String REGEX_VALID_DATE = "^(?:(0[1-9]|1[0-2])/[0-9]{2})$";
+    private static final String REGEX_BOOLEAN = "^(?:(0|1))$";
 
     private static final String GUEST_NAME = "guest name";
     private static final String CARDHOLDER_NAME = "cardholder name";
@@ -36,6 +37,7 @@ public class CreditCardController extends EntityController<CreditCard> {
     private static final String CVC = "CVC/CVV (card validation code/value)";
     private static final String GUEST = "guest";
     private static final String NUMBER_GUEST = "number of the guest";
+    private static final String EXISITING_CREDIT_CARD = "whether you want to use an existing credit card ([1] Yes, [0] No)";
 
 
     private static final String NOT_FOUND = "not found";
@@ -117,7 +119,7 @@ public class CreditCardController extends EntityController<CreditCard> {
         // get persistence
         Persistence persistence = this.getPersistenceImpl();
 
-        // add guest to ArrayList of guests
+        // add credit card to ArrayList of guests
         persistence.createCache(creditCard, CreditCard.class);
 
         // print credit card
@@ -128,7 +130,7 @@ public class CreditCardController extends EntityController<CreditCard> {
 
     }
 
-    protected CreditCard createCreditCard(View view)
+    public CreditCard createCreditCard(View view)
     {
         // get card holder name
         String cardHolderName = view.getInputRegex(CARDHOLDER_NAME, REGEX_ONE_ALPHA_NUMERIC_CHARACTER);
@@ -382,7 +384,7 @@ public class CreditCardController extends EntityController<CreditCard> {
         printCreditCards(view, creditCards);
     }
 
-    private void printCreditCards(View view, ArrayList<CreditCard> creditCards)
+    public void printCreditCards(View view, ArrayList<CreditCard> creditCards)
     {
 
         view.displayText("\nThe following credit cards are on file for this guest:\n");
@@ -412,6 +414,78 @@ public class CreditCardController extends EntityController<CreditCard> {
 
     public CreditCard select(View view) throws Exception {
         return null;
+    }
+
+    public CreditCard getCreditCard(View view, Guest guest)
+    {
+        // get credit cards of guest
+        ArrayList<CreditCard> creditCards = guest.getCreditCards();
+
+        printCreditCards(view, creditCards);
+
+        // get whether an existing credit card should be used
+        String stringExistingCreditCard = view.getInputRegex(EXISITING_CREDIT_CARD, REGEX_BOOLEAN);
+
+        // break out of function
+        if(stringExistingCreditCard == null)
+        {
+            return null;
+        }
+
+        // convert String to boolean
+        boolean existingCreditCard = "1".equals(stringExistingCreditCard);
+
+        CreditCard creditCard;
+
+        // select from existing credit cards
+        if(existingCreditCard == true) {
+
+            // get credit card
+            creditCard = view.getInputArray(creditCards, "number of the credit card", REGEX_NUMBERS);
+
+            //check whether credit card was found
+            if (creditCard == null) {
+                return null;
+            }
+
+            // print credit card
+            view.displayText(creditCard.toString());
+        }
+        else
+        {
+            // create new credit card
+            creditCard = createCreditCard(view);
+
+            // break out of method
+            if(creditCard == null)
+            {
+                return null;
+            }
+
+            // check whether this credit card already exists
+            // iterate through all existing guests
+            for(CreditCard creditCardIterator : creditCards)
+            {
+
+                // check whether the credit card number is the same
+                if(creditCardIterator.getCardNumber() == creditCard.getCardNumber())
+                {
+                    view.displayText("\nA credit card with these credentials already exists in this guest's profile.\n\n");
+                    return null;
+                }
+            }
+
+            // add credit card to ArrayLIst
+            creditCards.add(creditCard);
+
+            // print credit card
+            view.displayText(creditCard.toString());
+
+            // display text
+            view.displayText("\nThe credit card has been added to this guest.\n\n");
+        }
+
+        return creditCard;
     }
 
 }
