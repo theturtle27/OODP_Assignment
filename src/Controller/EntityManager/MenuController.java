@@ -81,7 +81,7 @@ public class MenuController extends EntityController<MenuItem> {
                     // Ensure no duplicate guest record, with same identification and nationality
                     Persistence persistence = this.getPersistenceImpl();
 
-                    persistence.create(menuItem, MenuItem.class);
+                    persistence.createCache(menuItem, MenuItem.class);
 
                     view.message("\nThe menu item has been added to the menu.\n");
                     valid = true;
@@ -145,13 +145,13 @@ public class MenuController extends EntityController<MenuItem> {
                         invalids.add(KEY_PRICE);
 
                     // Attempts to update entity
-                    if(invalids.size() == 0 && persistence.update(menuItem, MenuItem.class)) {
-                        valid = true;
-                        view.message("MenuItem successfully updated!");
-                    }
-                    else {
-                        view.error(invalids);
-                    }
+//                    if(invalids.size() == 0 && persistence.update(menuItem, MenuItem.class)) {
+                    valid = true;
+                    view.message("MenuItem successfully updated!");
+//                    }
+//                    else {
+//                        view.error(invalids);
+//                    }
                 } catch(IndexOutOfBoundsException e) {
                 }
             } while(!valid && !view.bailout());
@@ -165,8 +165,10 @@ public class MenuController extends EntityController<MenuItem> {
         MenuItem menuItem = select(view);
 
         Persistence persistence = this.getPersistenceImpl();
-        if(menuItem != null && persistence.delete(menuItem, MenuItem.class))
-            view.message("MenuItem deleted successfully!");
+        ArrayList<Entity> entities = persistence.retrieveAll(MenuItem.class);
+        entities.remove(menuItem);
+//        if(menuItem != null && persistence.delete(menuItem, MenuItem.class))
+        view.message("MenuItem deleted successfully!");
 
     }
 
@@ -174,7 +176,7 @@ public class MenuController extends EntityController<MenuItem> {
     @Override
     public MenuItem select(View view) throws Exception {
         this.show(view);
-        MenuItem menuItem = null;
+        Entity menuItem = null;
 
         Map<String, String> inputMap = new LinkedHashMap<String, String>();
         inputMap.put(KEY_ID, null);
@@ -193,9 +195,12 @@ public class MenuController extends EntityController<MenuItem> {
                         retry = true;
                     }
                     else {
-                        menuItem = persistence.retrieveByID(Long.parseLong(input), MenuItem.class);
-                        if(menuItem == null)
-                            view.error(Arrays.asList(KEY_ID));
+                        ArrayList<Entity> entities = persistence.retrieveAll(MenuItem.class);
+                        for(Entity entity:entities){
+                            if(entity.getIdentifier() == Long.parseLong(input)){
+                                menuItem = entity;
+                            }
+                        }
                     }
                 } catch(NumberFormatException e) {
                     view.error(Arrays.asList(KEY_ID));
@@ -203,7 +208,7 @@ public class MenuController extends EntityController<MenuItem> {
             } while(retry);
         } while(menuItem == null && !view.bailout());
 
-        return menuItem;
+        return (MenuItem)menuItem;
     }
 
     @Override
@@ -211,10 +216,10 @@ public class MenuController extends EntityController<MenuItem> {
         Persistence persistence = this.getPersistenceImpl();
         List entityList = new ArrayList();
         // Provide a predicate to search for matching items
-        Iterable<MenuItem> menuItems = persistence.search(MenuItem.class);
+        ArrayList<Entity> menuItems = persistence.retrieveAll(MenuItem.class);
 
         // Loop through results and add it into the list
-        for(MenuItem entity: menuItems)
+        for(Entity entity: menuItems)
             entityList.add(entity);
 
         view.display(entityList);

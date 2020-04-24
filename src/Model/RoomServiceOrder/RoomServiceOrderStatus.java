@@ -8,5 +8,7 @@ public enum RoomServiceOrderStatus {
 
     PREPARING,
 
-    DELIVERED
+    DELIVERED,
+
+    CANCELED
 }

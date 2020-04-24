@@ -23,6 +23,7 @@ public class Main {
             CreditCardController creditCardController = new CreditCardController(persistence);
             RoomTypeController roomTypeController = new RoomTypeController(persistence);
             RoomController roomController = new RoomController(persistence, roomTypeController);
+            MenuController menuController = new MenuController(persistence);
 
             GuestController guestController = new GuestController(persistence, creditCardController);
             ReservationController reservationController = new ReservationController(persistence, creditCardController, roomController, roomTypeController, guestController);
@@ -32,7 +33,7 @@ public class Main {
             NavigationController hotelmanagementController = new NavigationController();
             hotelmanagementController.addView(new ConsoleView(roomController, "Manage Room", sc));
             hotelmanagementController.addView(new ConsoleView(roomTypeController, "Manage Room Type", sc));
-            hotelmanagementController.addView(new ConsoleView(new MenuController(persistence), "Manage Menu Item", sc));
+            hotelmanagementController.addView(new ConsoleView(menuController, "Manage Menu Item", sc));
 
 
             ConsoleView hotelmanagementView = new ConsoleView(hotelmanagementController, "Hotel Management", sc);
@@ -43,9 +44,11 @@ public class Main {
 
             ConsoleView guestmanagementView = new ConsoleView(guestmanagementController, "Guest Management", sc);
 
+            StayController stayController = new StayController(persistence,guestController,reservationController,roomController,roomTypeController);
+
             NavigationController frontDeskController = new NavigationController();
-            frontDeskController.addView(new ConsoleView(new StayController(persistence,guestController,reservationController), "Check-In/Check-Out Management", sc));
-            frontDeskController.addView(new ConsoleView(new RoomServiceManagementController(persistence), "Room Service Management", sc));
+            frontDeskController.addView(new ConsoleView(stayController, "Check-In/Check-Out Management", sc));
+            frontDeskController.addView(new ConsoleView(new RoomServiceManagementController(persistence,roomController,menuController,stayController), "Room Service Management", sc));
 
             ConsoleView frontDeskView = new ConsoleView(frontDeskController, "Front Desk", sc);
 

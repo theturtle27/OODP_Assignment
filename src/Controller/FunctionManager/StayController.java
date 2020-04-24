@@ -2,11 +2,16 @@ package Controller.FunctionManager;
 
 import Controller.EntityController;
 import Controller.EntityManager.GuestController;
+import Controller.EntityManager.RoomController;
+import Controller.EntityManager.RoomTypeController;
 import Model.Guest.Guest;
 import Model.Payment.DiscountType;
 import Model.Payment.Payment;
 import Model.Payment.PaymentType;
+import Model.Room.BedType;
+import Model.Room.Room;
 import Model.Room.RoomStatus;
+import Model.Room.RoomType;
 import Model.Stay.Stay;
 import Model.Stay.StayStatus;
 import Model.reservation.Reservation;
@@ -28,14 +33,42 @@ public class StayController extends EntityController<Stay> {
     public final static String KEY_EMAIL_ADDRESS = "email address";
     public final static String KEY_DISCOUNT_VALUE = "value for discount";
     public final static String KEY_ID = "ID of stay or 'Search' to search for guest ID by name";
+    private static final String REGEX_NUMBERS = "[0-9]+";
+    private static final String PATTERN_VALID_DATE = "d.MM.yyyy";
+    private static final String PATTERN_PRINT_VALID_DATE = "dd.mm.yyyy";
+    private static final String REGEX_VALID_DATE = "^(?:(?:31(\\/|-|\\.)(?:0?[13578]|1[02]))\\1|(?:(?:29|30)(\\/|-|\\.)(?:0?[1,3-9]|1[0-2])\\2))(?:(?:1[6-9]|[2-9]\\d)?\\d{2})$|^(?:29(\\/|-|\\.)0?2\\3(?:(?:(?:1[6-9]|[2-9]\\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00))))$|^(?:0?[1-9]|1\\d|2[0-8])(\\/|-|\\.)(?:(?:0?[1-9])|(?:1[0-2]))\\4(?:(?:1[6-9]|[2-9]\\d)?\\d{2})$";
+    private static final String REGEX_BOOLEAN = "^(?:(0|1))$";
+    private static final String REGEX_ONE_ALPHA_NUMERIC_CHARACTER = "^.*[a-zA-Z0-9]+.*$";
+
+    private static final String CHECK_IN_DATE = "check in date";
+    private static final String CHECK_OUT_DATE = "check out date";
+    private static final String NUMBER_OF_ADULTS = "number of adults";
+    private static final String NUMBER_OF_CHILDREN = "number of children";
+    private static final String BED_TYPE = "bed type";
+    private static final String ENABLED_WIFI = "enabled wifi ([1] Yes, [0] No)";
+    private static final String WITH_VIEW = "with view  ([1] Yes, [0] No)";
+    private static final String SMOKING = "smoking ([1] Yes, [0] No)";
+    private static final String GUEST_NAME = "guest name";
+    private static final String CONTINUE_RESERVATION = "whether you want to continue the reservation ([1] Yes, [0] No)";
+    private static final String ABORT_RESERVATION = "The reservation is aborted.\n";
+    private static final String CREATE_GUEST = "Create a guest before making a reservation with these guest details.\n\n";
+    private static final String SEARCH_RESERVATION = "whether the reservation should be search by [1] reservation ID or [0] guest name";
+    private static final String RESERVATION_ID = "reservation id";
+    private static final String RESERVATION = "reservation";
+    private static final String NUMBER_RESERVATION = "number of the reservation";
+
 
     private final GuestController guestController;
     private final ReservationController reservationController;
+    private final RoomTypeController roomTypeController;
+    private final RoomController roomController;
 
-    public StayController(Persistence persistence ,GuestController guestController, ReservationController reservationController) {
+    public StayController(Persistence persistence ,GuestController guestController, ReservationController reservationController,RoomController roomController,RoomTypeController roomTypeController) {
         super(persistence);
         this.guestController = guestController;
         this.reservationController = reservationController;
+        this.roomController = roomController;
+        this.roomTypeController = roomTypeController;
     }
 
     @Override
@@ -237,6 +270,115 @@ public class StayController extends EntityController<Stay> {
         ArrayList<Entity> stays = persistence.retrieveAll(Stay.class);
 
         Guest guest = guestController.select(view);
+
+        LocalDate checkOutDate = view.getValidDate(CHECK_OUT_DATE, PATTERN_VALID_DATE, PATTERN_PRINT_VALID_DATE, REGEX_VALID_DATE, LocalDate.now());
+
+        // break out of method
+        if(checkOutDate == null)
+        {
+            return;
+        }
+
+        // get number of adults
+        String stringNumberOfAdults = view.getInputRegex(NUMBER_OF_ADULTS, REGEX_NUMBERS);
+
+        // break out of method
+        if(stringNumberOfAdults == null)
+        {
+            return;
+        }
+
+        // convert number of adults to short
+        short numberOfAdults = Short.parseShort(stringNumberOfAdults);
+
+        // get number of adults
+        String stringNumberOfChildren = view.getInputRegex(NUMBER_OF_CHILDREN, REGEX_NUMBERS);
+
+        // break out of method
+        if(stringNumberOfChildren == null)
+        {
+            return;
+        }
+
+        // convert number of children to short
+        short numberOfChildren = Short.parseShort(stringNumberOfChildren);
+
+        // get room type
+        RoomType roomType = roomTypeController.select(view);
+
+        //check whether room type was found
+        if(roomType == null)
+        {
+            return;
+        }
+
+        // get bed type
+        BedType bedType = (BedType)view.getInputEnum(BedType.class, BED_TYPE, REGEX_NUMBERS);
+
+        // break out of method
+        if(bedType == null)
+        {
+            return;
+        }
+
+        // get enabled wifi
+        String stringEnabledWifi = view.getInputRegex(ENABLED_WIFI, REGEX_BOOLEAN);
+
+        // break out of function
+        if(stringEnabledWifi == null)
+        {
+            return;
+        }
+
+        // declare enabled Wifi boolean
+        boolean enabledWifi;
+
+        // convert String to boolean
+        enabledWifi = "1".equals(stringEnabledWifi);
+
+        // get with view
+        String stringWithView = view.getInputRegex(WITH_VIEW, REGEX_BOOLEAN);
+
+        // break out of function
+        if(stringWithView == null)
+        {
+            return;
+        }
+
+        // declare with view boolean
+        boolean withView;
+
+        // convert String to boolean
+        withView = "1".equals(stringWithView);
+
+        // get smoking
+        String stringSmoking = view.getInputRegex(SMOKING, REGEX_BOOLEAN);
+
+        // break out of function
+        if(stringSmoking == null)
+        {
+            return;
+        }
+
+        // declare smoking boolean
+        boolean smoking;
+
+        // convert String to boolean
+        smoking = "1".equals(stringSmoking);
+
+        // get room meeting the requirements
+        Room room = roomController.getAvailableRoom(LocalDate.now(), checkOutDate, roomType.getRoomTypeEnum(), bedType, enabledWifi, withView, smoking, false);
+
+        if(room == null) {
+
+            view.display("Room is not avalible now");
+        }
+        else {
+            Stay stay = new Stay(guest,room,LocalDate.now(),numberOfAdults,numberOfChildren);
+            stay.setStatus(StayStatus.CHECKEDIN);
+            persistence.createCache(stay,Stay.class);
+            view.display("Room is registered successfully, your room number is " + room.getRoomNumber());
+        }
     }
 
     private ArrayList<Stay> getStaysAvalibleCheckout(Guest guest) throws Exception{
@@ -245,7 +387,7 @@ public class StayController extends EntityController<Stay> {
         ArrayList<Stay> relatedStays = new ArrayList<>();
         for (Entity entity: stays) {
             Stay stay = (Stay)entity;
-            if ((stay.getGuest() == guest)&&(stay.getStatus()== StayStatus.CHECKEDIN)){
+            if ((stay.getGuest().getName() == guest.getName())&&(stay.getStatus()== StayStatus.CHECKEDIN)){
                 relatedStays.add(stay);
             }
         }
@@ -330,5 +472,19 @@ public class StayController extends EntityController<Stay> {
             entityList.add(entity);
 
         view.display(entityList);
+    }
+
+    public Entity getStayByRoomNumber(String roomNumber) throws Exception{
+        Persistence persistence = this.getPersistenceImpl();
+        Entity result = null;
+        ArrayList<Entity> entities = persistence.retrieveAll(Stay.class);
+        for (Entity entity: entities){
+            Stay stay = (Stay) entity;
+            if(stay.getRoom().getRoomNumber().equals(roomNumber) && stay.getStatus().equals(StayStatus.CHECKEDIN)){
+                result = entity;
+                break;
+            }
+        }
+        return result;
     }
 }

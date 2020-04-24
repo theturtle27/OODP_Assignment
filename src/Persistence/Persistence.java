@@ -2,6 +2,7 @@ package Persistence;
 
 import Model.Guest.Guest;
 import Model.Menu.MenuItem;
+import Model.Payment.Payment;
 import Model.Room.Room;
 import Model.Room.RoomType;
 import Model.Stay.Stay;
@@ -84,6 +85,7 @@ public class Persistence {
         loadArray(Stay.class);
         loadArray(Reservation.class);
         loadArray(RoomType.class);
+        loadArray(Payment.class);
     }
 
     private <T extends Entity> void loadArray(Class<T> type) throws Exception{
