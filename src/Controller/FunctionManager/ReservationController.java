@@ -10,6 +10,7 @@ import Model.Room.BedType;
 import Model.Room.Room;
 import Model.Room.RoomType;
 import Model.reservation.Reservation;
+import Model.reservation.ReservationStatus;
 import Persistence.Persistence;
 import View.View;
 import Persistence.Entity;
@@ -43,6 +44,7 @@ public class ReservationController extends EntityController<Reservation> {
     private static final String RESERVATION_ID = "reservation id";
     private static final String RESERVATION = "reservation";
     private static final String NUMBER_RESERVATION = "number of the reservation";
+    private static final String CONTINUE_RESERVATION_WAITLIST = "whether you want to continue the reservation and be put on waitlist for such a room ([1] Yes, [0] No)";
 
     private static final String NOT_FOUND = "not found";
 
@@ -202,16 +204,60 @@ public class ReservationController extends EntityController<Reservation> {
         // convert String to boolean
         smoking = "1".equals(stringSmoking);
 
-        // get room meting the requirements
-        Room room = roomController.getAvailableRoom(checkInDate, checkOutDate, roomType.getRoomTypeEnum(), bedType, enabledWifi, withView, smoking);
+        // get room meeting the requirements
+        Room room = roomController.getAvailableRoom(checkInDate, checkOutDate, roomType.getRoomTypeEnum(), bedType, enabledWifi, withView, smoking, false);
 
+        // declare reservation status
+        ReservationStatus reservationStatus;
+        
         // check whether a room is available
         if(room == null)
         {
 
             view.displayText("\nNo room with the selected requirements is available for the selected dates.\n\n");
 
-            return;
+            // check whether reservation should be continued with being put on waitlist
+            String stringReservationWaitlist = view.getInputRegex(CONTINUE_RESERVATION_WAITLIST, REGEX_BOOLEAN);
+
+            // break out of function
+            if(stringReservationWaitlist == null)
+            {
+                return;
+            }
+
+            // declare reservation boolean
+            boolean reservationWaitlist;
+
+            // convert String to boolean
+            reservationWaitlist = "1".equals(stringReservationWaitlist);
+
+            if(reservationWaitlist)
+            {
+            	// get room meeting the requirements
+                room = roomController.getAvailableRoom(checkInDate, checkOutDate, roomType.getRoomTypeEnum(), bedType, enabledWifi, withView, smoking, true);
+                
+                // check whether room exists
+                if(room == null)
+                {
+                	view.displayText("\nNo room with the selected requirements exists. Please change your requirements for the room.\n\n");
+                	
+                	return;
+                }
+                
+                // set reservation status to in waitlist
+            	reservationStatus = ReservationStatus.IN_WAITLIST;
+
+            }
+            else
+            {
+                return;
+            }
+        }
+        else
+        {
+        	// set reservation status to confirmed
+        	reservationStatus = ReservationStatus.CONFIRMED;
+        	
         }
 
         // get room rate
@@ -264,7 +310,7 @@ public class ReservationController extends EntityController<Reservation> {
         CreditCard creditCard = creditCardController.getCreditCard(view, guest);
 
         // create the reservation
-        Reservation reservation = new Reservation(guest, creditCard, room, checkInDate, checkOutDate, numberOfAdults, numberOfChildren);
+        Reservation reservation = new Reservation(guest, creditCard, room, checkInDate, checkOutDate, numberOfAdults, numberOfChildren, reservationStatus);
 
         // get persistence
         Persistence persistence = this.getPersistenceImpl();
@@ -398,15 +444,59 @@ public class ReservationController extends EntityController<Reservation> {
         smoking = "1".equals(stringSmoking);
 
         // get room meeting the requirements
-        Room room = roomController.getAvailableRoom(checkInDate, checkOutDate, roomType.getRoomTypeEnum(), bedType, enabledWifi, withView, smoking);
+        Room room = roomController.getAvailableRoom(checkInDate, checkOutDate, roomType.getRoomTypeEnum(), bedType, enabledWifi, withView, smoking, false);
 
+        // declare reservation status
+        ReservationStatus reservationStatus;
+        
         // check whether a room is available
         if(room == null)
         {
 
             view.displayText("\nNo room with the selected requirements is available for the selected dates.\n\n");
 
-            return;
+            // check whether reservation should be continued with being put on waitlist
+            String stringReservationWaitlist = view.getInputRegex(CONTINUE_RESERVATION_WAITLIST, REGEX_BOOLEAN);
+
+            // break out of function
+            if(stringReservationWaitlist == null)
+            {
+                return;
+            }
+
+            // declare reservation boolean
+            boolean reservationWaitlist;
+
+            // convert String to boolean
+            reservationWaitlist = "1".equals(stringReservationWaitlist);
+
+            if(reservationWaitlist)
+            {
+            	// get room meeting the requirements
+                room = roomController.getAvailableRoom(checkInDate, checkOutDate, roomType.getRoomTypeEnum(), bedType, enabledWifi, withView, smoking, true);
+                
+                // check whether room exists
+                if(room == null)
+                {
+                	view.displayText("\nNo room with the selected requirements exists. Please change your requirements for the room.\n\n");
+                	
+                	return;
+                }
+                
+                // set reservation status to in waitlist
+            	reservationStatus = ReservationStatus.IN_WAITLIST;
+
+            }
+            else
+            {
+                return;
+            }
+        }
+        else
+        {
+        	// set reservation status to confirmed
+        	reservationStatus = ReservationStatus.CONFIRMED;
+        	
         }
 
         // get room rate
@@ -473,6 +563,9 @@ public class ReservationController extends EntityController<Reservation> {
 
         // set room
         reservation.setRoom(room);
+        
+        // set reservation status
+        reservation.setStatus(reservationStatus);
 
         // set guest
         reservation.setGuest(guest);
@@ -485,6 +578,9 @@ public class ReservationController extends EntityController<Reservation> {
 
         // display text
         view.displayText("\nThe reservation has been updated.\n\n\n");
+
+        // check waitlist
+        checkWaitlist(reservation);
     }
 
     @Override
@@ -509,6 +605,9 @@ public class ReservationController extends EntityController<Reservation> {
             reservations.remove(reservation);
 
             view.displayText("The reservation has been removed.\n\n");
+
+            // check waitlist
+            checkWaitlist(reservation);
         }
         catch(Exception e)
         {
@@ -735,5 +834,94 @@ public class ReservationController extends EntityController<Reservation> {
     @Override
     protected boolean retrieve(View view) throws Exception {
         return true;
+    }
+
+    public void createExpirationTimer()
+    {
+        // get today's time at 4 pm
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.HOUR_OF_DAY,16);
+        cal.set(Calendar.MINUTE,0);
+        cal.set(Calendar.SECOND,0);
+        cal.set(Calendar.MILLISECOND,0);
+        Date date = cal.getTime();
+
+        // create a timer
+        Timer timer = new Timer();
+
+        // schedule a task to be executed every 24 hours
+        timer.schedule(new TimerTask(){
+            public void run(){
+
+                expireReservations();
+
+            }
+        },date, 24*60*60*1000);
+    }
+
+    private void expireReservations()
+    {
+        // get persistence
+        Persistence persistence = this.getPersistenceImpl();
+
+        try {
+
+            // get all reservations
+            ArrayList<Entity> reservations = persistence.retrieveAll(Reservation.class);
+
+            // iterate through all reservations
+            for (Entity entity : reservations) {
+
+                // cast to reservation object
+                Reservation reservation = (Reservation)entity;
+
+                // if the current date is not before the check-in date and reservation has not been checked-in
+                if((!LocalDate.now().isBefore(reservation.getCheckInDate())) && reservation.getStatus() != ReservationStatus.CHECKED_IN);
+                {
+                    //reservation has expired -> remove reservation
+                    reservations.remove(reservation);
+
+                    // check waitlist
+                    checkWaitlist(reservation);
+
+                }
+
+            }
+        }
+        catch(Exception e)
+        {
+
+        }
+    }
+
+    private void checkWaitlist(Reservation reservation)
+    {
+        // get room of this reservation
+        Room room = reservation.getRoom();
+
+        // get the reservations of this room
+        ArrayList<Reservation> roomReservations = room.getReservations();
+
+        // iterate through the reservations of this room
+        for(Reservation reservationIterator : roomReservations)
+        {
+            // only check reservations that are in the waitlist
+            if(reservationIterator.getStatus() == ReservationStatus.IN_WAITLIST)
+            {
+
+                // get check-in date of reservation
+                LocalDate checkInDate = reservationIterator.getCheckInDate();
+
+                // get check-out date of reservation
+                LocalDate checkOutDate = reservationIterator.getCheckOutDate();
+
+                // check whether room is available
+                if (roomController.getRoomAvailability(room, checkInDate, checkOutDate)) {
+
+                    // change reservation status from in waitlist to confirmed
+                    reservationIterator.setStatus(ReservationStatus.CONFIRMED);
+                }
+            }
+        }
     }
 }

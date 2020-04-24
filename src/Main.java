@@ -12,7 +12,7 @@ import Persistence.Persistence;
 import View.ConsoleView;
 
 import java.io.File;
-import java.util.Scanner;
+import java.util.*;
 
 public class Main {
 
@@ -25,8 +25,11 @@ public class Main {
 
             CreditCardController creditCardController = new CreditCardController(persistence);
             RoomController roomController = new RoomController(persistence);
+
             GuestController guestController = new GuestController(persistence, creditCardController);
             ReservationController reservationController = new ReservationController(persistence, creditCardController, roomController, guestController);
+
+            reservationController.expireReservations();
 
             NavigationController hotelmanagementController = new NavigationController();
             hotelmanagementController.addView(new ConsoleView(roomController, "Manage Room", sc));

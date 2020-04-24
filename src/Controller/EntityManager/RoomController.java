@@ -526,7 +526,7 @@ public class RoomController extends EntityController<Room> {
             for(Reservation reservation : reservations)
             {
                 // check only for reservations that are confirmed or checked-in
-                if((reservation.getStatus() == ReservationStatus.CHECKED_IN) || (reservation.getStatus() == ReservationStatus.CHECKED_IN)) {
+                if((reservation.getStatus() == ReservationStatus.CONFIRMED) || (reservation.getStatus() == ReservationStatus.CHECKED_IN)) {
 
                     // get check-in date of the reservation
                     LocalDate reservationCheckInDate = reservation.getCheckInDate();
@@ -871,7 +871,7 @@ public class RoomController extends EntityController<Room> {
 
     }
 
-    public Room getAvailableRoom(LocalDate checkInDate, LocalDate checkOutDate, RoomTypeEnum roomTypeEnum, BedType bedType, boolean enabledWifi, boolean withView, boolean smoking)
+    public Room getAvailableRoom(LocalDate checkInDate, LocalDate checkOutDate, RoomTypeEnum roomTypeEnum, BedType bedType, boolean enabledWifi, boolean withView, boolean smoking, boolean isWaitlist)
     {
         // get persistence
         Persistence persistence = this.getPersistenceImpl();
@@ -888,7 +888,7 @@ public class RoomController extends EntityController<Room> {
                 Room room = (Room)entity;
 
                 // check whether room is available
-                if (getRoomAvailability(room, checkInDate, checkOutDate)) {
+                if (getRoomAvailability(room, checkInDate, checkOutDate) || isWaitlist) {
 
                     // check the room type
                     boolean isRoomType = room.getRoomType().getRoomTypeEnum() == roomTypeEnum;

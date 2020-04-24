@@ -23,7 +23,7 @@ public class Reservation extends StatusEntity<ReservationStatus> {
 	private short numberOfChildren;
 
 	// constructor for use in program
-	public Reservation(Guest guest, CreditCard creditCard, Room room, LocalDate checkInDate, LocalDate checkOutDate, short numberOfAdults, short numberOfChildren) {
+	public Reservation(Guest guest, CreditCard creditCard, Room room, LocalDate checkInDate, LocalDate checkOutDate, short numberOfAdults, short numberOfChildren, ReservationStatus reservationStatus) {
 
 		this.guest = guest;
 		this.creditCard = creditCard;
@@ -32,7 +32,7 @@ public class Reservation extends StatusEntity<ReservationStatus> {
 		this.checkOutDate = checkOutDate;
 		this.numberOfAdults = numberOfAdults;
 		this.numberOfChildren = numberOfChildren;
-		super.setStatus(ReservationStatus.CONFIRMED);
+		super.setStatus(reservationStatus);
 		this.room.setReservation(this);
 	}
 
