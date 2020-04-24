@@ -39,8 +39,8 @@ public class RoomType extends Entity{
         String stringRoomRate = String.format("%.2f",roomRate);
 
         return    "\n------------Room Type--------------"
-                + "\nRoom Type       : " + stringRoomTypeEnum
-                + "\nRoom Rate       : " + stringRoomRate;
+                + "\nRoom Type        : " + stringRoomTypeEnum
+                + "\nRoom Rate        : " + stringRoomRate;
 
     }
 

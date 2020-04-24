@@ -30,13 +30,11 @@ public class CreditCardController extends EntityController<CreditCard> {
     private static final String REGEX_VALID_DATE = "^(?:(0[1-9]|1[0-2])/[0-9]{2})$";
     private static final String REGEX_BOOLEAN = "^(?:(0|1))$";
 
-    private static final String GUEST_NAME = "guest name";
     private static final String CARDHOLDER_NAME = "cardholder name";
-    private static final String CREDIT_CARD_NUMBER = "credit card number";
-    private static final String EXPIRATION_DATE = "expiration date";
+    private static final String CREDIT_CARD_NUMBER = "credit card number without spaces";
+    private static final String EXPIRATION_DATE = "expiration date (format: mm/yy)";
     private static final String CVC = "CVC/CVV (card validation code/value)";
-    private static final String GUEST = "guest";
-    private static final String NUMBER_GUEST = "number of the guest";
+
     private static final String EXISITING_CREDIT_CARD = "whether you want to use an existing credit card ([1] Yes, [0] No)";
 
 
@@ -189,7 +187,7 @@ public class CreditCardController extends EntityController<CreditCard> {
             paymentNetwork = PaymentNetwork.JCB;
         }
 
-        view.displayText("\nThe payment network of this credit card is: " + paymentNetwork.toString() + ".\n\n");
+        view.displayText("The payment network of this credit card is: " + view.capitalizeFirstLetter(paymentNetwork.toString()) + ".\n");
 
         // get expiration date
         YearMonth expirationDate = view.getValidDate(EXPIRATION_DATE, PATTERN_VALID_DATE, REGEX_VALID_DATE);

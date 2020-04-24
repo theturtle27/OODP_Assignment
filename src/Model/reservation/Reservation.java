@@ -3,9 +3,7 @@ package Model.reservation;
 import Model.Guest.CreditCard;
 import Model.Guest.Guest;
 import Model.Room.Room;
-import Model.Room.RoomStatus;
 import Model.StatusEntity;
-import Persistence.Entity;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -92,7 +90,7 @@ public class Reservation extends StatusEntity<ReservationStatus> {
 		return numberOfChildren;
 	}
 
-	public void setNumberOfChildren(short NumberOfChildren)
+	public void setNumberOfChildren(short numberOfChildren)
 	{
 		this.numberOfChildren = numberOfChildren;
 	}
@@ -159,27 +157,27 @@ public class Reservation extends StatusEntity<ReservationStatus> {
 		// format total cost
 		String stringTotalCost = String.format("%.2f",room.getRoomType().getRoomRate()*numberOfDays);
 
-		return    "\n===========Reservation============"
-				+ "\nID              : " + this.getIdentifier()
-				+ "\nStatus          : " + stringReservationStatus
-				+ "\n-------Reservation Details--------"
-				+ "\nCheck In Date   : " + stringCheckInDate
-				+ "\nCheck Out Date  : " + stringCheckOutDate
-				+ "\nNo. of Adults   : " + numberOfAdults
-				+ "\nNo. of Children : " + numberOfChildren
-				+ "\n-----------Room Details-----------"
-				+ "\nRoom Type       : " + stringRoomTypeEnum
-				+ "\nBed Type        : " + stringBedType
-				+ "\nEnabled Wifi    : " + stringEnabledWifi
-				+ "\nWith View       : " + stringWithView
-				+ "\nSmoking         : " + stringSmoking
-				+ "\n----------Guest Details-----------"
-				+ "\nName            : " + guest.getName()
+		return    "\n============Reservation============"
+				+ "\nID               : " + this.getIdentifier()
+				+ "\nStatus           : " + stringReservationStatus
+				+ "\n--------Reservation Details--------"
+				+ "\nCheck In Date    : " + stringCheckInDate
+				+ "\nCheck Out Date   : " + stringCheckOutDate
+				+ "\nNo. of Adults    : " + numberOfAdults
+				+ "\nNo. of Children  : " + numberOfChildren
+				+ "\n-----------Room Details------------"
+				+ "\nRoom Type        : " + stringRoomTypeEnum
+				+ "\nBed Type         : " + stringBedType
+				+ "\nEnabled Wifi     : " + stringEnabledWifi
+				+ "\nWith View        : " + stringWithView
+				+ "\nSmoking          : " + stringSmoking
+				+ "\n-----------Guest Details-----------"
+				+ "\nName             : " + guest.getName()
 				+ creditCard.toString()
-				+ "-----------Cost Details-----------"
-				+ "\nNo. of nights   : " + numberOfDays
-				+ "\nRate per night  : SGD " + stringRoomRate
-				+ "\nTotal cost      : SGD " + stringTotalCost;
+				+ "-----------Cost Details------------"
+				+ "\nNo. of nights    : " + numberOfDays
+				+ "\nRate per night   : SGD " + stringRoomRate
+				+ "\nTotal cost       : SGD " + stringTotalCost;
 
 
 	}

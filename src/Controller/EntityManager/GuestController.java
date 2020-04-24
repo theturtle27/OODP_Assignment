@@ -1,27 +1,16 @@
 package Controller.EntityManager;
 
-import java.lang.ref.SoftReference;
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.regex.Pattern;
 
 import Controller.EntityController;
 import Model.Guest.CreditCard;
 import Model.Guest.Gender;
 import Model.Guest.Guest;
 import Model.Guest.IdentityType;
-import Model.Room.BedType;
-import Model.Room.Room;
-import Model.Room.RoomType;
-import Model.reservation.Reservation;
 import Persistence.Entity;
 import Persistence.Persistence;
-import View.ConsoleView;
 import View.View;
 
 
@@ -33,21 +22,30 @@ public class GuestController extends EntityController<Guest> {
     private static final String REGEX_PHONE_NUMBER = "^\\+(?:[0-9] ?){6,14}[0-9]$";
 
     private static final String GUEST_NAME = "guest name";
-    private static final String STREET_NAME = "street name";
+
+    private static final String ADDRESS = "\n--------------ADDRESS--------------\n";
+    private static final String STREET_NAME = "street name with street number";
     private static final String CITY_NAME = "city name";
     private static final String POSTAL_CODE = "postal code";
     private static final String COUNTRY = "name of the country";
+
+    private static final String IDENTIFICATION = "\n-----------Identification----------\n";
     private static final String GENDER = "gender";
     private static final String NATIONALITY = "nationality";
     private static final String IDENTITY_TYPE = "identity type";
     private static final String IDENTITY_NUMBER = "identity number";
-    private static final String EMAIL_ADDRESS = "eMail address";
-    private static final String PHONE_NUMBER = "phone number";
+
+    private static final String CONTACT = "\n--------------Contact--------------\n";
+    private static final String EMAIL_ADDRESS = "email address";
+    private static final String PHONE_NUMBER = "phone number with international prefix (e.g. +65)";
+
+    private static final String CREDIT_CARD = "\n------------Credit Card------------\n";
+
     private static final String GUEST = "guest";
     private static final String NUMBER_GUEST = "number of the guest";
 
 
-    private static final String NOT_FOUND = "not found";
+    private static final String NOT_FOUND = "cannot be found";
 
     private CreditCardController creditCardController;
 
@@ -105,6 +103,8 @@ public class GuestController extends EntityController<Guest> {
             return;
         }
 
+        view.displayText(ADDRESS);
+
         // get street name
         String streetName = view.getInputRegex(STREET_NAME, REGEX_ONE_ALPHA_NUMERIC_CHARACTER);
 
@@ -140,6 +140,8 @@ public class GuestController extends EntityController<Guest> {
         {
             return;
         }
+
+        view.displayText(IDENTIFICATION);
 
         // get gender
         Gender gender = (Gender)view.getInputEnum(Gender.class, GENDER, REGEX_NUMBERS);
@@ -183,6 +185,8 @@ public class GuestController extends EntityController<Guest> {
             return;
         }
 
+        view.displayText(CONTACT);
+
         // get email
         String eMail = view.getInputRegex(EMAIL_ADDRESS, REGEX_EMAIL);
 
@@ -201,7 +205,9 @@ public class GuestController extends EntityController<Guest> {
             return;
         }
 
-        CreditCard creditCard = (CreditCard)creditCardController.createCreditCard(view);
+        view.displayText(CREDIT_CARD);
+
+        CreditCard creditCard = creditCardController.createCreditCard(view);
 
         // break out of function
         if(creditCard == null)
@@ -210,7 +216,7 @@ public class GuestController extends EntityController<Guest> {
         }
 
         // create ArrayList of credit cards
-        ArrayList<CreditCard> creditCards = new ArrayList<CreditCard>();
+        ArrayList<CreditCard> creditCards = new ArrayList<>();
         creditCards.add(creditCard);
 
         // create guest
@@ -229,7 +235,7 @@ public class GuestController extends EntityController<Guest> {
         view.displayText("\nThe guest has been added to the system.\n\n");
     }
 
-    private boolean guestExists(View view, IdentityType identitytType, String identityNumber, String nationality)
+    private boolean guestExists(View view, IdentityType identityType, String identityNumber, String nationality)
     {
         // get persistence
         Persistence persistence = this.getPersistenceImpl();
@@ -246,7 +252,7 @@ public class GuestController extends EntityController<Guest> {
                 Guest guest = (Guest)entity;
 
                 // check whether identity type, identity number and nationality are the same
-                if (guest.getIdentityType().equals(identitytType) && guest.getIdentityNumber().equals(identityNumber) && guest.getNationality().equals(nationality)) {
+                if (guest.getIdentityType().equals(identityType) && guest.getIdentityNumber().equals(identityNumber) && guest.getNationality().equals(nationality)) {
                     view.displayText("\nA guest with these credentials already exists.\nPlease update the guest's information instead of creating a duplicate guest.\n\n");
 
                     return true;
@@ -288,6 +294,8 @@ public class GuestController extends EntityController<Guest> {
             return;
         }
 
+        view.displayText(ADDRESS);
+
         // get street name
         String streetName = view.getInputRegex(STREET_NAME, REGEX_ONE_ALPHA_NUMERIC_CHARACTER);
 
@@ -324,6 +332,8 @@ public class GuestController extends EntityController<Guest> {
             return;
         }
 
+        view.displayText(IDENTIFICATION);
+
         // get gender
         Gender gender = (Gender)view.getInputEnum(Gender.class, GENDER, REGEX_NUMBERS);
 
@@ -359,6 +369,8 @@ public class GuestController extends EntityController<Guest> {
         {
             return;
         }
+
+        view.displayText(CONTACT);
 
         // get email
         String eMail = view.getInputRegex(EMAIL_ADDRESS, REGEX_EMAIL);
@@ -486,7 +498,7 @@ public class GuestController extends EntityController<Guest> {
                 }
 
                 // create ArrayList of guests
-                ArrayList<Guest> potentialGuests = new ArrayList<Guest>();
+                ArrayList<Guest> potentialGuests = new ArrayList<>();
 
                 // convert guest name to lower case
                 String guestNameLowerCase = guestName.toLowerCase();
@@ -530,7 +542,7 @@ public class GuestController extends EntityController<Guest> {
 
                 } else if (potentialGuests.size() == 1) {
                     // print guest details
-                    view.displayText(potentialGuests.get(0).toString() + "\n");
+                    view.displayText(potentialGuests.get(0).toString() + "\n\n");
 
                     // get guest
                     guest = potentialGuests.get(0);

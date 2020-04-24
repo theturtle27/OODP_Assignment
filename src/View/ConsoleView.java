@@ -15,10 +15,10 @@ import java.util.regex.Pattern;
 
 public class ConsoleView extends View {
 
-    private static final int WIDTH = 40;
+    private static final int WIDTH = 50;
 
     public final static String KEY_OPTION = "Option";
-    private static final String INVALID = "invalid";
+    private static final String INVALID = "is invalid";
     private final Scanner scanner;
     private final Controller controller;
 
@@ -73,7 +73,7 @@ public class ConsoleView extends View {
                 System.out.println();
 
                 if(option < 1 || option > options.size() + 1)
-                    System.out.println("Invalid selection, please enter a valid value");
+                    System.out.println("Invalid selection, please enter a valid value\n");
                 else if(option <= options.size())
                     controller.onOptionSelected(this, option - 1);
             } while(option < 1 || option > options.size() + 1);
@@ -187,7 +187,7 @@ public class ConsoleView extends View {
             repeatEntry = false;
 
             // get date
-            String stringDate = getInputRegex(name.trim() + " (" + patternDate + ")", regexDate);
+            String stringDate = getInputRegex(name.trim() , regexDate);
 
             // break out of method
             if(stringDate == null)
@@ -287,7 +287,7 @@ public class ConsoleView extends View {
             repeatEntry = false;
 
             // print
-            System.out.print("Enter the " + name.trim() + ": ");
+            System.out.printf("Enter the " + name.trim() + " : ");
 
             // get input
             String testInput = scanner.nextLine();
@@ -346,14 +346,14 @@ public class ConsoleView extends View {
             for(Object eIterator : e.getEnumConstants())
             {
                 // print
-                System.out.println(iterator + ". " + capitalizeFirstLetter(eIterator.toString()));
+                System.out.println(iterator + ") " + capitalizeFirstLetter(eIterator.toString()));
 
                 // increment iterator
                 iterator++;
             }
 
             // print
-            System.out.print("\nPlease select an option: ");
+            System.out.print("Please select an option: ");
 
             // get input
             String testInput = scanner.nextLine();
@@ -430,7 +430,7 @@ public class ConsoleView extends View {
             {
 
                 // print
-                System.out.println("[" + iterator + "]\n" + eIterator.toString() + "\n");
+                System.out.println(iterator + ")\n" + eIterator.toString() + "\n");
 
                 // increment iterator
                 iterator++;
@@ -488,10 +488,12 @@ public class ConsoleView extends View {
 
 
         // print
-        System.out.print("\nThe " + name.trim() + " is " + operation.trim() + ".\n\nDo you want to try again?\n[1] Yes\n[0] No\n\nPlease select an option: ");
+        System.out.print("\nThe " + name.trim() + " " + operation.trim() + ".\n\nDo you want to try again?\n1) Yes\n0) No\n\nPlease select an option: ");
 
         // check whether the entry should be tried again
         String stringRepeatEntry = scanner.nextLine();
+
+        System.out.println();
 
         //TODO: error checking for this
         // return boolean

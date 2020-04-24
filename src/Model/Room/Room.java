@@ -168,16 +168,16 @@ public class Room extends Entity{
 
 		// String for room information
 		StringBuffer stringRoom = new StringBuffer();
-		stringRoom.append("\n===============Room==============="
-				+ "\nRoom Number     : " + roomNumber
+		stringRoom.append("\n===============Room================"
+				+ "\nRoom Number      : " + roomNumber
 				+ roomType.toString()
-				+ "\n---------Room Description---------"
-				+ "\nBed Type        : " + stringBedType
-				+ "\nEnabled Wifi    : " + stringEnabledWifi
-				+ "\nWith View       : " + stringWithView
-				+ "\nSmoking         : " + stringSmoking
-				+ "\n------------Room Status-----------"
-				+ "\nRoom Status    : " + stringRoomStatus);
+				+ "\n---------Room Description----------"
+				+ "\nBed Type         : " + stringBedType
+				+ "\nEnabled Wifi     : " + stringEnabledWifi
+				+ "\nWith View        : " + stringWithView
+				+ "\nSmoking          : " + stringSmoking
+				+ "\n------------Room Status------------"
+				+ "\nRoom Status      : " + stringRoomStatus);
 
 		if(roomStatus == RoomStatus.UNDER_MAINTENANCE)
 		{
@@ -189,7 +189,7 @@ public class Room extends Entity{
 			String stringMaintenanceEndDate = maintenanceEndDate.format(formatter);
 
 			// append maintenance dates to room
-			stringRoom.append("\nEnd Date       : " + stringMaintenanceEndDate);
+			stringRoom.append("\nEnd Date         : " + stringMaintenanceEndDate);
 
 		}
 
