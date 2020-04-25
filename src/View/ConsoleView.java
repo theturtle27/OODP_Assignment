@@ -487,17 +487,19 @@ public class ConsoleView extends View {
     public boolean repeatEntry(String operation)
     {
 
-        // print
-        System.out.print("\n" +  operation.trim() + "\n\nDo you want to try again?\n1) Yes\n0) No\n\nPlease select an option: ");
+        String stringRepeatEntry = "-1";
+        do{
+            // print
+            System.out.print("\n" +  operation.trim() + "\n\nDo you want to try again?\n1) Yes\n0) No\n\nPlease select an option: ");
 
-        // check whether the entry should be tried again
-        String stringRepeatEntry = scanner.nextLine();
+            // check whether the entry should be tried again
+            stringRepeatEntry = scanner.nextLine();
 
-        System.out.println();
+            System.out.println();
 
-        //TODO: error checking for this
-        // return boolean
-        return "1".equals(stringRepeatEntry.trim());
+        }while(!((stringRepeatEntry.equals("0"))||(stringRepeatEntry.equals("1"))));
+
+        return stringRepeatEntry.equals("1");
     }
 
     public void displayText(String OutputMessage)
