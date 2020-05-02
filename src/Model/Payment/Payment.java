@@ -3,11 +3,9 @@ package Model.Payment;
 import Model.RoomServiceOrder.RoomServiceOrder;
 import Model.RoomServiceOrder.RoomServiceOrderStatus;
 import Model.Stay.Stay;
-import Model.reservation.Reservation;
 import Persistence.Entity;
 
 import java.util.ArrayList;
-import java.util.concurrent.TimeUnit;
 
 public class Payment extends Entity {
     // private final List<Reservation> reservations;

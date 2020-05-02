@@ -1,6 +1,6 @@
 package Model.Room;
 
-import Model.reservation.Reservation;
+import Model.Reservation.Reservation;
 import Model.Stay.Stay;
 import Persistence.Entity;
 
@@ -122,6 +122,11 @@ public class Room extends Entity{
 	public Stay getStay()
 	{
 		return stay;
+	}
+
+	public void setStay(Stay stay)
+	{
+		this.stay = stay;
 	}
 
 	// test method

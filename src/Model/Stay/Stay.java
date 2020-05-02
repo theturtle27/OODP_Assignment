@@ -1,18 +1,14 @@
 package Model.Stay;
 
 import Model.Guest.Guest;
-import Model.Payment.Payment;
 import Model.Room.Room;
 import Model.Room.RoomStatus;
 import Model.RoomServiceOrder.RoomServiceOrder;
 import Model.StatusEntity;
-import Model.reservation.Reservation;
-import Model.reservation.ReservationStatus;
-import Persistence.Entity;
+import Model.Reservation.Reservation;
+import Model.Reservation.ReservationStatus;
 
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
 import java.time.LocalDate;
 
 public class Stay extends StatusEntity<StayStatus> {
@@ -28,12 +24,12 @@ public class Stay extends StatusEntity<StayStatus> {
     //TODO: Add room service orders
 
     //check-in for walk-in guest
-    public Stay(Guest guest, Room room, LocalDate checkInDate, int numberOfAdults, int numberOfChildren)
+    public Stay(Guest guest, Room room, LocalDate checkInDate, LocalDate checkOutDate, int numberOfAdults, int numberOfChildren)
     {
         this.guest = guest;
         this.room = room;
         this.checkInDate = checkInDate;
-        this.checkOutDate = null;
+        this.checkOutDate = checkOutDate;
         this.numberOfAdults = numberOfAdults;
         this.numberOfChildren = numberOfChildren;
         this.roomServiceOrders = new ArrayList<>();
@@ -48,7 +44,7 @@ public class Stay extends StatusEntity<StayStatus> {
         guest = reservation.getGuest();
         room = reservation.getRoom();
         checkInDate = reservation.getCheckInDate();
-        checkOutDate = null;
+        checkOutDate = reservation.getCheckOutDate();
         numberOfAdults = reservation.getNumberOfAdults();
         numberOfChildren = reservation.getNumberOfChildren();
         this.roomServiceOrders = new ArrayList<>();
@@ -64,6 +60,7 @@ public class Stay extends StatusEntity<StayStatus> {
     {
 
         room.setRoomStatus(RoomStatus.OCCUPIED);
+        room.setStay(this);
 
     }
 

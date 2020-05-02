@@ -6,7 +6,7 @@ import Model.Payment.Payment;
 import Model.Room.Room;
 import Model.Room.RoomType;
 import Model.Stay.Stay;
-import Model.reservation.Reservation;
+import Model.Reservation.Reservation;
 
 import java.io.*;
 import java.lang.ref.SoftReference;

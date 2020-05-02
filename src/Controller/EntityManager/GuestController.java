@@ -21,31 +21,30 @@ public class GuestController extends EntityController<Guest> {
     private static final String REGEX_EMAIL = "^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
     private static final String REGEX_PHONE_NUMBER = "^\\+(?:[0-9] ?){6,14}[0-9]$";
 
-    private static final String GUEST_NAME = "guest name";
+    private static final String GUEST_NAME = "the guest name";
 
     private static final String ADDRESS = "\n--------------ADDRESS--------------\n";
-    private static final String STREET_NAME = "street name with street number";
-    private static final String CITY_NAME = "city name";
-    private static final String POSTAL_CODE = "postal code";
-    private static final String COUNTRY = "name of the country";
+    private static final String STREET_NAME = "the street name with street number";
+    private static final String CITY_NAME = "the city name";
+    private static final String POSTAL_CODE = "the postal code";
+    private static final String COUNTRY = "the name of the country";
 
     private static final String IDENTIFICATION = "\n-----------Identification----------\n";
     private static final String GENDER = "gender";
-    private static final String NATIONALITY = "nationality";
+    private static final String NATIONALITY = "the nationality";
     private static final String IDENTITY_TYPE = "identity type";
-    private static final String IDENTITY_NUMBER = "identity number";
+    private static final String IDENTITY_NUMBER = "the identity number";
 
     private static final String CONTACT = "\n--------------Contact--------------\n";
-    private static final String EMAIL_ADDRESS = "email address";
-    private static final String PHONE_NUMBER = "phone number with international prefix (e.g. +65)";
+    private static final String EMAIL_ADDRESS = "the email address";
+    private static final String PHONE_NUMBER = "the phone number with international prefix (e.g. +65)";
 
     private static final String CREDIT_CARD = "\n------------Credit Card------------\n";
 
-    private static final String GUEST = "guest";
     private static final String NUMBER_GUEST = "number of the guest";
 
 
-    private static final String NOT_FOUND = "cannot be found";
+    private static final String NOT_FOUND = "The selected option cannot be found.";
 
     private CreditCardController creditCardController;
 
@@ -539,7 +538,7 @@ public class GuestController extends EntityController<Guest> {
                 if (potentialGuests.isEmpty()) {
 
                     // check whether the entry of the guest name should be tried again
-                    repeatEntry = view.repeatEntry(GUEST, NOT_FOUND);
+                    repeatEntry = view.repeatEntry(NOT_FOUND);
 
                 } else if (potentialGuests.size() == 1) {
                     // print guest details

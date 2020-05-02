@@ -35,7 +35,7 @@ public abstract class View {
 
     public abstract YearMonth getValidDate(String name, String patternDate, String regexDate);
 
-    public abstract LocalDate getValidDate(String name, String patternDate, String printPatternDate, String regexDate, LocalDate dateInput);
+    public abstract LocalDate getValidDate(String name, String patternDate, String regexDate, LocalDate dateInput);
 
     public abstract String getInputRegex(String name, String patternCondition);
 
@@ -43,7 +43,7 @@ public abstract class View {
 
     public abstract <E> E getInputArray(ArrayList<E> e, String name, String patternEnum);
 
-    public abstract boolean repeatEntry(String name, String operation);
+    public abstract boolean repeatEntry(String operation);
 
     public abstract void displayText(String OutputMessage);
 

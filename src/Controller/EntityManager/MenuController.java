@@ -28,9 +28,11 @@ public class MenuController extends EntityController<MenuItem> {
 
     @Override
     public List<String> getOptions() {
-        List<String> options = new ArrayList<String>(super.getOptions());
-
-        return options;
+        return Arrays.asList("Create a new menu item",
+                "Update a reservation",
+                "Search a reservation",
+                "Remove a reservation",
+                "Print all reservations");
     }
 
     @Override

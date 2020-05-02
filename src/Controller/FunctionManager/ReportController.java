@@ -45,20 +45,13 @@ public class ReportController extends PersistenceController {
     }
 //
 
-    private HashMap<RoomTypeEnum, Integer> getNumberOfRoomsByRoomType() {
+    private HashMap<RoomTypeEnum, Integer> getNumberOfRoomsByRoomType(ArrayList<Entity> rooms) {
         // create a hash map to store the number of rooms of a room type
         HashMap<RoomTypeEnum, Integer> numberOfRoomsByRoomType = new HashMap<RoomTypeEnum, Integer>();
 
-        // get persistence
-        Persistence persistence = this.getPersistenceImpl();
-
-        try {
-
-            // get all rooms
-            ArrayList<Entity> rooms = persistence.retrieveAll(Room.class);
-
             // iterate through all room types
             for (RoomTypeEnum roomType : RoomTypeEnum.values()) {
+
                 // iterator to count number of rooms of this room type
                 int numberOfRoomsOfRoomType = 0;
 
@@ -80,28 +73,19 @@ public class ReportController extends PersistenceController {
                 numberOfRoomsByRoomType.put(roomType, numberOfRoomsOfRoomType);
 
             }
-        } catch (Exception e) {
-
-        }
 
         return numberOfRoomsByRoomType;
 
     }
 
-    private HashMap<RoomTypeEnum, ArrayList<String>> getRoomNumbersByRoomType(RoomStatus roomStatus) {
+    private HashMap<RoomTypeEnum, ArrayList<String>> getRoomNumbersByRoomType(ArrayList<Entity> rooms, RoomStatus roomStatus) {
+
         // create a hash map to store the room numbers of a room type
         HashMap<RoomTypeEnum, ArrayList<String>> roomNumbers = new HashMap<RoomTypeEnum, ArrayList<String>>();
 
-        // get persistence
-        Persistence persistence = this.getPersistenceImpl();
-
-        try {
-
-            // get all rooms
-            ArrayList<Entity> rooms = persistence.retrieveAll(Room.class);
-
             // iterate through all room types
             for (RoomTypeEnum roomType : RoomTypeEnum.values()) {
+
                 // create ArrayList of Strings to store all room numbers of rooms of this room type
                 ArrayList<String> roomNumbersOfRoomType = new ArrayList<String>();
 
@@ -110,6 +94,12 @@ public class ReportController extends PersistenceController {
 
                     // cast to room object
                     Room room = (Room) entity;
+
+                    if(room.getRoomNumber().equals("04-11"))
+                    {
+                        System.out.println(room);
+                        System.out.println(room.hashCode());
+                    }
 
                     //check whether room type of this room is equal to the current room type
                     if (room.getRoomType().getRoomTypeEnum() == roomType && room.getRoomStatus() == roomStatus) {
@@ -123,15 +113,12 @@ public class ReportController extends PersistenceController {
 
             }
 
-        } catch (Exception e) {
-
-        }
-
         return roomNumbers;
 
     }
 
-    private HashMap<RoomStatus, ArrayList<String>> getRoomNumbersByRoomStatus() {
+    private HashMap<RoomStatus, ArrayList<String>> getRoomNumbersByRoomStatus(ArrayList<Entity> rooms) {
+
         // create a hash map to store the room numbers of a room type
         HashMap<RoomStatus, ArrayList<String>> roomNumbers = new HashMap<RoomStatus, ArrayList<String>>();
 
@@ -142,7 +129,7 @@ public class ReportController extends PersistenceController {
             ArrayList<String> roomNumbersOfRoomStatus = new ArrayList<String>();
 
             // get room numbers of this room status by room type
-            HashMap<RoomTypeEnum, ArrayList<String>> roomNumbersByRoomType = getRoomNumbersByRoomType(roomStatus);
+            HashMap<RoomTypeEnum, ArrayList<String>> roomNumbersByRoomType = getRoomNumbersByRoomType(rooms, roomStatus);
 
             //iterate through all room types
             for (RoomTypeEnum roomType : RoomTypeEnum.values()) {
@@ -164,6 +151,7 @@ public class ReportController extends PersistenceController {
     }
 
     public void showRoomStatistic(View view, boolean byRoomType) {
+
         // get persistence
         Persistence persistence = this.getPersistenceImpl();
 
@@ -192,10 +180,12 @@ public class ReportController extends PersistenceController {
                 }
 
                 // get vacant room numbers by room type
-                HashMap<RoomTypeEnum, ArrayList<String>> roomNumbersByRoomType = getRoomNumbersByRoomType(roomstatus);
+                HashMap<RoomTypeEnum, ArrayList<String>> roomNumbersByRoomType = getRoomNumbersByRoomType(rooms, roomstatus);
 
                 // get the number of rooms of each room type
-                HashMap<RoomTypeEnum, Integer> numberOfRooms = getNumberOfRoomsByRoomType();
+                HashMap<RoomTypeEnum, Integer> numberOfRooms = getNumberOfRoomsByRoomType(rooms);
+
+                System.out.println();
 
                 // iterate through all room types
                 for (RoomTypeEnum roomType : RoomTypeEnum.values()) {
@@ -228,6 +218,7 @@ public class ReportController extends PersistenceController {
                     }
 
                 }
+                System.out.println();
 
             }
 
@@ -235,7 +226,7 @@ public class ReportController extends PersistenceController {
             else {
 
                 // get room numbers by room status
-                HashMap<RoomStatus, ArrayList<String>> roomNumbersByRoomStatus = getRoomNumbersByRoomStatus();
+                HashMap<RoomStatus, ArrayList<String>> roomNumbersByRoomStatus = getRoomNumbersByRoomStatus(rooms);
 
                 // iterate through all room status
                 for (RoomStatus roomStatusIterator : RoomStatus.values()) {
@@ -263,6 +254,7 @@ public class ReportController extends PersistenceController {
                     }
 
                 }
+                System.out.println();
 
             }
         } catch (Exception e) {

@@ -4,9 +4,7 @@ import Controller.EntityController;
 import Model.Guest.*;
 import Persistence.Persistence;
 import View.View;
-import Persistence.Entity;
 
-import java.lang.ref.SoftReference;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,15 +28,13 @@ public class CreditCardController extends EntityController<CreditCard> {
     private static final String REGEX_VALID_DATE = "^(?:(0[1-9]|1[0-2])/[0-9]{2})$";
     private static final String REGEX_BOOLEAN = "^(?:(0|1))$";
 
-    private static final String CARDHOLDER_NAME = "cardholder name";
-    private static final String CREDIT_CARD_NUMBER = "credit card number without spaces";
-    private static final String EXPIRATION_DATE = "expiration date (format: mm/yy)";
-    private static final String CVC = "CVC/CVV (card validation code/value)";
+    private static final String CARDHOLDER_NAME = "the cardholder name";
+    private static final String CREDIT_CARD_NUMBER = "the credit card number without spaces";
+    private static final String EXPIRATION_DATE = "the expiration date (format: mm/yy)";
+    private static final String CVC = "the CVC/CVV (card validation code/value)";
 
-    private static final String EXISITING_CREDIT_CARD = "whether you want to use an existing credit card ([1] Yes, [0] No)";
+    private static final String EXISTING_CREDIT_CARD = "whether you want to use an existing credit card :\n1) Yes\n0) No\n\nPlease select an option";
 
-
-    private static final String NOT_FOUND = "not found";
 
     private GuestController guestController;
 
@@ -315,7 +311,7 @@ public class CreditCardController extends EntityController<CreditCard> {
         printCreditCards(view, creditCards);
 
         // get whether an existing credit card should be used
-        String stringExistingCreditCard = view.getInputRegex(EXISITING_CREDIT_CARD, REGEX_BOOLEAN);
+        String stringExistingCreditCard = view.getInputRegex(EXISTING_CREDIT_CARD, REGEX_BOOLEAN);
 
         // break out of function
         if(stringExistingCreditCard == null)

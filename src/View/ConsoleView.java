@@ -15,10 +15,11 @@ import java.util.regex.Pattern;
 
 public class ConsoleView extends View {
 
-    private static final int WIDTH = 50;
+    // DO NOT CHANGE
+    private static final int WIDTH = 72;
 
     public final static String KEY_OPTION = "Option";
-    private static final String INVALID = "is invalid";
+    private static final String INVALID = "The selected option is invalid.";
     private final Scanner scanner;
     private final Controller controller;
 
@@ -203,7 +204,7 @@ public class ConsoleView extends View {
             {
 
                 // check whether the entry should be repeated
-                repeatEntry = repeatEntry(name, INVALID);
+                repeatEntry = repeatEntry(INVALID);
 
             }
             else
@@ -217,7 +218,7 @@ public class ConsoleView extends View {
         return date;
     }
 
-    public LocalDate getValidDate(String name, String patternDate, String printPatternDate, String regexDate, LocalDate dateInput)
+    public LocalDate getValidDate(String name, String patternDate, String regexDate, LocalDate dateInput)
     {
         // declare LocalDate variable
         LocalDate date = null;
@@ -235,7 +236,7 @@ public class ConsoleView extends View {
             repeatEntry = false;
 
             // get date
-            String stringDate = getInputRegex(name.trim() + " (" + printPatternDate + ")", regexDate);
+            String stringDate = getInputRegex(name.trim() , regexDate);
 
             // break out of method
             if(stringDate == null)
@@ -251,7 +252,7 @@ public class ConsoleView extends View {
             {
 
                 // check whether the entry should be repeated
-                repeatEntry = repeatEntry(name, INVALID);
+                repeatEntry = repeatEntry(INVALID);
 
             }
             else
@@ -287,7 +288,7 @@ public class ConsoleView extends View {
             repeatEntry = false;
 
             // print
-            System.out.printf("Enter the " + name.trim() + " : ");
+            System.out.printf("Enter " + name.trim() + " : ");
 
             // get input
             String testInput = scanner.nextLine();
@@ -300,7 +301,7 @@ public class ConsoleView extends View {
             {
 
                 // check whether the entry should be repeated
-                repeatEntry = repeatEntry(name, INVALID);
+                repeatEntry = repeatEntry(INVALID);
 
             }
             else
@@ -369,7 +370,7 @@ public class ConsoleView extends View {
             {
 
                 // check whether the entry should be repeated
-                repeatEntry = repeatEntry(name, INVALID);
+                repeatEntry = repeatEntry(INVALID);
 
                 continue;
 
@@ -384,7 +385,7 @@ public class ConsoleView extends View {
             {
 
                 // check whether the entry should be repeated
-                repeatEntry = repeatEntry(name, INVALID);
+                repeatEntry = repeatEntry(INVALID);
 
             }
             else
@@ -454,7 +455,7 @@ public class ConsoleView extends View {
             {
 
                 // check whether the entry should be repeated
-                repeatEntry = repeatEntry(name, INVALID);
+                repeatEntry = repeatEntry(INVALID);
 
                 continue;
 
@@ -469,7 +470,7 @@ public class ConsoleView extends View {
             {
 
                 // check whether the entry should be repeated
-                repeatEntry = repeatEntry(name, INVALID);
+                repeatEntry = repeatEntry(INVALID);
 
             }
             else
@@ -483,12 +484,12 @@ public class ConsoleView extends View {
 
     }
 
-    public boolean repeatEntry(String name, String operation)
+    public boolean repeatEntry(String operation)
     {
 
 
         // print
-        System.out.print("\nThe " + name.trim() + " " + operation.trim() + ".\n\nDo you want to try again?\n1) Yes\n0) No\n\nPlease select an option: ");
+        System.out.print("\n" +  operation.trim() + "\n\nDo you want to try again?\n1) Yes\n0) No\n\nPlease select an option: ");
 
         // check whether the entry should be tried again
         String stringRepeatEntry = scanner.nextLine();

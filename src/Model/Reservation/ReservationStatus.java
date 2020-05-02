@@ -1,4 +1,4 @@
-package Model.reservation;
+package Model.Reservation;
 
 public enum ReservationStatus {
 

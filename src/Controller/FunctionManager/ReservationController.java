@@ -9,14 +9,16 @@ import Model.Guest.CreditCard;
 import Model.Guest.Guest;
 import Model.Room.BedType;
 import Model.Room.Room;
+import Model.Room.RoomStatus;
 import Model.Room.RoomType;
-import Model.reservation.Reservation;
-import Model.reservation.ReservationStatus;
+import Model.Reservation.Reservation;
+import Model.Reservation.ReservationStatus;
 import Persistence.Persistence;
 import View.View;
 import Persistence.Entity;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
@@ -29,25 +31,25 @@ public class ReservationController extends EntityController<Reservation> {
     private static final String REGEX_BOOLEAN = "^(?:(0|1))$";
     private static final String REGEX_ONE_ALPHA_NUMERIC_CHARACTER = "^.*[a-zA-Z0-9]+.*$";
 
-    private static final String CHECK_IN_DATE = "check in date";
-    private static final String CHECK_OUT_DATE = "check out date";
-    private static final String NUMBER_OF_ADULTS = "number of adults";
-    private static final String NUMBER_OF_CHILDREN = "number of children";
+    private static final String CHECK_IN_DATE = "the check in date (format: dd.mm.yyyy)";
+    private static final String CHECK_OUT_DATE = "the check out date (format: dd.mm.yyyy)";
+    private static final String NUMBER_OF_ADULTS = "the number of adults";
+    private static final String NUMBER_OF_CHILDREN = "the number of children";
     private static final String BED_TYPE = "bed type";
-    private static final String ENABLED_WIFI = "enabled wifi ([1] Yes, [0] No)";
-    private static final String WITH_VIEW = "with view  ([1] Yes, [0] No)";
-    private static final String SMOKING = "smoking ([1] Yes, [0] No)";
+    private static final String ENABLED_WIFI = "whether Wifi should enabled :\n1) Yes\n0) No\n\nPlease select an option";
+    private static final String WITH_VIEW = "whether the room should have a view :\n1) Yes\n0) No\n\nPlease select an option";
+    private static final String SMOKING = "whether this should be a smoking friendly room :\n1) Yes\n0) No\n\nPlease select an option";
     private static final String GUEST_NAME = "guest name";
-    private static final String CONTINUE_RESERVATION = "whether you want to continue the reservation ([1] Yes, [0] No)";
+    private static final String CONTINUE_RESERVATION = "whether you want to continue the reservation : \n1) Yes\n0) No\n\nPlease select an option";
     private static final String ABORT_RESERVATION = "The reservation is aborted.\n";
     private static final String CREATE_GUEST = "Create a guest before making a reservation with these guest details.\n\n";
-    private static final String SEARCH_RESERVATION = "whether the reservation should be search by [1] reservation ID or [0] guest name";
+    private static final String SEARCH_RESERVATION = "whether the reservation should be searched by \n1) Reservation ID\n0) Guest name\n\nPlease select an option";
     private static final String RESERVATION_ID = "reservation id";
     private static final String RESERVATION = "reservation";
     private static final String NUMBER_RESERVATION = "number of the reservation";
-    private static final String CONTINUE_RESERVATION_WAITLIST = "whether you want to continue the reservation and be put on waitlist for such a room ([1] Yes, [0] No)";
+    private static final String CONTINUE_RESERVATION_WAITLIST = "whether you want to continue the reservation and be put on waitlist for such a room : \n1) Yes\n0) No\n\nPlease select an option";
 
-    private static final String NOT_FOUND = "not found";
+    private static final String NOT_FOUND = "The selected option cannot be found.";
 
     private final CreditCardController creditCardController;
     private final RoomController roomController;
@@ -103,7 +105,7 @@ public class ReservationController extends EntityController<Reservation> {
     protected void create(View view) throws Exception {
 
         // get valid check-in date
-        LocalDate checkInDate = view.getValidDate(CHECK_IN_DATE, PATTERN_VALID_DATE, PATTERN_PRINT_VALID_DATE, REGEX_VALID_DATE, LocalDate.now().minusDays(1));
+        LocalDate checkInDate = view.getValidDate(CHECK_IN_DATE, PATTERN_VALID_DATE, REGEX_VALID_DATE, LocalDate.now().minusDays(1));
 
         // break out of method
         if(checkInDate == null)
@@ -112,7 +114,7 @@ public class ReservationController extends EntityController<Reservation> {
         }
 
         // get valid check-out date
-        LocalDate checkOutDate = view.getValidDate(CHECK_OUT_DATE, PATTERN_VALID_DATE, PATTERN_PRINT_VALID_DATE, REGEX_VALID_DATE, checkInDate);
+        LocalDate checkOutDate = view.getValidDate(CHECK_OUT_DATE, PATTERN_VALID_DATE, REGEX_VALID_DATE, checkInDate);
 
         // break out of method
         if(checkOutDate == null)
@@ -315,6 +317,9 @@ public class ReservationController extends EntityController<Reservation> {
         // create the reservation
         Reservation reservation = new Reservation(guest, creditCard, room, checkInDate, checkOutDate, numberOfAdults, numberOfChildren, reservationStatus);
 
+        // set room status to reserved
+        room.setRoomStatus(RoomStatus.RESERVED);
+
         // get persistence
         Persistence persistence = this.getPersistenceImpl();
 
@@ -325,24 +330,24 @@ public class ReservationController extends EntityController<Reservation> {
         view.displayText(reservation.toString() + "\n\n");
 
         // display text
-        view.displayText("\nThe reservation has been added to the system.\n\n\n");
+        view.displayText("The reservation has been added to the system.\n\n\n");
 
     }
 
     @Override
     protected void update(View view) throws Exception {
 
-        // search for guest via name
+        // search for reservation
         Reservation reservation = select(view);
 
-        //check whether guest was found
+        //check whether reservation was found
         if(reservation == null)
         {
             return;
         }
 
         // get valid check-in date
-        LocalDate checkInDate = view.getValidDate(CHECK_IN_DATE, PATTERN_VALID_DATE, PATTERN_PRINT_VALID_DATE, REGEX_VALID_DATE, LocalDate.now().minusDays(1));
+        LocalDate checkInDate = view.getValidDate(CHECK_IN_DATE, PATTERN_VALID_DATE, REGEX_VALID_DATE, LocalDate.now().minusDays(1));
 
         // break out of method
         if(checkInDate == null)
@@ -351,7 +356,7 @@ public class ReservationController extends EntityController<Reservation> {
         }
 
         // get valid check-out date
-        LocalDate checkOutDate = view.getValidDate(CHECK_OUT_DATE, PATTERN_VALID_DATE, PATTERN_PRINT_VALID_DATE, REGEX_VALID_DATE, checkInDate);
+        LocalDate checkOutDate = view.getValidDate(CHECK_OUT_DATE, PATTERN_VALID_DATE, REGEX_VALID_DATE, checkInDate);
 
         // break out of method
         if(checkOutDate == null)
@@ -699,7 +704,7 @@ public class ReservationController extends EntityController<Reservation> {
                     if (reservation == null) {
 
                         // check whether the entry of the room number should be tried again
-                        repeatEntry = view.repeatEntry(RESERVATION_ID, NOT_FOUND);
+                        repeatEntry = view.repeatEntry(NOT_FOUND);
 
                     }
                 }
@@ -757,7 +762,7 @@ public class ReservationController extends EntityController<Reservation> {
                     if (potentialReservations.isEmpty()) {
 
                         // check whether the entry of the reservation's guest name should be tried again
-                        repeatEntry = view.repeatEntry(RESERVATION, NOT_FOUND);
+                        repeatEntry = view.repeatEntry(NOT_FOUND);
 
                     } else if (potentialReservations.size() == 1) {
 
@@ -839,27 +844,25 @@ public class ReservationController extends EntityController<Reservation> {
         return true;
     }
 
-    public void createExpirationTimer()
+    public void createExpirationTimer(Timer timer)
     {
+        //expireReservations();
+
         // get today's time at 4 pm
         Calendar cal = Calendar.getInstance();
         cal.set(Calendar.HOUR_OF_DAY,16);
         cal.set(Calendar.MINUTE,0);
         cal.set(Calendar.SECOND,0);
         cal.set(Calendar.MILLISECOND,0);
-        Date date = cal.getTime();
-
-        // create a timer
-        Timer timer = new Timer();
+        Date date = new Date();
 
         // schedule a task to be executed every 24 hours
         timer.schedule(new TimerTask(){
             public void run(){
-
                 expireReservations();
 
             }
-        },date, 24*60*60*1000);
+        },date, 5*1000);
     }
 
     private void expireReservations()
@@ -872,23 +875,37 @@ public class ReservationController extends EntityController<Reservation> {
             // get all reservations
             ArrayList<Entity> reservations = persistence.retrieveAll(Reservation.class);
 
+            // create an ArrayList of reservations that need to be removed from the existing reservations ArrayList
+            ArrayList<Reservation> expiredReservations = new ArrayList<>();
+
             // iterate through all reservations
             for (Entity entity : reservations) {
 
                 // cast to reservation object
                 Reservation reservation = (Reservation)entity;
 
-                // if the current date is not before the check-in date and reservation has not been checked-in
-                if((!LocalDate.now().isBefore(reservation.getCheckInDate())) && reservation.getStatus() != ReservationStatus.CHECKED_IN);
-                {
-                    //reservation has expired -> remove reservation
-                    reservations.remove(reservation);
+                // check in time at 3pm + 1 hour to expire
+                LocalDateTime checkInDateTime = reservation.getCheckInDate().atTime(16, 0);
 
-                    // check waitlist
-                    checkWaitlist(reservation);
+                // if the current date is not before the check-in date and reservation has not been checked-in
+                if((!LocalDateTime.now().isBefore(checkInDateTime)) && reservation.getStatus() != ReservationStatus.CHECKED_IN)
+                {
+
+                    //reservation has expired -> add to ArrayList of expired reservations
+                    expiredReservations.add(reservation);
 
                 }
 
+            }
+
+            // iterate through the reservations that need to be removed
+            for(Reservation reservation : expiredReservations)
+            {
+                //reservation has expired -> remove reservation
+                reservations.remove(reservation);
+
+                // check waitlist
+                checkWaitlist(reservation);
             }
         }
         catch(Exception e)
@@ -899,6 +916,7 @@ public class ReservationController extends EntityController<Reservation> {
 
     private void checkWaitlist(Reservation reservation)
     {
+
         // get room of this reservation
         Room room = reservation.getRoom();
 
@@ -908,6 +926,7 @@ public class ReservationController extends EntityController<Reservation> {
         // iterate through the reservations of this room
         for(Reservation reservationIterator : roomReservations)
         {
+
             // only check reservations that are in the waitlist
             if(reservationIterator.getStatus() == ReservationStatus.IN_WAITLIST)
             {

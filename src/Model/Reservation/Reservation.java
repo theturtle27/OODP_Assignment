@@ -1,4 +1,4 @@
-package Model.reservation;
+package Model.Reservation;
 
 import Model.Guest.CreditCard;
 import Model.Guest.Guest;
@@ -21,7 +21,7 @@ public class Reservation extends StatusEntity<ReservationStatus> {
 	private short numberOfChildren;
 
 	// constructor for use in program
-	public Reservation(Guest guest, CreditCard creditCard, Room room, LocalDate checkInDate, LocalDate checkOutDate, short numberOfAdults, short numberOfChildren, ReservationStatus reservationStatus) {
+	public Reservation(Guest guest, CreditCard creditCard, Room room, LocalDate checkInDate, LocalDate checkOutDate, short numberOfAdults, short numberOfChildren, Model.Reservation.ReservationStatus reservationStatus) {
 
 		this.guest = guest;
 		this.creditCard = creditCard;
@@ -166,6 +166,7 @@ public class Reservation extends StatusEntity<ReservationStatus> {
 				+ "\nNo. of Adults    : " + numberOfAdults
 				+ "\nNo. of Children  : " + numberOfChildren
 				+ "\n-----------Room Details------------"
+				+ "\nRoom Number      : " + room.getRoomNumber()
 				+ "\nRoom Type        : " + stringRoomTypeEnum
 				+ "\nBed Type         : " + stringBedType
 				+ "\nEnabled Wifi     : " + stringEnabledWifi

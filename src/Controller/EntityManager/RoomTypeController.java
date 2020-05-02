@@ -15,7 +15,7 @@ public class RoomTypeController extends EntityController<RoomType> {
     private static final String REGEX_NUMBERS = "[0-9]+";
     private static final String REGEX_ROOM_RATE = "[0-9]+([,.][0-9]{1,2})?";
 
-    private static final String ROOM_RATE = "room rate in SGD";
+    private static final String ROOM_RATE = "the room rate in SGD";
     private static final String NUMBER_ROOM_TYPE = "number of the room type";
 
     public RoomTypeController(Persistence persistence) {super(persistence);}

@@ -1,10 +1,9 @@
 package Controller.EntityManager;
 
-import Model.Guest.Guest;
 import Model.Room.*;
 import Model.Stay.Stay;
-import Model.reservation.Reservation;
-import Model.reservation.ReservationStatus;
+import Model.Reservation.Reservation;
+import Model.Reservation.ReservationStatus;
 import Persistence.Entity;
 import Controller.EntityController;
 import Persistence.Persistence;
@@ -20,26 +19,20 @@ public class RoomController extends EntityController<Room> {
     private static final String REGEX_NUMBERS = "[0-9]+";
     private static final String REGEX_BOOLEAN = "^(?:(0|1))$";
     private static final String REGEX_VALID_ROOM_NUMBER = "^(?:(0[1-9]|[1-9][0-9])-(0[1-9]|[1-9][0-9]))$";
-    private static final String REGEX_ROOM_RATE = "[0-9]+([,.][0-9]{1,2})?";
     private static final String PATTERN_VALID_DATE = "d.MM.yyyy";
-    private static final String PATTERN_PRINT_VALID_DATE = "dd.mm.yyyy";
     private static final String REGEX_VALID_DATE = "^(?:(?:31(\\/|-|\\.)(?:0?[13578]|1[02]))\\1|(?:(?:29|30)(\\/|-|\\.)(?:0?[1,3-9]|1[0-2])\\2))(?:(?:1[6-9]|[2-9]\\d)?\\d{2})$|^(?:29(\\/|-|\\.)0?2\\3(?:(?:(?:1[6-9]|[2-9]\\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00))))$|^(?:0?[1-9]|1\\d|2[0-8])(\\/|-|\\.)(?:(?:0?[1-9])|(?:1[0-2]))\\4(?:(?:1[6-9]|[2-9]\\d)?\\d{2})$";
 
-    private static final String ROOM_NUMBER = "room number (format: <2 digit floor level from 01>-<2 digit running room number from 01> [e.g. 02-07])";
+    private static final String ROOM_NUMBER = "the room number (format: <2 digit floor level from 01>-<2 digit running room number from 01> [e.g. 02-07])";
     private static final String BED_TYPE = "bed type";
-    private static final String ENABLED_WIFI = "enabled wifi ([1] Yes, [0] No)";
-    private static final String WITH_VIEW = "with view  ([1] Yes, [0] No)";
-    private static final String SMOKING = "smoking ([1] Yes, [0] No)";
-    private static final String ROOM_STATUS = "room status";
-    private static final String ROOM_TYPE = "room type";
-    private static final String ROOM_RATE = "room rate in SGD";
-    private static final String NUMBER_ROOM_TYPE = "number of the room type";
-    private static final String START_DATE = "start date";
-    private static final String END_DATE = "end date";
-    private static final String MAINTENANCE_END_DATE = "maintenance end date";
+    private static final String ENABLED_WIFI = "whether Wifi is enabled :\n1) Yes\n0) No\n\nPlease select an option";
+    private static final String WITH_VIEW = "whether the room has a view :\n1) Yes\n0) No\n\nPlease select an option";
+    private static final String SMOKING = "whether this is a smoking friendly room :\n1) Yes\n0) No\n\nPlease select an option";
+    private static final String START_DATE = "the start date (format: dd.mm.yyyy)";
+    private static final String END_DATE = "the end date (format: dd.mm.yyyy)";
+    private static final String MAINTENANCE_END_DATE = "the maintenance end date (format: dd.mm.yyyy)";
 
-    private static final String NOT_UNIQUE = "not unique";
-    private static final String NOT_FOUND = "not found";
+    private static final String NOT_UNIQUE = "The selected option is not unique.";
+    private static final String NOT_FOUND = "The selected option cannot be found.";
 
     private final RoomTypeController roomTypeController;
 
@@ -175,7 +168,7 @@ public class RoomController extends EntityController<Room> {
         // get persistence
         Persistence persistence = this.getPersistenceImpl();
 
-        // add guest to ArrayList of guests
+        // add room to ArrayList of rooms
         persistence.createCache(room, Room.class);
 
         // print room
@@ -243,7 +236,7 @@ public class RoomController extends EntityController<Room> {
                 if (!uniqueRoomNumber) {
 
                     // check whether the entry of the room number should be tried again
-                    repeatEntry = view.repeatEntry(ROOM_NUMBER, NOT_UNIQUE);
+                    repeatEntry = view.repeatEntry(NOT_UNIQUE);
 
                 } else {
                     roomNumber = testRoomNumber;
@@ -261,99 +254,104 @@ public class RoomController extends EntityController<Room> {
         return roomNumber;
     }
 
-    //TODO: method belongs in room type controller
-    private void createRoomType(View view) throws Exception
-    {
+    @Override
+    protected void update(View view) throws Exception {
+
+        // search for room via room number
+        Room room = select(view);
+
+        //check whether guest was found
+        if(room == null)
+        {
+            return;
+        }
 
         // get room type
-        RoomTypeEnum roomTypeEnum = (RoomTypeEnum)view.getInputEnum(RoomTypeEnum.class, ROOM_TYPE, REGEX_NUMBERS);
+        RoomType roomType = roomTypeController.select(view);
 
-        // break out of method
-        if(roomTypeEnum == null)
+        //check whether room type was found
+        if(roomType == null)
         {
             return;
         }
 
-        // get room rate
-        String stringRoomRate = view.getInputRegex(ROOM_RATE, REGEX_ROOM_RATE);
+        // get bed type
+        BedType bedType = (BedType)view.getInputEnum(BedType.class, BED_TYPE, REGEX_NUMBERS);
 
         // break out of method
-        if(stringRoomRate == null)
+        if(bedType == null)
         {
             return;
         }
 
-        // convert String to double
-        double roomRate = Double.parseDouble(stringRoomRate);
+        // get enabled wifi
+        String stringEnabledWifi = view.getInputRegex(ENABLED_WIFI, REGEX_BOOLEAN);
 
-        // create room type
-        RoomType roomType = new RoomType(roomTypeEnum, roomRate);
+        // break out of function
+        if(stringEnabledWifi == null)
+        {
+            return;
+        }
 
-        // get persistence
-        Persistence persistence = this.getPersistenceImpl();
+        // declare enabled Wifi boolean
+        boolean enabledWifi;
 
-        // add roomType to ArrayList of roomTypes
-        persistence.createCache(roomType, RoomType.class);
+        // convert String to boolean
+        enabledWifi = "1".equals(stringEnabledWifi);
 
-        // print roomType
-        view.displayText(roomType.toString());
+        // get with view
+        String stringWithView = view.getInputRegex(WITH_VIEW, REGEX_BOOLEAN);
+
+        // break out of function
+        if(stringWithView == null)
+        {
+            return;
+        }
+
+        // declare with view boolean
+        boolean withView;
+
+        // convert String to boolean
+        withView = "1".equals(stringWithView);
+
+        // get smoking
+        String stringSmoking = view.getInputRegex(SMOKING, REGEX_BOOLEAN);
+
+        // break out of function
+        if(stringSmoking == null)
+        {
+            return;
+        }
+
+        // declare smoking boolean
+        boolean smoking;
+
+        // convert String to boolean
+        smoking = "1".equals(stringSmoking);
+
+        // set everything if there were no errors
+        // set room type
+        room.setRoomType(roomType);
+
+        // set bed type
+        room.setBedType(bedType);
+
+        // set enabled wifi
+        room.setEnabledWifi(enabledWifi);
+
+        // set with view
+        room.setWithView(withView);
+
+        // set smoking
+        room.setSmoking(smoking);
+
+        // print room
+        view.displayText(room.toString());
 
         // display text
-        view.displayText("\n\nThe room type has been added to the system.\n\n");
+        view.displayText("\n\nThe room's details have been updated.\n\n");
 
     }
-
-    /*
-    //TODO: method belongs in room type controller
-    public RoomType getRoomType(View view)
-    {
-        // get persistence
-        Persistence persistence = this.getPersistenceImpl();
-
-        // initialize guest
-        RoomType roomType = null;
-
-        try {
-
-            // get all room types
-            ArrayList<Entity> roomTypes = persistence.retrieveAll(RoomType.class);
-
-            // check whether any room types exist
-            if (roomTypes.size() == 0) {
-                view.displayText("No room type exists. Error!\n\n");
-
-                return null;
-            }
-
-            // flag to check whether the entry of the should be tried again
-            boolean repeatEntry;
-
-            //repeat
-            do {
-                // initialize repeat flag to false
-                repeatEntry = false;
-
-                // select roomType
-                roomType = (RoomType) view.getInputArray(roomTypes, NUMBER_ROOM_TYPE, REGEX_NUMBERS);
-
-                // break out of method
-                if (roomType == null) {
-                    return null;
-                }
-
-                // print room type details
-                view.displayText(roomType.toString() + "\n\n");
-
-            } while (roomType == null && repeatEntry);
-        }
-        catch(Exception e)
-        {
-
-        }
-
-        return roomType;
-
-    }*/
 
     private void updateRoomStatus(View view) throws Exception
     {
@@ -371,7 +369,7 @@ public class RoomController extends EntityController<Room> {
         LocalDate startDate = LocalDate.now();
 
         // get valid end date
-        LocalDate endDate = view.getValidDate(MAINTENANCE_END_DATE, PATTERN_VALID_DATE, PATTERN_PRINT_VALID_DATE, REGEX_VALID_DATE, LocalDate.now());
+        LocalDate endDate = view.getValidDate(MAINTENANCE_END_DATE, PATTERN_VALID_DATE, REGEX_VALID_DATE, LocalDate.now());
 
         // break out of method
         if(endDate == null)
@@ -435,7 +433,7 @@ public class RoomController extends EntityController<Room> {
         }
 
         // get valid start date
-        LocalDate startDate = view.getValidDate(START_DATE, PATTERN_VALID_DATE, PATTERN_PRINT_VALID_DATE, REGEX_VALID_DATE, LocalDate.now().minusDays(1));
+        LocalDate startDate = view.getValidDate(START_DATE, PATTERN_VALID_DATE, REGEX_VALID_DATE, LocalDate.now().minusDays(1));
 
         // break out of method
         if(startDate == null)
@@ -444,7 +442,7 @@ public class RoomController extends EntityController<Room> {
         }
 
         // get valid end date
-        LocalDate endDate = view.getValidDate(END_DATE, PATTERN_VALID_DATE, PATTERN_PRINT_VALID_DATE, REGEX_VALID_DATE, startDate);
+        LocalDate endDate = view.getValidDate(END_DATE, PATTERN_VALID_DATE, REGEX_VALID_DATE, startDate);
 
         // break out of method
         if(endDate == null)
@@ -551,105 +549,6 @@ public class RoomController extends EntityController<Room> {
     }
 
     @Override
-    protected void update(View view) throws Exception {
-
-        // search for room via room number
-        Room room = select(view);
-
-        //check whether guest was found
-        if(room == null)
-        {
-            return;
-        }
-
-        // get room type
-        RoomType roomType = roomTypeController.select(view);
-
-        //check whether room type was found
-        if(roomType == null)
-        {
-            return;
-        }
-
-        // get bed type
-        BedType bedType = (BedType)view.getInputEnum(BedType.class, BED_TYPE, REGEX_NUMBERS);
-
-        // break out of method
-        if(bedType == null)
-        {
-            return;
-        }
-
-        // get enabled wifi
-        String stringEnabledWifi = view.getInputRegex(ENABLED_WIFI, REGEX_BOOLEAN);
-
-        // break out of function
-        if(stringEnabledWifi == null)
-        {
-            return;
-        }
-
-        // declare enabled Wifi boolean
-        boolean enabledWifi;
-
-        // convert String to boolean
-        enabledWifi = "1".equals(stringEnabledWifi);
-
-        // get with view
-        String stringWithView = view.getInputRegex(WITH_VIEW, REGEX_BOOLEAN);
-
-        // break out of function
-        if(stringWithView == null)
-        {
-            return;
-        }
-
-        // declare with view boolean
-        boolean withView;
-
-        // convert String to boolean
-        withView = "1".equals(stringWithView);
-
-        // get smoking
-        String stringSmoking = view.getInputRegex(SMOKING, REGEX_BOOLEAN);
-
-        // break out of function
-        if(stringSmoking == null)
-        {
-            return;
-        }
-
-        // declare smoking boolean
-        boolean smoking;
-
-        // convert String to boolean
-        smoking = "1".equals(stringSmoking);
-
-        // set everything if there were no errors
-        // set room type
-        room.setRoomType(roomType);
-
-        // set bed type
-        room.setBedType(bedType);
-
-        // set enabled wifi
-        room.setEnabledWifi(enabledWifi);
-
-        // set with view
-        room.setWithView(withView);
-
-        // set smoking
-        room.setSmoking(smoking);
-
-        // print room
-        view.displayText(room.toString());
-
-        // display text
-        view.displayText("\n\nThe room's details have been updated.\n\n");
-
-    }
-
-    @Override
     protected void delete(View view) throws Exception
     {
 
@@ -672,7 +571,7 @@ public class RoomController extends EntityController<Room> {
             // remove room
             rooms.remove(room);
 
-            view.displayText("\n\nThe room has been removed.\n\n");
+            view.displayText("The room has been removed.\n\n");
         }
         catch(Exception e)
         {
@@ -680,7 +579,6 @@ public class RoomController extends EntityController<Room> {
         }
 
     }
-
 
     @Override
     public Room select(View view) throws Exception {
@@ -698,7 +596,7 @@ public class RoomController extends EntityController<Room> {
 
             // check whether any rooms exist
             if (rooms.size() == 0) {
-                view.displayText("No room exists. Create a room before updating the room's details.\n\n");
+                view.displayText("No room exists. Create a room before searching for the room's details.\n\n");
 
                 return null;
             }
@@ -743,7 +641,7 @@ public class RoomController extends EntityController<Room> {
                 if (room == null) {
 
                     // check whether the entry of the room number should be tried again
-                    repeatEntry = view.repeatEntry(ROOM_NUMBER, NOT_FOUND);
+                    repeatEntry = view.repeatEntry(NOT_FOUND);
 
                 }
 
@@ -769,7 +667,7 @@ public class RoomController extends EntityController<Room> {
 
             // check whether any rooms exist
             if (rooms.size() == 0) {
-                view.displayText("No room exists. Create a room before updating the room's details.\n\n");
+                view.displayText("No room exists. Create a room before printing the room's details.\n\n");
 
                 return;
             }
@@ -792,81 +690,6 @@ public class RoomController extends EntityController<Room> {
 
         }
     }
-    /*
-    private void updateRoomType(View view)
-    {
-
-        // get room type enum
-        RoomType roomType = getRoomType(view);
-
-        // break out of method
-        if(roomType == null)
-        {
-            return;
-        }
-
-        // get room rate
-        String stringRoomRate = view.getInputRegex(ROOM_RATE, REGEX_ROOM_RATE);
-
-        // break out of method
-        if(stringRoomRate == null)
-        {
-            return;
-        }
-
-        // convert String to double
-        double roomRate = Double.parseDouble(stringRoomRate);
-
-        // set the room rate
-        roomType.setRoomRate(roomRate);
-
-        // print room type
-        view.displayText(roomType.toString());
-
-        // display text
-        view.displayText("\n\nThe room type has been updated.\n\n");
-
-    }*/
-    /*
-    private void printRoomTypes(View view)
-    {
-
-        // get persistence
-        Persistence persistence = this.getPersistenceImpl();
-
-        try {
-
-            // get all rooms
-            ArrayList<Entity> roomTypes = persistence.retrieveAll(RoomType.class);
-
-            // check whether any room types exist
-            if (roomTypes.size() == 0) {
-                view.displayText("No room type exists. Error!\n\n");
-
-                return;
-            }
-
-            view.displayText("The following room types exist:\n");
-
-            // iterate through all guests
-            for (Entity entity : roomTypes) {
-
-                // cast to guest object
-                RoomType roomType = (RoomType)entity;
-
-                //print guest
-                view.displayText(roomType.toString() + "\n");
-
-            }
-
-            view.displayText("\n");
-        }
-        catch(Exception e)
-        {
-
-        }
-
-    }*/
 
     public Room getAvailableRoom(LocalDate checkInDate, LocalDate checkOutDate, RoomTypeEnum roomTypeEnum, BedType bedType, boolean enabledWifi, boolean withView, boolean smoking, boolean isWaitlist)
     {
@@ -904,6 +727,7 @@ public class RoomController extends EntityController<Room> {
 
                     // check whether all requirements are met
                     if (isRoomType && isBedType && isEnabledWifi && isWithView && isSmoking) {
+
                         return room;
                     }
 
@@ -913,7 +737,7 @@ public class RoomController extends EntityController<Room> {
         }
         catch(Exception e)
         {
-
+            System.out.println("Exception");
         }
 
         return null;

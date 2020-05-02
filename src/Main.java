@@ -16,6 +16,7 @@ public class Main {
     public static void main(String[] args) {
         // write your code here
         Scanner sc = new Scanner(System.in);
+        Timer timer = new Timer();
         Persistence persistence;
         try {
             persistence = new Persistence(new File("aotoid.cfg"));
@@ -28,7 +29,7 @@ public class Main {
             GuestController guestController = new GuestController(persistence, creditCardController);
             ReservationController reservationController = new ReservationController(persistence, creditCardController, roomController, roomTypeController, guestController);
 
-            reservationController.createExpirationTimer();
+            reservationController.createExpirationTimer(timer);
 
             NavigationController hotelmanagementController = new NavigationController();
             hotelmanagementController.addView(new ConsoleView(roomController, "Manage Room", sc));
@@ -65,7 +66,11 @@ public class Main {
             ConsoleView mainView = new ConsoleView(mainNav, "Main View", sc);
             mainView.show();
 
+            timer.cancel();
+            timer.purge();
+
             persistence.writeAllDataArray();
+
         } catch (Exception e) {
             e.printStackTrace();
         }
