@@ -191,7 +191,7 @@ public class Payment extends Entity {
                 + "\n   Weekends      : " + noOfWeekEndDays
                 + "\nNo. of Adults    : " + stay.getNumberOfAdults()
                 + "\nNo. of Children  : " + stay.getNumberOfChildren()
-                + "\nNo of Room Orders: " + stay.getRoomServiceOrders().size()
+                + "\nNo. of Orders    : " + stay.getRoomServiceOrders().size()
                 + "\n-----------Cost Details------------"
                 + "\nRate per Night"
                 + "\n   Weekdays      : SGD " + stringRoomRate
@@ -209,7 +209,7 @@ public class Payment extends Entity {
             String stringRoomServiceOrderCost = String.format("%.2f",roomServiceOrder.getTotalPrice());
 
             // print price of room service order
-            stringPayment.append("\n   " + iterator + ". order      : SGD " + stringRoomServiceOrderCost);
+            stringPayment.append("\n   " + iterator + ". Order      : SGD " + stringRoomServiceOrderCost);
 
             // increment iterator
             iterator++;

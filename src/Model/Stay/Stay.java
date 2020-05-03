@@ -70,8 +70,6 @@ public class Stay extends Entity {
 
         room.setStatus(RoomStatus.VACANT);
 
-        System.out.println(room.getReservations().size());
-
         // iterate through reservations of this room
         for(Reservation reservation : room.getReservations())
         {

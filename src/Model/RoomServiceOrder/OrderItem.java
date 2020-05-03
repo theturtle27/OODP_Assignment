@@ -37,7 +37,7 @@ public class OrderItem extends Entity {
         return    "\n------------Order Item-------------"
                 + "\nName             : " + menuItem.getName()
                 + "\nDescription      : " + menuItem.getDescription()
-                + "\nPrice            : " + stringPrice
+                + "\nPrice            : SGD " + stringPrice
                 + "\nOrder Remark     : " + orderRemark;
 
     }

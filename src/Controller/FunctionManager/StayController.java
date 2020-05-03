@@ -75,9 +75,9 @@ public class StayController extends EntityController<Stay> {
 
     @Override
     public List<String> getOptions() {
-        return Arrays.asList("Check in (Reservation)",
-                "Check in (Walked In)",
-                "Check out");
+        return Arrays.asList("Check In (Reservation)",
+                "Check In (Walk In)",
+                "Check Out");
     }
 
     @Override

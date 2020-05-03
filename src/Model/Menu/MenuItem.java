@@ -48,7 +48,7 @@ public class MenuItem extends Entity {
         return    "\n-------------Menu Item-------------"
                 + "\nName             : " + name
                 + "\nDescription      : " + description
-                + "\nPrice            : " + stringPrice;
+                + "\nPrice            : SGD " + stringPrice;
     }
 
 }

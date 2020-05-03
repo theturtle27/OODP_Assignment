@@ -35,7 +35,7 @@ public class Main {
             NavigationController hotelmanagementController = new NavigationController();
             hotelmanagementController.addView(new ConsoleView(roomController, "Manage Room", sc));
             hotelmanagementController.addView(new ConsoleView(roomTypeController, "Manage Room Type", sc));
-            hotelmanagementController.addView(new ConsoleView(menuController, "Manage Menu Item", sc));
+            hotelmanagementController.addView(new ConsoleView(menuController, "Manage Menu", sc));
 
 
             ConsoleView hotelmanagementView = new ConsoleView(hotelmanagementController, "Hotel Management", sc);

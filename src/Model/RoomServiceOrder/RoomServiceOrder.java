@@ -82,8 +82,11 @@ public class RoomServiceOrder extends StatusEntity<RoomServiceOrderStatus> {
             stringRoomServiceOrder.append(orderItem);
         }
 
+        // format total price
+        String stringTotalPrice = String.format("%.2f",totalPrice);
+
         stringRoomServiceOrder.append("\n-----------------------------------"
-                                    +"\nTotal Price      : " + totalPrice);
+                                    +"\nTotal Price      : SGD " + stringTotalPrice);
 
         return stringRoomServiceOrder.toString();
     }

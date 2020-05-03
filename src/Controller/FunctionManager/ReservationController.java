@@ -861,7 +861,6 @@ public class ReservationController extends EntityController<Reservation> {
         // schedule a task to be executed every 24 hours
         timer.schedule(new TimerTask(){
             public void run(){
-                System.out.print("Test");
                 expireReservations();
 
             }
