@@ -95,14 +95,8 @@ public class ReportController extends PersistenceController {
                     // cast to room object
                     Room room = (Room) entity;
 
-                    if(room.getRoomNumber().equals("04-11"))
-                    {
-                        System.out.println(room);
-                        System.out.println(room.hashCode());
-                    }
-
                     //check whether room type of this room is equal to the current room type
-                    if (room.getRoomType().getRoomTypeEnum() == roomType && room.getRoomStatus() == roomStatus) {
+                    if (room.getRoomType().getRoomTypeEnum() == roomType && room.getStatus() == roomStatus) {
                         roomNumbersOfRoomType.add(room.getRoomNumber());
                     }
 

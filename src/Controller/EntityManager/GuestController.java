@@ -93,6 +93,7 @@ public class GuestController extends EntityController<Guest> {
 
     @Override
     protected void create(View view) throws Exception {
+
         // get name of the guest
         String guestName = view.getInputRegex(GUEST_NAME, REGEX_ONE_ALPHA_NUMERIC_CHARACTER);
 

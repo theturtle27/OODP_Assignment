@@ -1,25 +1,26 @@
 package Model.RoomServiceOrder;
 
 import Model.Menu.MenuItem;
+import Persistence.Entity;
 
-public class OrderItem {
+public class OrderItem extends Entity {
     private MenuItem menuItem;
     private String orderRemark;
 
-    public OrderItem(MenuItem menuItems, String remarks) {
-        this.menuItem = menuItems;
-        this.orderRemark = remarks;
+    public OrderItem(MenuItem menuItem, String orderRemark) {
+        this.menuItem = menuItem.copyMenuItem();
+        this.orderRemark = orderRemark;
     }
 
     public MenuItem getMenuItem() {
         return menuItem;
     }
 
-    public void setMenuItem(MenuItem menuItems) {
+    /*public void setMenuItem(MenuItem menuItems) {
         this.menuItem = menuItems;
-    }
+    }*/
 
-    public String getRemark() {
+    public String getOrderRemark() {
         return orderRemark;
     }
 
@@ -29,9 +30,15 @@ public class OrderItem {
 
     @Override
     public String toString() {
-        return "=========OrderItem========" +
-                "\nmenuItems:\n" + menuItem +
-                "\nremarks='" + orderRemark +
-                '\n';
+
+        // format room rate
+        String stringPrice = String.format("%.2f",menuItem.getPrice());
+
+        return    "\n------------Order Item-------------"
+                + "\nName             :" + menuItem.getName()
+                + "\nDescription      :" + menuItem.getDescription()
+                + "\nPrice            :" + stringPrice
+                + "\nOrder Remark     :" + orderRemark;
+
     }
 }

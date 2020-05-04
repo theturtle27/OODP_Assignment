@@ -56,6 +56,8 @@ public class StayController extends EntityController<Stay> {
     private static final String RESERVATION = "reservation";
     private static final String NUMBER_RESERVATION = "number of the reservation";
 
+    private static final String CONTINUE_CHECK_IN = "whether you want to continue the check in of this reservation : \n1) Yes\n0) No\n\nPlease select an option";
+
 
     private final GuestController guestController;
     private final ReservationController reservationController;
@@ -102,72 +104,64 @@ public class StayController extends EntityController<Stay> {
         // get reservation
         Reservation reservation = reservationController.select(view);
 
+
         //check whether reservation was found
         if(reservation == null)
         {
             return;
         }
 
-        // get persistence
-        Persistence persistence = this.getPersistenceImpl();
+        // check whether check in should be continued with being put on waitlist
+        /*String stringContinueCheckIn = view.getInputRegex(CONTINUE_CHECK_IN, REGEX_BOOLEAN);
 
-        try
+        // break out of function
+        if(stringContinueCheckIn == null)
         {
+            return;
+        }
 
-            // get all stays
-            ArrayList<Entity> stays = persistence.retrieveAll(Stay.class);
+        // declare reservation boolean
+        boolean continueCheckIn;
 
-            String message;
+        // convert String to boolean
+        continueCheckIn = "1".equals(stringContinueCheckIn);*/
 
-            if (reservation.getStatus() == ReservationStatus.CONFIRMED)
-            {
-                    // set reservation status to checked in
-                    reservation.setStatus(ReservationStatus.CHECKED_IN);
+        //if(continueCheckIn) {
 
-                    // get all rooms
-                    //ArrayList<Entity> rooms = persistence.retrieveAll(Room.class);
+            // get persistence
+            Persistence persistence = this.getPersistenceImpl();
 
-                    // iterate through all rooms
-                    /*for(Entity entity :  rooms)
-                    {
-                        // cast to room
-                        Room room = (Room)entity;
+            try {
 
-                        // check whether room number is the same
-                        if(room.getRoomNumber().equals(reservation.getRoom().getRoomNumber()))
-                        {
-                            // set room status to occupied
-                            room.setRoomStatus(RoomStatus.OCCUPIED);
+                // get all stays
+                ArrayList<Entity> stays = persistence.retrieveAll(Stay.class);
 
-                            break;
-                        }
-                    }*/
+                String message;
 
+                if (reservation.getStatus() == ReservationStatus.CONFIRMED) {
                     // create stay
                     Stay stay = new Stay(reservation);
-
-                    System.out.println(stay.getRoom());
-                    System.out.println(stay.getRoom().hashCode());
 
                     // add stay to persistence
                     stays.add(stay);
 
+                    view.display(reservation);
+
                     message = "The above reservation has been checked-in successfully, the room number assigned is " + stay.getRoom().getRoomNumber();
 
-            } else {
+                } else {
 
-                message = "We are unable to check-in for the reservation above as it is still in the wait list and there are no available rooms for the specified room requirements.";
+                    message = "We are unable to check-in for the reservation above as it is still in the wait list and there are no available rooms for the specified room requirements.";
+
+                }
+
+                //view.display(reservation);
+                view.message(message + "\n");
+
+            } catch (Exception e) {
 
             }
-
-            //view.display(reservation);
-            view.message(message+ "\n");
-
-        }
-        catch(Exception e)
-        {
-
-        }
+        //}
 
 
     }
@@ -228,6 +222,7 @@ public class StayController extends EntityController<Stay> {
     }*/
 
     private void performCheckOut(View view) throws Exception {
+
         Guest guest = guestController.select(view);
 
         if(guest != null) {
@@ -577,15 +572,29 @@ public class StayController extends EntityController<Stay> {
     }
 
     public Entity getStayByRoomNumber(String roomNumber) throws Exception{
+
+        // get persistence
         Persistence persistence = this.getPersistenceImpl();
+
         Entity result = null;
-        ArrayList<Entity> entities = persistence.retrieveAll(Stay.class);
-        for (Entity entity: entities){
-            Stay stay = (Stay) entity;
-            if(stay.getRoom().getRoomNumber().equals(roomNumber) && stay.getStatus().equals(StayStatus.CHECKEDIN)){
-                result = entity;
-                break;
+
+        try {
+
+            ArrayList<Entity> entities = persistence.retrieveAll(Stay.class);
+
+            for (Entity entity : entities) {
+
+                Stay stay = (Stay) entity;
+
+                if (stay.getRoom().getRoomNumber().equals(roomNumber)) {  //was before: stay.getRoom().getRoomNumber().equals(roomNumber) && stay.getStatus().equals(StayStatus.CHECKEDIN)
+                    result = entity;
+                    break;
+                }
             }
+        }
+        catch(Exception e)
+        {
+
         }
         return result;
     }

@@ -7,13 +7,6 @@ public class MenuItem extends Entity {
     private String name;
     private String description;
     private double price;
-    //
-
-    protected MenuItem() {
-        this.name = null;
-        this.description = null;
-        this.price = 0;
-    }
 
     public MenuItem(String name, String description, double price)
     {
@@ -21,24 +14,24 @@ public class MenuItem extends Entity {
         this.description = description;
         this.price = price;
     }
-    //
+
     public String getName() {
         return name;
     }
-    //
+
     public String getDescription() {
         return description;
     }
-    //
+
     public double getPrice() {
         return price;
     }
-    //
+
     public void setPrice(double price)
     {
         this.price = price;
     }
-    //
+
     public MenuItem copyMenuItem()
     {
         MenuItem menuItem = new MenuItem(name, description, price);
@@ -46,11 +39,16 @@ public class MenuItem extends Entity {
     }
 
     @Override
+    //TODO: check how that works
     public String toString() {
-        return super.toString() +
-                "Name: " + this.getName() + "\n" +
-                "description: " + this.getDescription() + "\n" +
-                "price: " + this.getPrice() + "\n";
+
+        // format room rate
+        String stringPrice = String.format("%.2f",price);
+
+        return    "\n-------------Menu Item-------------"
+                + "\nName             : " + name
+                + "\nDescription      : " + description
+                + "\nPrice            : " + stringPrice;
     }
 
 }

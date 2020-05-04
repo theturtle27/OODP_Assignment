@@ -36,8 +36,7 @@ public class RoomController extends EntityController<Room> {
 
     private final RoomTypeController roomTypeController;
 
-    public RoomController(Persistence persistence, RoomTypeController roomTypeController)
-    {
+    public RoomController(Persistence persistence, RoomTypeController roomTypeController) {
         super(persistence);
         this.roomTypeController = roomTypeController;
     }
@@ -82,7 +81,8 @@ public class RoomController extends EntityController<Room> {
             case 5:
                 checkRoomAvailability(view);
                 break;
-            case 6: show(view);
+            case 6:
+                show(view);
                 break;
         }
     }
@@ -94,8 +94,7 @@ public class RoomController extends EntityController<Room> {
         String roomNumber = uniqueRoomNumber(view);
 
         // break out of method
-        if(roomNumber == null)
-        {
+        if (roomNumber == null) {
             return;
         }
 
@@ -103,17 +102,15 @@ public class RoomController extends EntityController<Room> {
         RoomType roomType = roomTypeController.select(view);
 
         //check whether guest was found
-        if(roomType == null)
-        {
+        if (roomType == null) {
             return;
         }
 
         // get bed type
-        BedType bedType = (BedType)view.getInputEnum(BedType.class, BED_TYPE, REGEX_NUMBERS);
+        BedType bedType = (BedType) view.getInputEnum(BedType.class, BED_TYPE, REGEX_NUMBERS);
 
         // break out of method
-        if(bedType == null)
-        {
+        if (bedType == null) {
             return;
         }
 
@@ -121,8 +118,7 @@ public class RoomController extends EntityController<Room> {
         String stringEnabledWifi = view.getInputRegex(ENABLED_WIFI, REGEX_BOOLEAN);
 
         // break out of function
-        if(stringEnabledWifi == null)
-        {
+        if (stringEnabledWifi == null) {
             return;
         }
 
@@ -136,8 +132,7 @@ public class RoomController extends EntityController<Room> {
         String stringWithView = view.getInputRegex(WITH_VIEW, REGEX_BOOLEAN);
 
         // break out of function
-        if(stringWithView == null)
-        {
+        if (stringWithView == null) {
             return;
         }
 
@@ -151,8 +146,7 @@ public class RoomController extends EntityController<Room> {
         String stringSmoking = view.getInputRegex(SMOKING, REGEX_BOOLEAN);
 
         // break out of function
-        if(stringSmoking == null)
-        {
+        if (stringSmoking == null) {
             return;
         }
 
@@ -179,8 +173,7 @@ public class RoomController extends EntityController<Room> {
 
     }
 
-    private String uniqueRoomNumber(View view)
-    {
+    private String uniqueRoomNumber(View view) {
 
         // get persistence
         Persistence persistence = this.getPersistenceImpl();
@@ -220,7 +213,7 @@ public class RoomController extends EntityController<Room> {
                 for (Entity entity : rooms) {
 
                     // cast to guest object
-                    Room room = (Room)entity;
+                    Room room = (Room) entity;
 
                     // check whether room Number exists already
                     if (room.getRoomNumber().equals(testRoomNumber)) {
@@ -245,9 +238,7 @@ public class RoomController extends EntityController<Room> {
 
             } while (roomNumber == null && repeatEntry);
 
-        }
-        catch(Exception e)
-        {
+        } catch (Exception e) {
 
         }
 
@@ -261,8 +252,7 @@ public class RoomController extends EntityController<Room> {
         Room room = select(view);
 
         //check whether guest was found
-        if(room == null)
-        {
+        if (room == null) {
             return;
         }
 
@@ -270,17 +260,15 @@ public class RoomController extends EntityController<Room> {
         RoomType roomType = roomTypeController.select(view);
 
         //check whether room type was found
-        if(roomType == null)
-        {
+        if (roomType == null) {
             return;
         }
 
         // get bed type
-        BedType bedType = (BedType)view.getInputEnum(BedType.class, BED_TYPE, REGEX_NUMBERS);
+        BedType bedType = (BedType) view.getInputEnum(BedType.class, BED_TYPE, REGEX_NUMBERS);
 
         // break out of method
-        if(bedType == null)
-        {
+        if (bedType == null) {
             return;
         }
 
@@ -288,8 +276,7 @@ public class RoomController extends EntityController<Room> {
         String stringEnabledWifi = view.getInputRegex(ENABLED_WIFI, REGEX_BOOLEAN);
 
         // break out of function
-        if(stringEnabledWifi == null)
-        {
+        if (stringEnabledWifi == null) {
             return;
         }
 
@@ -303,8 +290,7 @@ public class RoomController extends EntityController<Room> {
         String stringWithView = view.getInputRegex(WITH_VIEW, REGEX_BOOLEAN);
 
         // break out of function
-        if(stringWithView == null)
-        {
+        if (stringWithView == null) {
             return;
         }
 
@@ -318,8 +304,7 @@ public class RoomController extends EntityController<Room> {
         String stringSmoking = view.getInputRegex(SMOKING, REGEX_BOOLEAN);
 
         // break out of function
-        if(stringSmoking == null)
-        {
+        if (stringSmoking == null) {
             return;
         }
 
@@ -353,15 +338,13 @@ public class RoomController extends EntityController<Room> {
 
     }
 
-    private void updateRoomStatus(View view) throws Exception
-    {
+    private void updateRoomStatus(View view) throws Exception {
 
         // search for room via room number
         Room room = select(view);
 
         //check whether room was found
-        if(room == null)
-        {
+        if (room == null) {
             return;
         }
 
@@ -372,8 +355,7 @@ public class RoomController extends EntityController<Room> {
         LocalDate endDate = view.getValidDate(MAINTENANCE_END_DATE, PATTERN_VALID_DATE, REGEX_VALID_DATE, LocalDate.now());
 
         // break out of method
-        if(endDate == null)
-        {
+        if (endDate == null) {
             return;
         }
 
@@ -381,20 +363,18 @@ public class RoomController extends EntityController<Room> {
         Boolean roomAvailable = getRoomAvailability(room, startDate, endDate);
 
         // break out of method
-        if(roomAvailable == null)
-        {
+        if (roomAvailable == null) {
             return;
         }
 
         // check whether room is available
-        if(roomAvailable.booleanValue())
-        {
+        if (roomAvailable.booleanValue()) {
 
             // set maintenance end date
             room.setMaintenanceEndDate(endDate);
 
             // set room status
-            room.setRoomStatus(RoomStatus.UNDER_MAINTENANCE);
+            room.setStatus(RoomStatus.UNDER_MAINTENANCE);
 
             // print room
             view.displayText(room.toString());
@@ -402,9 +382,7 @@ public class RoomController extends EntityController<Room> {
             // print
             view.displayText("\n\nThe room's status has been set to under maintenance.\n\n");
 
-        }
-        else
-        {
+        } else {
 
             // print
             view.displayText("\nThe room's status cannot be set to under maintenance since the room is not available up to the maintenance end date.\n\n");
@@ -420,15 +398,13 @@ public class RoomController extends EntityController<Room> {
 
     }
 
-    private void checkRoomAvailability(View view) throws Exception
-    {
+    private void checkRoomAvailability(View view) throws Exception {
 
         // search for room via room number
         Room room = select(view);
 
         //check whether room was found
-        if(room == null)
-        {
+        if (room == null) {
             return;
         }
 
@@ -436,8 +412,7 @@ public class RoomController extends EntityController<Room> {
         LocalDate startDate = view.getValidDate(START_DATE, PATTERN_VALID_DATE, REGEX_VALID_DATE, LocalDate.now().minusDays(1));
 
         // break out of method
-        if(startDate == null)
-        {
+        if (startDate == null) {
             return;
         }
 
@@ -445,21 +420,17 @@ public class RoomController extends EntityController<Room> {
         LocalDate endDate = view.getValidDate(END_DATE, PATTERN_VALID_DATE, REGEX_VALID_DATE, startDate);
 
         // break out of method
-        if(endDate == null)
-        {
+        if (endDate == null) {
             return;
         }
 
         // check whether room is available
-        if(getRoomAvailability(room, startDate, endDate))
-        {
+        if (getRoomAvailability(room, startDate, endDate)) {
 
             // print
             view.displayText("\nThe room is available for the selected dates.\n\n");
 
-        }
-        else
-        {
+        } else {
 
             // print
             view.displayText("\nThe room is not available for the selected dates.\n\n");
@@ -468,22 +439,19 @@ public class RoomController extends EntityController<Room> {
 
     }
 
-    public boolean getRoomAvailability(Room room, LocalDate startDate, LocalDate endDate)
-    {
+    public boolean getRoomAvailability(Room room, LocalDate startDate, LocalDate endDate) {
 
         // get maintenance end date
         LocalDate maintenanceEndDate = room.getMaintenanceEndDate();
 
         // if maintenance end date exists
-        if(!(maintenanceEndDate == null))
-        {
+        if (!(maintenanceEndDate == null)) {
 
             // check whether start date would clash with maintenance end date
             boolean maintenanceAfter = !(startDate.isBefore(maintenanceEndDate));
 
             // if the start would clash with the maintenance
-            if(!maintenanceAfter)
-            {
+            if (!maintenanceAfter) {
                 return false;
             }
 
@@ -493,8 +461,7 @@ public class RoomController extends EntityController<Room> {
         Stay stay = room.getStay();
 
         // if whether stay exists
-        if(!(stay == null))
-        {
+        if (!(stay == null)) {
 
             // get check-out date of the current stay
             LocalDate stayCheckOutDate = stay.getCheckOutDate();
@@ -503,8 +470,7 @@ public class RoomController extends EntityController<Room> {
             boolean stayAfter = !(startDate.isBefore(stayCheckOutDate));
 
             // if start date would clash with stay check out
-            if(!stayAfter)
-            {
+            if (!stayAfter) {
                 return false;
             }
 
@@ -514,14 +480,12 @@ public class RoomController extends EntityController<Room> {
         ArrayList<Reservation> reservations = room.getReservations();
 
         // if reservations exist
-        if(!(reservations == null))
-        {
+        if (!(reservations == null)) {
 
             // iterate through all reservations
-            for(Reservation reservation : reservations)
-            {
+            for (Reservation reservation : reservations) {
                 // check only for reservations that are confirmed or checked-in
-                if((reservation.getStatus() == ReservationStatus.CONFIRMED) || (reservation.getStatus() == ReservationStatus.CHECKED_IN)) {
+                if ((reservation.getStatus() == ReservationStatus.CONFIRMED) || (reservation.getStatus() == ReservationStatus.CHECKED_IN)) {
 
                     // get check-in date of the reservation
                     LocalDate reservationCheckInDate = reservation.getCheckInDate();
@@ -549,8 +513,7 @@ public class RoomController extends EntityController<Room> {
     }
 
     @Override
-    protected void delete(View view) throws Exception
-    {
+    protected void delete(View view) throws Exception {
 
         // get persistence
         Persistence persistence = this.getPersistenceImpl();
@@ -572,9 +535,7 @@ public class RoomController extends EntityController<Room> {
             rooms.remove(room);
 
             view.displayText("The room has been removed.\n\n");
-        }
-        catch(Exception e)
-        {
+        } catch (Exception e) {
 
         }
 
@@ -621,7 +582,7 @@ public class RoomController extends EntityController<Room> {
                 for (Entity entity : rooms) {
 
                     // cast to room object
-                    Room roomIterator = (Room)entity;
+                    Room roomIterator = (Room) entity;
 
                     // check whether room Number exists
                     if (roomIterator.getRoomNumber().equals(roomNumber)) {
@@ -677,7 +638,7 @@ public class RoomController extends EntityController<Room> {
             // iterate through all rooms
             for (Entity entity : rooms) {
 
-                Room room = (Room)entity;
+                Room room = (Room) entity;
 
                 //print room
                 view.displayText(room.toString() + "\n");
@@ -685,14 +646,12 @@ public class RoomController extends EntityController<Room> {
             }
 
             view.displayText("\n");
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
 
         }
     }
 
-    public Room getAvailableRoom(LocalDate checkInDate, LocalDate checkOutDate, RoomTypeEnum roomTypeEnum, BedType bedType, boolean enabledWifi, boolean withView, boolean smoking, boolean isWaitlist)
-    {
+    public Room getAvailableRoom(LocalDate checkInDate, LocalDate checkOutDate, RoomTypeEnum roomTypeEnum, BedType bedType, boolean enabledWifi, boolean withView, boolean smoking, boolean isWaitlist) {
         // get persistence
         Persistence persistence = this.getPersistenceImpl();
 
@@ -705,7 +664,7 @@ public class RoomController extends EntityController<Room> {
             for (Entity entity : rooms) {
 
                 // cast to room object
-                Room room = (Room)entity;
+                Room room = (Room) entity;
 
                 // check whether room is available
                 if (getRoomAvailability(room, checkInDate, checkOutDate) || isWaitlist) {
@@ -734,13 +693,38 @@ public class RoomController extends EntityController<Room> {
                 }
 
             }
-        }
-        catch(Exception e)
-        {
+        } catch (Exception e) {
             System.out.println("Exception");
         }
 
         return null;
     }
 
+    public Room getRoom(Room room) {
+
+        // get persistence
+        Persistence persistence = this.getPersistenceImpl();
+
+        try {
+
+            // get all rooms
+            ArrayList<Entity> rooms = persistence.retrieveAll(Room.class);
+
+            // iterate through all rooms
+            for (Entity entity : rooms) {
+
+                // cast to room object
+                Room roomIterator = (Room) entity;
+
+                // get Room
+                if (roomIterator.getRoomNumber().equals(room.getRoomNumber())) {
+
+                    return roomIterator;
+                }
+            }
+        } catch (Exception e) {
+        }
+
+        return null;
+    }
 }

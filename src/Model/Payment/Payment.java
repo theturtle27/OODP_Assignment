@@ -12,6 +12,7 @@ public class Payment extends Entity {
     private ArrayList<Stay> stays;
     private double weekendSurcharge;
     private double discount;
+    private double tax;
     private DiscountType discountType;
     private PaymentType paymentType;
 

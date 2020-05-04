@@ -487,7 +487,6 @@ public class ConsoleView extends View {
     public boolean repeatEntry(String operation)
     {
 
-
         // print
         System.out.print("\n" +  operation.trim() + "\n\nDo you want to try again?\n1) Yes\n0) No\n\nPlease select an option: ");
 

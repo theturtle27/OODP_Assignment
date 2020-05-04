@@ -34,7 +34,8 @@ public class Stay extends StatusEntity<StayStatus> {
         this.numberOfChildren = numberOfChildren;
         this.roomServiceOrders = new ArrayList<>();
         // set room status of rooms to occupied
-        checkInRooms();
+        room.setStatus(RoomStatus.OCCUPIED);
+        room.setStay(this);
     }
 
     // check in for guest with reservation
@@ -53,21 +54,21 @@ public class Stay extends StatusEntity<StayStatus> {
         reservation.setStatus(ReservationStatus.CHECKED_IN);
 
         // set room status of rooms to occupied
-        checkInRooms();
+        room.setStatus(RoomStatus.OCCUPIED);
+        room.setStay(this);
     }
 
     private void checkInRooms()
     {
 
-        room.setRoomStatus(RoomStatus.OCCUPIED);
-        room.setStay(this);
+
 
     }
 
     public void checkOut()
     {
 
-        room.setRoomStatus(RoomStatus.VACANT);
+        room.setStatus(RoomStatus.VACANT);
 
     }
 

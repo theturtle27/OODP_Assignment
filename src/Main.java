@@ -19,6 +19,7 @@ public class Main {
         Timer timer = new Timer();
         Persistence persistence;
         try {
+
             persistence = new Persistence(new File("aotoid.cfg"));
 
             CreditCardController creditCardController = new CreditCardController(persistence);

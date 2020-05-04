@@ -34,7 +34,7 @@ public class ReservationController extends EntityController<Reservation> {
     private static final String CHECK_IN_DATE = "the check in date (format: dd.mm.yyyy)";
     private static final String CHECK_OUT_DATE = "the check out date (format: dd.mm.yyyy)";
     private static final String NUMBER_OF_ADULTS = "the number of adults";
-    private static final String NUMBER_OF_CHILDREN = "the number of children";
+    private static final String NUMBER_OF_CHILDREN = "the number of chiltdren";
     private static final String BED_TYPE = "bed type";
     private static final String ENABLED_WIFI = "whether Wifi should enabled :\n1) Yes\n0) No\n\nPlease select an option";
     private static final String WITH_VIEW = "whether the room should have a view :\n1) Yes\n0) No\n\nPlease select an option";
@@ -318,7 +318,7 @@ public class ReservationController extends EntityController<Reservation> {
         Reservation reservation = new Reservation(guest, creditCard, room, checkInDate, checkOutDate, numberOfAdults, numberOfChildren, reservationStatus);
 
         // set room status to reserved
-        room.setRoomStatus(RoomStatus.RESERVED);
+        room.setStatus(RoomStatus.RESERVED);
 
         // get persistence
         Persistence persistence = this.getPersistenceImpl();

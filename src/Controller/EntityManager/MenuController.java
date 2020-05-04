@@ -1,7 +1,9 @@
 package Controller.EntityManager;
 
 import Controller.EntityController;
+import Model.Guest.Guest;
 import Model.Menu.MenuItem;
+import Model.Room.RoomType;
 import Persistence.Persistence;
 import Persistence.Entity;
 import View.View;
@@ -9,6 +11,16 @@ import View.View;
 import java.util.*;
 
 public class MenuController extends EntityController<MenuItem> {
+
+    private static final String REGEX_NUMBERS = "[0-9]+";
+    private static final String REGEX_ONE_ALPHA_NUMERIC_CHARACTER = "^.*[a-zA-Z0-9]+.*$";
+    private static final String REGEX_PRICE = "[0-9]+([,.][0-9]{1,2})?";
+
+    private static final String MENU_ITEM_NAME = "the name of the menu item";
+    private static final String MENU_ITEM_DESCRIPTION = "the description of the menu item";
+    private static final String MENU_ITEM_PRICE = "the price of the menu item";
+    private static final String NUMBER_ROOM_TYPE = "number of the menu item";
+
 
     public final static String KEY_NAME = "name of the menu item";
     public final static String KEY_DESCRIPTION = "description of the menu item";
@@ -29,10 +41,9 @@ public class MenuController extends EntityController<MenuItem> {
     @Override
     public List<String> getOptions() {
         return Arrays.asList("Create a new menu item",
-                "Update a reservation",
-                "Search a reservation",
-                "Remove a reservation",
-                "Print all reservations");
+                "Update the price of a menu item",
+                "Remove a menu item",
+                "Print the menu");
     }
 
     @Override
@@ -42,189 +53,225 @@ public class MenuController extends EntityController<MenuItem> {
                 create(view);
                 break;
             case 1:
-                retrieve(view);
-                break;
-            case 2:
                 update(view);
                 break;
-            case 3:
+            case 2:
                 delete(view);
                 break;
-            case 4:
+            case 3:
                 show(view);
                 break;
         }
     }
 
-    @Override
     protected void create(View view) throws Exception {
-        Map<String, String> inputMap = new LinkedHashMap<String, String>();
-        inputMap.put(KEY_NAME, null);
-        inputMap.put(KEY_DESCRIPTION, null);
-        inputMap.put(KEY_PRICE, null);
 
-        boolean valid = false;
-        do {
-            view.input(inputMap);
+        // get name of the menu item
+        String menuItemName = view.getInputRegex(MENU_ITEM_NAME, REGEX_ONE_ALPHA_NUMERIC_CHARACTER);
 
-            try {
-                MenuItem menuItem = new MenuItem(inputMap.get(KEY_NAME), inputMap.get(KEY_DESCRIPTION), Double.parseDouble(inputMap.get(KEY_PRICE)));
+        // break out of function
+        if(menuItemName == null)
+        {
+            return;
+        }
 
-                // Validate all fields
-                List<String> invalids = new ArrayList<String>();
-                if(menuItem.getName().length() == 0)
-                    invalids.add(KEY_NAME);
-                if(menuItem.getDescription().length() == 0)
-                    invalids.add(KEY_DESCRIPTION);
-                if(menuItem.getPrice() <= 0)
-                    invalids.add(KEY_PRICE);
+        // get description of the menu item
+        String menuItemDescription = view.getInputRegex(MENU_ITEM_DESCRIPTION, REGEX_ONE_ALPHA_NUMERIC_CHARACTER);
 
-                if(invalids.size() == 0) {
-                    // Ensure no duplicate guest record, with same identification and nationality
-                    Persistence persistence = this.getPersistenceImpl();
+        // break out of function
+        if(menuItemDescription == null)
+        {
+            return;
+        }
 
-                    persistence.createCache(menuItem, MenuItem.class);
+        // get price of menu item
+        String stringMenuItemPrice = view.getInputRegex(MENU_ITEM_PRICE, REGEX_PRICE);
 
-                    view.message("\nThe menu item has been added to the menu.\n");
-                    valid = true;
-                    this.show(view);
-                }
-                else {
-                    view.error(invalids);
-                }
-            } catch(IndexOutOfBoundsException e) {
-            }
-        } while(!valid && !view.bailout());
+        // break out of method
+        if(stringMenuItemPrice == null)
+        {
+            return;
+        }
+
+        // convert String to double
+        double menuItemPrice = Double.parseDouble(stringMenuItemPrice);
+
+        // create menu item
+        MenuItem menuItem = new MenuItem(menuItemName, menuItemDescription, menuItemPrice);
+
+        // get persistence
+        Persistence persistence = this.getPersistenceImpl();
+
+        // add menu item to ArrayList of menu items
+        persistence.createCache(menuItem, MenuItem.class);
+
+        // print menu item
+        view.displayText(menuItem.toString());
+
+        view.displayText("\n\nThe menu item has been added to the menu.\n\n");
 
     }
+
+    protected void update(View view) throws Exception {
+
+        // get room type enum
+        MenuItem menuItem = select(view);
+
+        // break out of method
+        if(menuItem == null)
+        {
+            return;
+        }
+
+        // get price of menu item
+        String stringMenuItemPrice = view.getInputRegex(MENU_ITEM_PRICE, REGEX_PRICE);
+
+        // break out of method
+        if(stringMenuItemPrice == null)
+        {
+            return;
+        }
+
+        // convert String to double
+        double menuItemPrice = Double.parseDouble(stringMenuItemPrice);
+
+        // set the room rate
+        menuItem.setPrice(menuItemPrice);
+
+        // print room type
+        view.displayText(menuItem.toString());
+
+        // display text
+        view.displayText("\n\nThe price of the menu item has been updated.\n\n");
+
+
+    }
+
+    public MenuItem select(View view) throws Exception {
+
+        // get persistence
+        Persistence persistence = this.getPersistenceImpl();
+
+        // initialize menu item
+        MenuItem menuItem = null;
+
+        try {
+
+            // get all menu items
+            ArrayList<Entity> menuItems = persistence.retrieveAll(MenuItem.class);
+
+            // check whether any room types exist
+            if (menuItems.size() == 0) {
+                view.displayText("No menu items exist. Please create a menu item before searching for it\n\n");
+
+                return null;
+            }
+
+            // flag to check whether the entry of the should be tried again
+            boolean repeatEntry;
+
+            //repeat
+            do {
+                // initialize repeat flag to false
+                repeatEntry = false;
+
+                // select roomType
+                menuItem = (MenuItem) view.getInputArray(menuItems, NUMBER_ROOM_TYPE, REGEX_NUMBERS);
+
+                // break out of method
+                if (menuItem == null) {
+                    return null;
+                }
+
+                // print room type details
+                view.displayText(menuItem.toString() + "\n\n");
+
+            } while (menuItem == null && repeatEntry);
+        }
+        catch(Exception e)
+        {
+
+        }
+
+        return menuItem;
+
+    }
+
 
     @Override
     protected boolean retrieve(View view) throws Exception {
-        Map<String, String> inputMap = new LinkedHashMap<String, String>();
-        inputMap.put(KEY_SEARCH, null);
-
-        view.input(inputMap);
-
-        Persistence persistence = this.getPersistenceImpl();
-
-        List entityList = new ArrayList();
-        // Provide a predicate to search for matching items
-        Iterable<MenuItem> menuItems = persistence.search(MenuItem.class);
-
-        // Loop through results and add it into the list
-        for(MenuItem entity: menuItems) {
-            if (entity.getName().equals(inputMap.get(KEY_SEARCH)))
-                entityList.add(entity);
-        }
-
-        // Display guests
-        view.display(entityList);
-
-        return entityList.size() > 0;
-    }
-
-    @Override
-    protected void update(View view) throws Exception {
-
-        MenuItem menuItem = select(view);
-
-        if(menuItem != null) {
-            Persistence persistence = this.getPersistenceImpl();
-            Map<String, String> inputMap = new LinkedHashMap<String, String>();
-            inputMap.put(KEY_PRICE, null);
-
-            boolean valid = false;
-            do {
-                // Retrieve user input for updateable fields
-                view.input(inputMap);
-
-                try {
-                    menuItem.setPrice(Double.parseDouble(inputMap.get(KEY_PRICE)));
-
-                    // Validate all fields
-                    List<String> invalids = new ArrayList<String>();
-                    if(menuItem.getPrice() <= 0)
-                        invalids.add(KEY_PRICE);
-
-                    // Attempts to update entity
-//                    if(invalids.size() == 0 && persistence.update(menuItem, MenuItem.class)) {
-                    valid = true;
-                    view.message("MenuItem successfully updated!");
-//                    }
-//                    else {
-//                        view.error(invalids);
-//                    }
-                } catch(IndexOutOfBoundsException e) {
-                }
-            } while(!valid && !view.bailout());
-        }
+        return false;
     }
 
     @Override
     protected void delete(View view) throws Exception
     {
 
-        MenuItem menuItem = select(view);
-
+        // get persistence
         Persistence persistence = this.getPersistenceImpl();
-        ArrayList<Entity> entities = persistence.retrieveAll(MenuItem.class);
-        entities.remove(menuItem);
-//        if(menuItem != null && persistence.delete(menuItem, MenuItem.class))
-        view.message("MenuItem deleted successfully!");
 
-    }
+        try {
 
+            // get all menu items
+            ArrayList<Entity> guests = persistence.retrieveAll(MenuItem.class);
 
-    @Override
-    public MenuItem select(View view) throws Exception {
-        this.show(view);
-        Entity menuItem = null;
+            // search for menu item
+            MenuItem menuItem = select(view);
 
-        Map<String, String> inputMap = new LinkedHashMap<String, String>();
-        inputMap.put(KEY_ID, null);
+            //check whether menu item was found
+            if (menuItem == null) {
+                return;
+            }
 
-        Persistence persistence = this.getPersistenceImpl();
-        do {
-            boolean retry;
-            do {
-                retry = false;
-                view.input(inputMap);
+            // remove guest
+            guests.remove(menuItem);
 
-                try {
-                    String input = inputMap.get(KEY_ID);
-                    if(input.toLowerCase().equals("search")) {
-                        retrieve(view);
-                        retry = true;
-                    }
-                    else {
-                        ArrayList<Entity> entities = persistence.retrieveAll(MenuItem.class);
-                        for(Entity entity:entities){
-                            if(entity.getIdentifier() == Long.parseLong(input)){
-                                menuItem = entity;
-                            }
-                        }
-                    }
-                } catch(NumberFormatException e) {
-                    view.error(Arrays.asList(KEY_ID));
-                }
-            } while(retry);
-        } while(menuItem == null && !view.bailout());
+            view.displayText("The menu item has been removed.\n\n");
+        }
+        catch(Exception e)
+        {
 
-        return (MenuItem)menuItem;
+        }
+
     }
 
     @Override
     public void show(View view) throws Exception{
+
+        // get persistence
         Persistence persistence = this.getPersistenceImpl();
-        List entityList = new ArrayList();
-        // Provide a predicate to search for matching items
-        ArrayList<Entity> menuItems = persistence.retrieveAll(MenuItem.class);
 
-        // Loop through results and add it into the list
-        for(Entity entity: menuItems)
-            entityList.add(entity);
+        try {
 
-        view.display(entityList);
+            // get all menu items
+            ArrayList<Entity> menuItems = persistence.retrieveAll(MenuItem.class);
+
+            // check whether any guests exist
+            if (menuItems.size() == 0) {
+                view.displayText("No menu item exists. Create a menu item before printing the menu items.\n\n");
+
+                return;
+            }
+
+            view.displayText("===============MENU================");
+
+            // iterate through all guests
+            for (Entity entity : menuItems) {
+
+                // cast to menu item object
+                MenuItem menuItem = (MenuItem)entity;
+
+                //print menu item
+                view.displayText(menuItem.toString());
+
+            }
+
+            view.displayText("\n\n");
+        }
+        catch(Exception e)
+        {
+
+        }
     }
 
 }

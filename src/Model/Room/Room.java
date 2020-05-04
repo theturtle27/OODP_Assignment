@@ -1,14 +1,15 @@
 package Model.Room;
 
 import Model.Reservation.Reservation;
+import Model.StatusEntity;
 import Model.Stay.Stay;
-import Persistence.Entity;
+import Model.StatusEntity;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
-public class Room extends Entity{
+public class Room extends StatusEntity<RoomStatus> {
 
 	private String roomNumber;
 	private RoomType roomType;
@@ -16,12 +17,10 @@ public class Room extends Entity{
 	private boolean enabledWifi;
 	private boolean withView;
 	private boolean smoking;
-	private RoomStatus roomStatus;
 	private LocalDate maintenanceEndDate;
 	private ArrayList<Reservation> reservations;
 	private Stay stay;
 
-	// TODO: all rooms as vacant initialized
 	public Room(String roomNumber, RoomType roomType, BedType bedType, boolean enabledWifi, boolean withView, boolean smoking)
 	{
 		this.roomNumber = roomNumber;
@@ -30,8 +29,8 @@ public class Room extends Entity{
 		this.enabledWifi = enabledWifi;
 		this.withView = withView;
 		this.smoking = smoking;
-		this.roomStatus = RoomStatus.VACANT;
-		this.reservations = new ArrayList<Reservation>();
+		super.setStatus(RoomStatus.VACANT);
+		this.reservations = new ArrayList<>();
 	}
 
 	public String getRoomNumber()
@@ -89,16 +88,6 @@ public class Room extends Entity{
 		this.smoking = smoking;
 	}
 
-	public RoomStatus getRoomStatus()
-	{
-		return roomStatus;
-	}
-
-	public void setRoomStatus(RoomStatus roomStatus)
-	{
-		this.roomStatus = roomStatus;
-	}
-
 	public LocalDate getMaintenanceEndDate()
 	{
 		return maintenanceEndDate;
@@ -138,7 +127,7 @@ public class Room extends Entity{
 		String stringEnabledWifi;
 
 		// convert enabled Wifi to String
-		if(enabledWifi == true) {
+		if(enabledWifi) {
 			stringEnabledWifi = "Yes";
 		}
 		else
@@ -149,7 +138,7 @@ public class Room extends Entity{
 		String stringWithView;
 
 		// convert enabled Wifi to String
-		if(withView == true) {
+		if(withView) {
 			stringWithView = "Yes";
 		}
 		else
@@ -160,7 +149,7 @@ public class Room extends Entity{
 		String stringSmoking;
 
 		// convert enabled Wifi to String
-		if(smoking == true) {
+		if(smoking) {
 			stringSmoking = "Yes";
 		}
 		else
@@ -169,7 +158,7 @@ public class Room extends Entity{
 		}
 
 		// convert room status to String
-		String stringRoomStatus = capitalizeFirstLetter(roomStatus.toString());
+		String stringRoomStatus = capitalizeFirstLetter(getStatus().toString());
 
 		// String for room information
 		StringBuffer stringRoom = new StringBuffer();
@@ -184,7 +173,7 @@ public class Room extends Entity{
 				+ "\n------------Room Status------------"
 				+ "\nRoom Status      : " + stringRoomStatus);
 
-		if(roomStatus == RoomStatus.UNDER_MAINTENANCE)
+		if(getStatus() == RoomStatus.UNDER_MAINTENANCE)
 		{
 
 			// create a formatter for date
