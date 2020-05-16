@@ -35,10 +35,10 @@ public class OrderItem extends Entity {
         String stringPrice = String.format("%.2f",menuItem.getPrice());
 
         return    "\n------------Order Item-------------"
-                + "\nName             :" + menuItem.getName()
-                + "\nDescription      :" + menuItem.getDescription()
-                + "\nPrice            :" + stringPrice
-                + "\nOrder Remark     :" + orderRemark;
+                + "\nName             : " + menuItem.getName()
+                + "\nDescription      : " + menuItem.getDescription()
+                + "\nPrice            : " + stringPrice
+                + "\nOrder Remark     : " + orderRemark;
 
     }
 }

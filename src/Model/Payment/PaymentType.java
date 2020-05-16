@@ -2,8 +2,8 @@ package Model.Payment;
 
 public enum PaymentType {
 
-	Cash,
+	CASH,
 
-	CreditCard;
+	CREDIT_CARD;
 
 }

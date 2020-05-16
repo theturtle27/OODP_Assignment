@@ -34,7 +34,7 @@ public class ReservationController extends EntityController<Reservation> {
     private static final String CHECK_IN_DATE = "the check in date (format: dd.mm.yyyy)";
     private static final String CHECK_OUT_DATE = "the check out date (format: dd.mm.yyyy)";
     private static final String NUMBER_OF_ADULTS = "the number of adults";
-    private static final String NUMBER_OF_CHILDREN = "the number of chiltdren";
+    private static final String NUMBER_OF_CHILDREN = "the number of children";
     private static final String BED_TYPE = "bed type";
     private static final String ENABLED_WIFI = "whether Wifi should enabled :\n1) Yes\n0) No\n\nPlease select an option";
     private static final String WITH_VIEW = "whether the room should have a view :\n1) Yes\n0) No\n\nPlease select an option";
@@ -44,7 +44,7 @@ public class ReservationController extends EntityController<Reservation> {
     private static final String ABORT_RESERVATION = "The reservation is aborted.\n";
     private static final String CREATE_GUEST = "Create a guest before making a reservation with these guest details.\n\n";
     private static final String SEARCH_RESERVATION = "whether the reservation should be searched by \n1) Reservation ID\n0) Guest name\n\nPlease select an option";
-    private static final String RESERVATION_ID = "reservation id";
+    private static final String RESERVATION_ID = "the reservation ID";
     private static final String RESERVATION = "reservation";
     private static final String NUMBER_RESERVATION = "number of the reservation";
     private static final String CONTINUE_RESERVATION_WAITLIST = "whether you want to continue the reservation and be put on waitlist for such a room : \n1) Yes\n0) No\n\nPlease select an option";
@@ -609,8 +609,10 @@ public class ReservationController extends EntityController<Reservation> {
                 return;
             }
 
-            // remove reservation
-            reservations.remove(reservation);
+            if(reservation.getStatus() != ReservationStatus.CHECKED_IN) {
+                // remove reservation
+                reservations.remove(reservation);
+            }
 
             view.displayText("The reservation has been removed.\n\n");
 
@@ -634,7 +636,7 @@ public class ReservationController extends EntityController<Reservation> {
 
         try {
 
-            // get all guests
+            // get all reservations
             ArrayList<Entity> reservations = persistence.retrieveAll(Reservation.class);
 
             // check whether any guests exist
@@ -859,6 +861,7 @@ public class ReservationController extends EntityController<Reservation> {
         // schedule a task to be executed every 24 hours
         timer.schedule(new TimerTask(){
             public void run(){
+                System.out.print("Test");
                 expireReservations();
 
             }

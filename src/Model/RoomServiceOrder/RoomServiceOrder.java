@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 public class RoomServiceOrder extends StatusEntity<RoomServiceOrderStatus> {
     private ArrayList<OrderItem> orderItems;
     private LocalDateTime orderTime;
+    private double totalPrice;
 
     public RoomServiceOrder()
     {
@@ -37,6 +38,7 @@ public class RoomServiceOrder extends StatusEntity<RoomServiceOrderStatus> {
         // sets date and time to now
         orderTime = LocalDateTime.now();
         super.setStatus(RoomServiceOrderStatus.CONFIRMED);
+        totalPrice = getTotalPrice();
     }
 
     /*
@@ -79,6 +81,9 @@ public class RoomServiceOrder extends StatusEntity<RoomServiceOrderStatus> {
             // append maintenance dates to room
             stringRoomServiceOrder.append(orderItem);
         }
+
+        stringRoomServiceOrder.append("\n-----------------------------------"
+                                    +"\nTotal Price      : " + totalPrice);
 
         return stringRoomServiceOrder.toString();
     }

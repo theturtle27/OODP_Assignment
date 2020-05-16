@@ -1,9 +1,11 @@
 package Controller.FunctionManager;
 
 import Controller.EntityController;
+import Controller.EntityManager.CreditCardController;
 import Controller.EntityManager.GuestController;
 import Controller.EntityManager.RoomController;
 import Controller.EntityManager.RoomTypeController;
+import Model.Guest.CreditCard;
 import Model.Guest.Guest;
 import Model.Payment.DiscountType;
 import Model.Payment.Payment;
@@ -22,51 +24,50 @@ import View.Options;
 import Persistence.Entity;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 public class StayController extends EntityController<Stay> {
-    public final static String KEY_NAME = "Reservation name";
-    public final static String KEY_IDENTIFICATION = "identification number";
-    public final static String KEY_NATIONALITY = "nationality";
-    public final static String KEY_GENDER = "gender";
-    public final static String KEY_CONTACT_NUMBER = "contact number";
-    public final static String KEY_EMAIL_ADDRESS = "email address";
-    public final static String KEY_DISCOUNT_VALUE = "value for discount";
-    public final static String KEY_ID = "ID of stay or 'Search' to search for guest ID by name";
     private static final String REGEX_NUMBERS = "[0-9]+";
     private static final String PATTERN_VALID_DATE = "d.MM.yyyy";
-    private static final String PATTERN_PRINT_VALID_DATE = "dd.mm.yyyy";
     private static final String REGEX_VALID_DATE = "^(?:(?:31(\\/|-|\\.)(?:0?[13578]|1[02]))\\1|(?:(?:29|30)(\\/|-|\\.)(?:0?[1,3-9]|1[0-2])\\2))(?:(?:1[6-9]|[2-9]\\d)?\\d{2})$|^(?:29(\\/|-|\\.)0?2\\3(?:(?:(?:1[6-9]|[2-9]\\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00))))$|^(?:0?[1-9]|1\\d|2[0-8])(\\/|-|\\.)(?:(?:0?[1-9])|(?:1[0-2]))\\4(?:(?:1[6-9]|[2-9]\\d)?\\d{2})$";
     private static final String REGEX_BOOLEAN = "^(?:(0|1))$";
     private static final String REGEX_ONE_ALPHA_NUMERIC_CHARACTER = "^.*[a-zA-Z0-9]+.*$";
+    //private static final String REGEX_PERCENTAGE = "(^(100([.]0{1,2})?)$)|(^[0-9]{1,2}([.][0-9]{1,2})?$)";
 
-    private static final String CHECK_OUT_DATE = "check out date (format: dd.mm.yyyy)";
-    private static final String NUMBER_OF_ADULTS = "number of adults";
-    private static final String NUMBER_OF_CHILDREN = "number of children";
+    private static final String CHECK_OUT_DATE = "the check out date (format: dd.mm.yyyy)";
+    private static final String NUMBER_OF_ADULTS = "the number of adults";
+    private static final String NUMBER_OF_CHILDREN = "the number of children";
     private static final String BED_TYPE = "bed type";
-    private static final String ENABLED_WIFI = "whether Wifi is enabled:\n1) Yes\n0) No\n\nPlease select an option";
-    private static final String WITH_VIEW = "whether the room has a view:\n1) Yes\n0) No\n\nPlease select an option";
-    private static final String SMOKING = "whether this is a smoking friendly room:\n1) Yes\n0) No\n\nPlease select an option";
+    private static final String ENABLED_WIFI = "whether Wifi should enabled :\n1) Yes\n0) No\n\nPlease select an option";
+    private static final String WITH_VIEW = "whether the room should have a view :\n1) Yes\n0) No\n\nPlease select an option";
+    private static final String SMOKING = "whether this should be a smoking friendly room :\n1) Yes\n0) No\n\nPlease select an option";
     private static final String GUEST_NAME = "guest name";
-    private static final String CONTINUE_RESERVATION = "whether you want to continue the reservation ([1] Yes, [0] No)";
-    private static final String ABORT_RESERVATION = "The reservation is aborted.\n";
+    private static final String CONTINUE_STAY = "whether you want to continue the booking : \n1) Yes\n0) No\n\nPlease select an option";
+    private static final String ABORT_STAY = "The booking is aborted.\n";
     private static final String CREATE_GUEST = "Create a guest before making a reservation with these guest details.\n\n";
-    private static final String SEARCH_RESERVATION = "whether the reservation should be search by [1] reservation ID or [0] guest name";
-    private static final String RESERVATION_ID = "reservation id";
-    private static final String RESERVATION = "reservation";
     private static final String NUMBER_RESERVATION = "number of the reservation";
 
-    private static final String CONTINUE_CHECK_IN = "whether you want to continue the check in of this reservation : \n1) Yes\n0) No\n\nPlease select an option";
+    private static final String HAVE_DISCOUNT = "whether you have a discount :\n1) Yes\n0) No\n\nPlease select an option";
+    private static final String DISCOUNT_TYPE = "discount type";
+    private static final String DISCOUNT_AMOUNT = "the discount amount";
+    private static final String PAYMENT_TYPE = "payment type";
+    private static final String WEEKEND_SURCHARGE = "the weekend surcharge in %%";
+    private static final String TAX = "the GST in %%";
 
+    private static final String CONTINUE_CHECK_IN = "whether you want to continue the check in of this reservation : \n1) Yes\n0) No\n\nPlease select an option";
+    private static final String NOT_FOUND = "The selected option cannot be found.";
 
     private final GuestController guestController;
+    private final CreditCardController creditCardController;
     private final ReservationController reservationController;
     private final RoomTypeController roomTypeController;
     private final RoomController roomController;
 
-    public StayController(Persistence persistence ,GuestController guestController, ReservationController reservationController,RoomController roomController,RoomTypeController roomTypeController) {
+    public StayController(Persistence persistence , GuestController guestController, CreditCardController creditCardController, ReservationController reservationController, RoomController roomController, RoomTypeController roomTypeController) {
         super(persistence);
         this.guestController = guestController;
+        this.creditCardController = creditCardController;
         this.reservationController = reservationController;
         this.roomController = roomController;
         this.roomTypeController = roomTypeController;
@@ -104,15 +105,21 @@ public class StayController extends EntityController<Stay> {
         // get reservation
         Reservation reservation = reservationController.select(view);
 
-
         //check whether reservation was found
         if(reservation == null)
         {
             return;
         }
 
+        if(LocalDate.now().isBefore(reservation.getCheckInDate()))
+        {
+            view.displayText("This reservation cannot be cecked in yet.\n\n");
+
+            return;
+        }
+
         // check whether check in should be continued with being put on waitlist
-        /*String stringContinueCheckIn = view.getInputRegex(CONTINUE_CHECK_IN, REGEX_BOOLEAN);
+        String stringContinueCheckIn = view.getInputRegex(CONTINUE_CHECK_IN, REGEX_BOOLEAN);
 
         // break out of function
         if(stringContinueCheckIn == null)
@@ -124,9 +131,9 @@ public class StayController extends EntityController<Stay> {
         boolean continueCheckIn;
 
         // convert String to boolean
-        continueCheckIn = "1".equals(stringContinueCheckIn);*/
+        continueCheckIn = "1".equals(stringContinueCheckIn);
 
-        //if(continueCheckIn) {
+        if(continueCheckIn) {
 
             // get persistence
             Persistence persistence = this.getPersistenceImpl();
@@ -139,6 +146,7 @@ public class StayController extends EntityController<Stay> {
                 String message;
 
                 if (reservation.getStatus() == ReservationStatus.CONFIRMED) {
+
                     // create stay
                     Stay stay = new Stay(reservation);
 
@@ -147,7 +155,7 @@ public class StayController extends EntityController<Stay> {
 
                     view.display(reservation);
 
-                    message = "The above reservation has been checked-in successfully, the room number assigned is " + stay.getRoom().getRoomNumber();
+                    message = "The above reservation has been checked-in successfully.";
 
                 } else {
 
@@ -156,194 +164,152 @@ public class StayController extends EntityController<Stay> {
                 }
 
                 //view.display(reservation);
-                view.message(message + "\n");
+                view.message("\n" + message + "\n");
 
             } catch (Exception e) {
 
             }
-        //}
+        }
 
 
     }
-
-    /*
-    private void performCheckInReservation(View view) throws Exception {
-        Guest guest = guestController.select(view);
-
-
-        if(guest != null) {
-            Persistence persistence = this.getPersistenceImpl();
-            ArrayList<Reservation> reservations = getReservationsAvalible(guest);
-
-            long count = reservations.size();
-            System.out.println(count);
-
-            // create new ArrayList
-            ArrayList<Reservation> checkInReservations = new ArrayList();
-
-            List<Options> ynOptionList = Arrays.asList(Options.Yes, Options.No);
-            if(count == 0) {
-                // There are no reservations, ask user to make reservation
-                view.message("You have no reservations for today, do you want to make one?");
-                if(view.options(ynOptionList) == Options.Yes) {
-                    performCheckInWalkIn(view);
-                }
-            }
-            else {
-                view.message("You have " + count + " reservations eligible for check-in");
-                view.message("Do you wish to add check-in all your reservations? (Select no to inspect each reservation to decide which ones to check-in)");
-
-                Options selectedOption = view.options(ynOptionList);
-
-                for(Reservation reservation: reservations) {
-                    if(selectedOption == Options.Yes) {
-                        checkInReservations.add(reservation);
-                    }
-                    else {
-                        view.display(reservation);
-                        view.message("Do you wish to check-in the above reservation?");
-                        if(view.options(ynOptionList) == Options.Yes)
-                            checkInReservations.add(reservation);
-                    }
-                }
-            }
-
-            // Proceed with check-in
-            if(checkInReservations.size() > 0) {
-                view.message("You have selected " + checkInReservations.size() + " reservation(s), do you wish to proceed to check-in?");
-                if (view.options(ynOptionList) == Options.Yes) {
-                    //checkin(view, checkInReservations);
-                }
-            }
-            else {
-                view.message("You have no reservations selected for check-in");
-            }
-        }
-    }*/
 
     private void performCheckOut(View view) throws Exception {
 
-        Guest guest = guestController.select(view);
+        Stay stay = select(view);
 
-        if(guest != null) {
-            ArrayList<Stay> stays = getStaysAvalibleCheckout(guest);
-            long count = stays.size();
-            if(count == 0) {
-                view.message("No checked-in room that is available for check-out.");
-            }
-            else {
-                view.message("You have " + count + " rooms eligible for check-out");
-                view.message("Do you wish to add check-out all your rooms (Select no to inspect each reservation to decide which ones to check-out)?");
+        //check whether reservation was found
+        if(stay == null)
+        {
+            view.message("No checked-in room exists that is available for check-out.");
 
-                ArrayList<Stay> checkoutStays = new ArrayList<Stay>();
-                List<Options> ynOptionList = Arrays.asList(Options.Yes, Options.No);
-                Options selectedOption = view.options(ynOptionList);
-
-                for(Stay stay: stays) {
-                    if(selectedOption == Options.Yes) {
-                        checkoutStays.add(stay);
-                    }
-                    else {
-                        view.message("Room number: " + stay.getRoom().getRoomNumber());
-                        view.display(stay);
-                        view.message("Do you wish to check-out of the above room?");
-                        if(view.options(ynOptionList) == Options.Yes)
-                            checkoutStays.add(stay);
-                    }
-                }
-
-                if(checkoutStays.size() > 0) {
-                    view.message("You have selected " + checkoutStays.size() + " room(s) to check out, do you wish to proceed?");
-                    if(view.options(ynOptionList) == Options.Yes)
-                        checkOut(view, checkoutStays);
-                }
-                else {
-                    view.message("You have no rooms selected for check-out");
-                }
-            }
+            return;
         }
-    }
-    /*
-    private void checkin(View view,Reservation reservation) throws Exception {
+
+        // check out
+        checkOut(view, stay);
 
         // get persistence
         Persistence persistence = this.getPersistenceImpl();
 
-        try
-        {
-
+        try {
             // get all stays
             ArrayList<Entity> stays = persistence.retrieveAll(Stay.class);
 
-            String message;
-            if (reservation.getStatus() == ReservationStatus.CONFIRMED) {
-                if (reservation.getRoom().getRoomStatus() == RoomStatus.VACANT) {
-                    reservation.setStatus(ReservationStatus.CHECKED_IN);
-                    Stay stay = new Stay(reservation);
-                    stays.add(stay);
-                    message = "The above reservation has been checked-in successfully, the room number assigned is " + stay.getRoom().getRoomNumber();
-                } else {
-                    message = "The hotel is still preparing your hotel room, please come back in an hour time, we apologise for any inconvenience caused.";
-                }
-            } else {
-                message = "We are unable to check-in for the reservation above as it is still in the wait list and there are no available rooms for the specified room requirements.";
-            }
+            // set room to vacant
+            stay.checkOut();
 
-            view.display(reservation);
-            view.message(message);
-
+            // remove stay
+            stays.remove(stay);
         }
         catch(Exception e)
         {
 
         }
-    }*/
 
-    private void checkOut(View view, ArrayList<Stay> stays) throws Exception {
-        Persistence persistence = this.getPersistenceImpl();
 
-        LocalDate today = LocalDate.now();
-        for(Stay stay: stays) {
-            // Update the end date of the reservations to today's date;
-            stay.setCheckOutDate(today);
+    }
+
+    private void checkOut(View view, Stay stay) throws Exception {
+
+        // set check out date to today
+        stay.setCheckOutDate(LocalDate.now());
+
+        // get discount
+        String stringHaveDiscount = view.getInputRegex(HAVE_DISCOUNT, REGEX_BOOLEAN);
+
+        // break out of function
+        if(stringHaveDiscount == null)
+        {
+            return;
         }
 
-        Payment payment = new Payment(stays);
-        view.display(payment);
+        // declare enabled Wifi boolean
+        boolean haveDiscount;
 
-        view.message("Do you have a discount?");
-        if(view.options(Arrays.asList(Options.Yes, Options.No)) == Options.Yes) {
-            Map<String, String> inputMap = new LinkedHashMap<String, String>();
-            inputMap.put(KEY_DISCOUNT_VALUE, null);
+        // convert String to boolean
+        haveDiscount = "1".equals(stringHaveDiscount);
 
-            view.message("Select a discount type");
-            DiscountType dType = view.options(Arrays.asList(DiscountType.values()));
-            double value = 0;
-            boolean valid;
-            do {
-                view.input(inputMap);
-                try {
-                    value = Double.parseDouble(inputMap.get(KEY_DISCOUNT_VALUE));
-                    valid = true;
-                } catch(NumberFormatException e) {
-                    view.error(Arrays.asList(KEY_DISCOUNT_VALUE));
-                    valid = false;
-                }
-            } while(!valid);
+        // initialize discount type
+        DiscountType discountType = null;
 
-            payment.setDiscount(dType, value);
-            view.display(payment);
+        // initialize discount amount
+        double discountAmount = 0.;
+
+        // if discount available
+        if(haveDiscount)
+        {
+            // get discount type
+            discountType = (DiscountType) view.getInputEnum(DiscountType.class, DISCOUNT_TYPE, REGEX_NUMBERS);
+
+            // break out of method
+            if(discountType == null)
+            {
+                return;
+            }
+
+            // get discount amount
+            String stringDiscountAmount = view.getInputRegex(DISCOUNT_AMOUNT, REGEX_NUMBERS);
+
+            // break out of function
+            if(stringDiscountAmount == null)
+            {
+                return;
+            }
+
+            // convert String to double
+            discountAmount = Double.parseDouble(stringDiscountAmount);
+
         }
 
-        view.message("Which method of payment to use?");
-        payment.setPaymentType(view.options(Arrays.asList(PaymentType.values())));
+        // get weekend surcharge
+        String stringWeekendSurcharge = view.getInputRegex(WEEKEND_SURCHARGE, REGEX_NUMBERS);
 
-        // Create payment
-        ArrayList<Entity> payments = persistence.retrieveAll(Payment.class);
-        payments.add(payment);
-        view.message("Your payment is successful, thank you for staying with us, we hope to see you again!");
-        view.message("Please take note of your receipt below");
-        view.display(payment);
+        // break out of function
+        if(stringWeekendSurcharge == null)
+        {
+            return;
+        }
+
+        // convert String to double
+        double weekendSurcharge = Double.parseDouble(stringWeekendSurcharge);
+
+        // get weekend surcharge
+        String stringTax = view.getInputRegex(TAX, REGEX_NUMBERS);
+
+        // break out of function
+        if(stringTax == null)
+        {
+            return;
+        }
+
+        // convert String to double
+        double tax = Double.parseDouble(stringTax);
+
+        // create payment
+        Payment payment = new Payment(discountType, discountAmount, weekendSurcharge, tax, stay);
+
+        // print payment receipt
+        view.displayText(payment.toString());
+
+        // get payment method
+        PaymentType paymentType = (PaymentType) view.getInputEnum(PaymentType.class, PAYMENT_TYPE, REGEX_NUMBERS);
+
+        // break out of method
+        if(paymentType == null)
+        {
+            return;
+        }
+
+        // check whether payment type is credit card
+        if(paymentType == PaymentType.CREDIT_CARD)
+        {
+            // get credit card of guest
+            CreditCard creditCard = creditCardController.getCreditCard(view, stay.getGuest());
+        }
+
+        view.displayText("\nThe payment has been successful.\n\n");
+
     }
 
 
@@ -351,14 +317,6 @@ public class StayController extends EntityController<Stay> {
         Persistence persistence = this.getPersistenceImpl();
 
         ArrayList<Entity> stays = persistence.retrieveAll(Stay.class);
-
-        Guest guest = guestController.select(view);
-
-        // break out of method
-        if(guest == null)
-        {
-            return;
-        }
 
         LocalDate checkOutDate = view.getValidDate(CHECK_OUT_DATE, PATTERN_VALID_DATE, REGEX_VALID_DATE, LocalDate.now());
 
@@ -460,29 +418,73 @@ public class StayController extends EntityController<Stay> {
 
         if(room == null) {
 
-            view.display("Room is not avalible now");
+            view.display("This room is not available for the selected dates");
         }
         else {
-            Stay stay = new Stay(guest,room,LocalDate.now(), checkOutDate, numberOfAdults,numberOfChildren);
-            stay.setStatus(StayStatus.CHECKEDIN);
-            persistence.createCache(stay,Stay.class);
-            view.display("\nRoom is registered successfully, your room number is " + room.getRoomNumber() + "\n");
-        }
-    }
 
-    private ArrayList<Stay> getStaysAvalibleCheckout(Guest guest) throws Exception{
-        Persistence persistence = getPersistenceImpl();
-        ArrayList<Entity> stays = persistence.retrieveAll(Stay.class);
-        ArrayList<Stay> relatedStays = new ArrayList<>();
-        for (Entity entity: stays) {
-            Stay stay = (Stay)entity;
-            if ((stay.getGuest().getName() == guest.getName())&&(stay.getStatus()== StayStatus.CHECKEDIN)){
-                relatedStays.add(stay);
+            // get room rate
+            double roomRate = room.getRoomType().getRoomRate();
+
+            // get the number of days of the stay
+            long numberOfDays = ChronoUnit.DAYS.between(LocalDate.now(), checkOutDate);
+
+            // format string
+            String stringPrintCost = String.format("The total room cost will be %7.2f SGD (%5.2f SGD per night) for the selected dates.\n", roomRate*numberOfDays, roomRate);
+
+            // print out expected cost for this room
+            view.displayText(stringPrintCost);
+
+            // check whether reservation should be continued
+            String stringContinueReservation = view.getInputRegex(CONTINUE_STAY, REGEX_BOOLEAN);
+
+            // break out of function
+            if(stringContinueReservation == null)
+            {
+                return;
             }
+
+            // declare reservation boolean
+            boolean continueReservation;
+
+            // convert String to boolean
+            continueReservation = "1".equals(stringContinueReservation);
+
+            if(!continueReservation)
+            {
+                view.displayText(ABORT_STAY);
+
+                return;
+            }
+
+            // get guest
+            Guest guest = guestController.select(view);
+
+            // check whether guest was found
+            if(guest == null)
+            {
+                view.displayText(CREATE_GUEST);
+
+                return;
+
+            }
+
+            // get credit card of guest
+            CreditCard creditCard = creditCardController.getCreditCard(view, guest);
+
+            // create stays
+            Stay stay = new Stay(guest,creditCard, room,LocalDate.now(), checkOutDate, numberOfAdults,numberOfChildren);
+
+            // add stay to ArrayList of stays
+            persistence.createCache(stay,Stay.class);
+
+            // print reservation
+            view.displayText(stay.toString() + "\n\n");
+
+            view.display("\nThe booking has been added to the system.\n");
         }
-        return relatedStays;
     }
 
+    /*
     private ArrayList<Reservation> getReservationsAvalible(Guest guest) throws Exception{
         Persistence persistence = getPersistenceImpl();
         ArrayList<Entity> reservations = persistence.retrieveAll(Reservation.class);
@@ -502,7 +504,7 @@ public class StayController extends EntityController<Stay> {
             }
         }
         return relatedReservations;
-    }
+    }*/
 
     @Override
     protected void create(View view) throws Exception {
@@ -523,35 +525,115 @@ public class StayController extends EntityController<Stay> {
 
     @Override
     public Stay select(View view) throws Exception {
+
+        // initialize reservation
         Stay stay = null;
 
-        Map<String, String> inputMap = new LinkedHashMap<String, String>();
-        inputMap.put(KEY_ID, null);
-
+        // get persistence
         Persistence persistence = this.getPersistenceImpl();
-        do {
-            boolean retry;
-            do {
-                retry = false;
-                // Retrieve user input for ID
-                view.input(inputMap);
 
-                try {
-                    String input = inputMap.get(KEY_ID);
-                    if(input.toLowerCase().equals("search")) {
-                        retrieve(view);
-                        retry = true;
+        try {
+
+            // get all stays
+            ArrayList<Entity> stays = persistence.retrieveAll(Stay.class);
+
+            // check whether any stay exists
+            if (stays.size() == 0) {
+                view.displayText("No stay exists. Create a stays before searching for the stay.\n\n");
+
+                return null;
+            }
+
+            // flag to check whether the entry of the guest name should be tried again
+            boolean repeatEntry;
+
+            //repeat
+            do {
+                // initialize repeat flag to false
+                repeatEntry = false;
+
+                    // get name of the guest
+                    String guestName = view.getInputRegex(GUEST_NAME, REGEX_ONE_ALPHA_NUMERIC_CHARACTER);
+
+                    // break out of function
+                    if (guestName == null) {
+                        return null;
                     }
-                    else {
-                        stay = persistence.retrieveByID(Long.parseLong(input), Stay.class);
-                        if(stay == null)
-                            view.error(Arrays.asList(KEY_ID));
+
+                    // create ArrayList of stays
+                    ArrayList<Stay> potentialStays = new ArrayList<>();
+
+                    // convert guest name to lower case
+                    String guestNameLowerCase = guestName.toLowerCase();
+
+                    // get words in name
+                    String[] names = guestNameLowerCase.trim().split("\\s+");
+
+                    // iterate through all stays
+                    for (Entity entity : stays) {
+
+                        // cast to stay object
+                        Stay stayIterator = (Stay)entity;
+
+                        // get guest of stay
+                        Guest guestIterator = stayIterator.getGuest();
+
+                        // flag to check whether all parts of the guests name are part of an existing guest
+                        boolean isPartOfName = true;
+
+                        // iterate through all names
+                        for (String name : names) {
+
+                            // check whether name is part of the guest's name
+                            if (!guestIterator.getName().toLowerCase().contains(name)) {
+                                // set flag to false
+                                isPartOfName = false;
+                                break;
+                            }
+                        }
+
+                        // check whether all parts of the name match with the guests name
+                        if (isPartOfName) {
+
+                            // add stay to potential stays
+                            potentialStays.add(stayIterator);
+                        }
                     }
-                } catch(NumberFormatException e) {
-                    view.error(Arrays.asList(KEY_ID));
-                }
-            } while(retry);
-        } while(stay == null && !view.bailout());
+
+                    // check whether a stay was found
+                    if (potentialStays.isEmpty()) {
+
+                        // check whether the entry of the reservation's guest name should be tried again
+                        repeatEntry = view.repeatEntry(NOT_FOUND);
+
+                    } else if (potentialStays.size() == 1) {
+
+                        // print stay details
+                        view.displayText(potentialStays.get(0).toString() + "\n\n");
+
+                        // get reservation
+                        stay = potentialStays.get(0);
+
+                    } else {
+
+                        // select stay from potential stays
+                        stay = view.getInputArray(potentialStays, NUMBER_RESERVATION, REGEX_NUMBERS);
+
+                        // break out of method
+                        if (stay == null) {
+                            return null;
+                        }
+
+                        // print stay details
+                        view.displayText(stay.toString() + "\n\n");
+                    }
+
+            }while(stay == null && repeatEntry);
+        }
+        catch(Exception e)
+        {
+
+        }
 
         return stay;
     }

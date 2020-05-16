@@ -42,6 +42,8 @@ public class Reservation extends StatusEntity<ReservationStatus> {
 		this.guest = guest;
 	}
 
+	public CreditCard getCreditCard() { return creditCard; }
+
 	public Room getRoom() {
 		return room;
 	}
@@ -95,7 +97,6 @@ public class Reservation extends StatusEntity<ReservationStatus> {
 		this.numberOfChildren = numberOfChildren;
 	}
 
-	// test method
 	public String toString()
 	{
 
@@ -176,9 +177,9 @@ public class Reservation extends StatusEntity<ReservationStatus> {
 				+ "\nName             : " + guest.getName()
 				+ creditCard.toString()
 				+ "-----------Cost Details------------"
-				+ "\nNo. of nights    : " + numberOfDays
-				+ "\nRate per night   : SGD " + stringRoomRate
-				+ "\nTotal cost       : SGD " + stringTotalCost;
+				+ "\nNo. of Nights    : " + numberOfDays
+				+ "\nRate per Night   : SGD " + stringRoomRate
+				+ "\nTotal Cost       : SGD " + stringTotalCost;
 
 
 	}

@@ -46,7 +46,7 @@ public class Main {
 
             ConsoleView guestmanagementView = new ConsoleView(guestmanagementController, "Guest Management", sc);
 
-            StayController stayController = new StayController(persistence,guestController,reservationController,roomController,roomTypeController);
+            StayController stayController = new StayController(persistence,guestController,creditCardController, reservationController,roomController,roomTypeController);
 
             NavigationController frontDeskController = new NavigationController();
             frontDeskController.addView(new ConsoleView(stayController, "Check-In/Check-Out Management", sc));
@@ -67,10 +67,10 @@ public class Main {
             ConsoleView mainView = new ConsoleView(mainNav, "Main View", sc);
             mainView.show();
 
+            persistence.writeAllDataArray();
+
             timer.cancel();
             timer.purge();
-
-            persistence.writeAllDataArray();
 
         } catch (Exception e) {
             e.printStackTrace();
